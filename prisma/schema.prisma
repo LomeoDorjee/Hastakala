@@ -16,7 +16,7 @@ model User {
   onboarded Boolean  @default(false) 
   department Department? @relation(fields: [depid], references: [depid])
   depid Int?
-  transfer Transfer[]
+  transferMaster TransferMaster[]
 }
 
 model Department {
@@ -30,14 +30,26 @@ model Product {
   productid String @id
   productname String
   isactive Boolean @default(false) 
-  transfers Transfer[]
+  transfers TransferMaster[]
 }
 
-model Transfer {
-  transferid Int @id @default(autoincrement())
+model TransferMaster {
+  transfermasterid Int @id @default(autoincrement())
   productid String
   product Product @relation(fields: [productid], references: [productid])
+  startdate String
+  startbyuserid String
+  startuser User @relation(fields: [startbyuserid], references: [userid])
+  transferdetails TransferDetail[]
+}
+
+model TransferDetail {
+  transferdetailid Int @id @default(autoincrement())
+  transfermasterid Int
+  transfermaster TransferMaster @relation(fields:[transfermasterid],references: [transfermasterid])
+  transferdate String
   fromuserid String
-  fromuser User @relation(fields: [fromuserid], references: [userid])
   touserid String
+  status String @default("")
+  reamrks String @default("")
 }

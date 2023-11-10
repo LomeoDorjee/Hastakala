@@ -1,6 +1,6 @@
 import UserTable from "@/components/table/UserTable"
 import { getAllDepartment } from "@/lib/actions/config/department.actions"
-import { getAllUsers } from "@/lib/actions/user.actions"
+import { getAllUsers } from "@/lib/actions/config/user.actions"
 import { clerkClient } from "@clerk/nextjs"
 import { User } from "@nextui-org/react"
 

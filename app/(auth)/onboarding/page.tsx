@@ -1,4 +1,4 @@
-import { fetchUserInfo, onBoardUser } from "@/lib/actions/user.actions"
+import { fetchUserInfo, onBoardUser } from "@/lib/actions/config/user.actions"
 import { currentUser } from "@clerk/nextjs"
 import { Spinner } from "@nextui-org/react"
 import { redirect } from "next/navigation"

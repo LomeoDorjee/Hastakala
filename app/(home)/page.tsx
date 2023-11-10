@@ -1,6 +1,6 @@
 import {Card, CardHeader, CardBody, CardFooter, Image, Button, Link} from "@nextui-org/react"
 import { currentUser } from "@clerk/nextjs"
-import { fetchUserInfo } from "@/lib/actions/user.actions"
+import { fetchUserInfo } from "@/lib/actions/config/user.actions"
 import { redirect } from "next/navigation"
 
 export default async function Home() {

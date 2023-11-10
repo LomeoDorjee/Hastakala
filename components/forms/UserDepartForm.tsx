@@ -4,7 +4,7 @@ import { DepartmentValidation } from "@/lib/validations/department"
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Switch, Select, SelectItem } from "@nextui-org/react"
 import { useFormStatus } from "react-dom"
 import toast from "react-hot-toast"
-import { updateUserDepartment } from "@/lib/actions/user.actions"
+import { updateUserDepartment } from "@/lib/actions/config/user.actions"
 import { usePathname } from 'next/navigation'
 import { revalidatePath } from "next/cache"
 

@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/db/main_db"
 import { clerkClient } from "@clerk/nextjs"
-import { catchErrorMessage } from "../utils"
+import { catchErrorMessage } from "../../utils"
 
 
 type UserProp = {
