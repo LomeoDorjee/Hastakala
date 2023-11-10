@@ -1,0 +1,2037 @@
+generator client {
+  provider = "prisma-client-js"
+  output = "../../node_modules/@prismapis"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("PIS_DATABASE_URL")
+}
+
+model Attachement {
+  AttachId Int     @id(map: "PK_Attachement")
+  StaffId  Int?
+  DateVS   String? @db.VarChar(10)
+  DateAD   String? @db.VarChar(10)
+  Descript String? @db.VarChar(150)
+  FilePath String? @db.VarChar(100)
+}
+
+model Attendance {
+  ATTENDANCEID      Int     @id(map: "PK__Attendance__0D44F85C")
+  STAFFID           Int?
+  DateVS            String? @db.VarChar(12)
+  DateAD            String? @db.VarChar(12)
+  InTime            String  @default("00:00:00 AM", map: "DF__Attendanc__InTim__0E391C95") @db.VarChar(12)
+  OutTime           String  @default("00:00:00 AM", map: "DF__Attendanc__OutTi__0F2D40CE") @db.VarChar(12)
+  BreakInTime       String  @default("00:00:00 AM", map: "DF__Attendanc__Break__10216507") @db.VarChar(12)
+  BreakOutTime      String  @default("00:00:00 AM", map: "DF__Attendanc__Break__11158940") @db.VarChar(12)
+  FieldVisitInTime  String  @default("00:00:00 AM", map: "DF__Attendanc__Field__1209AD79") @db.VarChar(12)
+  FieldVisitOutTime String  @default("00:00:00 AM", map: "DF__Attendanc__Field__12FDD1B2") @db.VarChar(12)
+  WorkHour          String? @default("0.00", map: "DF__Attendanc__WorkH__13F1F5EB") @db.VarChar(10)
+  Iflate            Float?  @default(0.00, map: "DF__Attendanc__Iflat__14E61A24")
+  IsCutLate         Int?    @default(0, map: "DF__Attendanc__IsCut__15DA3E5D")
+  IsInformed        Int     @default(1, map: "DF_Attendance_IsInformed")
+  Remarks           String? @default(" ", map: "DF__Attendanc__Remar__16CE6296") @db.VarChar(100)
+  Break2_Out        String  @default("00:00:00 AM", map: "DF__ATTENDANC__Break__30242045") @db.VarChar(12)
+  Break2_In         String  @default("00:00:00 AM", map: "DF__ATTENDANC__Break__3118447E") @db.VarChar(12)
+  Break3_Out        String  @default("00:00:00 AM", map: "DF__ATTENDANC__Break__320C68B7") @db.VarChar(12)
+  Break3_In         String  @default("00:00:00 AM", map: "DF__ATTENDANC__Break__33008CF0") @db.VarChar(12)
+  Break4_Out        String  @default("00:00:00 AM", map: "DF__ATTENDANC__Break__33F4B129") @db.VarChar(12)
+  Break4_In         String  @default("00:00:00 AM", map: "DF__ATTENDANC__Break__34E8D562") @db.VarChar(12)
+  Break5_Out        String  @default("00:00:00 AM", map: "DF__ATTENDANC__Break__35DCF99B") @db.VarChar(12)
+  Break5_In         String  @default("00:00:00 AM", map: "DF__ATTENDANC__Break__36D11DD4") @db.VarChar(12)
+  Visithrs          Float?  @default(0, map: "DF__Attendanc__Visit__32CB82C6")
+  IsManual          String? @default("N", map: "DF__Attendanc__IsMan__33BFA6FF") @db.VarChar(1)
+  RealofficeIN      String? @db.VarChar(12)
+  RealofficeOUT     String? @db.VarChar(12)
+
+  @@index([ATTENDANCEID, STAFFID], map: "INDX_ATTENDANCE")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ATTENDDAILY {
+  ATTENDID   Float
+  STAFFID    Int?
+  ATTENDDATE String? @db.VarChar(10)
+  IFLEAVE    Float?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ATTENDMONTHLY {
+  ATTENDID Float
+  STAFFID  Int?
+  ABSDAYS  Float?
+  MONTHID  Int?
+  INYEAR   Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model CastTypes {
+  CastID   Int    @db.SmallInt
+  CastName String @db.VarChar(30)
+
+  @@ignore
+}
+
+model ChequeDetail {
+  ChequeDetailId  Int     @id(map: "PK_ChequeDetail")
+  VoucherMasterId Int?
+  Bank            String? @db.VarChar(50)
+  Cheque_DDDate   String? @db.VarChar(10)
+  Cheque_DDNo     String? @db.VarChar(30)
+  Amount          Float?
+  Currency        String? @db.VarChar(10)
+}
+
+model ContractInfo {
+  ConInfoID Int     @id(map: "PK_ConInfo")
+  StaffID   Int?
+  StartDate String  @db.VarChar(10)
+  ENDDate   String  @db.VarChar(10)
+  Remark    String? @db.VarChar(100)
+  STAFF     STAFF?  @relation(fields: [StaffID], references: [STAFFID], onDelete: NoAction, onUpdate: NoAction, map: "FK_ConInfo")
+}
+
+model CutLateWork {
+  CutLateWorkID Int    @id(map: "PK__CutLateWork__7A3223E8")
+  ToolLeaveId   Int?
+  ATTENDANCEID  Int?
+  CutTime       Float?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model DAYNAMES {
+  DAYID   Int
+  DAYNAME String @db.VarChar(9)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model DISTRICT {
+  DISTRICTID     Int     @db.SmallInt
+  ZONEID         Int?    @db.SmallInt
+  DISTRICTNAME   String? @db.VarChar(50)
+  DISTRICTNAMENP String? @db.VarChar(35)
+
+  @@ignore
+}
+
+model ENG_FYEAR_PIS {
+  FYEARID Int     @id(map: "PK_ENG_FYEAR_PIS")
+  FYEAR   String? @db.VarChar(10)
+}
+
+model FamilyInfo {
+  FamilyInfoID Int       @id(map: "PK_FamilyInfoID_FI")
+  StaffID      Int?
+  Name         String?   @db.VarChar(100)
+  Code         String?   @db.VarChar(20)
+  DOB          String?   @db.VarChar(10)
+  Address      String?   @db.VarChar(100)
+  Gender       String?   @db.VarChar(10)
+  RelationID   Int?
+  Pic_Path     String?   @db.VarChar(255)
+  ORGANIZATION String?   @db.VarChar(50)
+  DESIGNATION  String?   @db.VarChar(50)
+  INSTITUTE    String?   @db.VarChar(50)
+  EDU_LEVEL    String?   @db.VarChar(50)
+  Relation     Relation? @relation(fields: [RelationID], references: [RelationID], onDelete: NoAction, onUpdate: NoAction, map: "FK_RelationID_FI")
+  STAFF        STAFF?    @relation(fields: [StaffID], references: [STAFFID], onDelete: NoAction, onUpdate: NoAction, map: "FK_StaffID_FI")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model GRADERATE {
+  GRADEID        Int?
+  STAFFID        Int?
+  GRADEINCYM     String? @db.VarChar(10)
+  NOOFGRADE      Int?
+  GRADERATE      Float?
+  MAXAMOUNT      Float?
+  IsActive       String? @db.Char(1)
+  GradeType      String? @db.Char(1)
+  PositionID     Int?
+  IsArrear       String? @db.Char(1)
+  FromDate       String? @db.VarChar(10)
+  ToDate         String? @db.VarChar(10)
+  IsPermanent    String  @default("N", map: "DF__GradeRate__IsPer__370627FE") @db.Char(1)
+  IsNewPermanent String  @default("N", map: "DF__GradeRate__IsNew__37FA4C37") @db.Char(1)
+
+  @@ignore
+}
+
+model IgnoredDelay {
+  IgnoreID  Int     @id(map: "PK_Ign")
+  IDateVS   String? @db.VarChar(10)
+  IDateAD   String? @db.VarChar(10)
+  StaffID   Int?
+  YearMonth String? @db.VarChar(7)
+  Minutes   Float?  @default(0, map: "DF__IgnoredDe__Minut__0FEC5ADD")
+  STAFF     STAFF?  @relation(fields: [StaffID], references: [STAFFID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Ign")
+
+  @@unique([StaffID, YearMonth], map: "Unq_Ign")
+  @@index([StaffID, YearMonth], map: "INDX_IgnoredDelay")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model JOBSHIFT {
+  JOBSHIFTID  Int     @db.SmallInt
+  DESCRIPTION String? @db.VarChar(30)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model JOBSTATUS {
+  JOBSTATUSID Int     @db.SmallInt
+  DESCRIPTION String? @db.VarChar(30)
+
+  @@ignore
+}
+
+model JobType {
+  JobTypeId Int     @id(map: "PK__JobType__58D1301D")
+  JobType   String? @db.VarChar(50)
+  Code      String? @db.VarChar(10)
+}
+
+model LateInformation {
+  InformedId     Int     @id(map: "PK__LateInformation__373B3228")
+  StaffId        Int?
+  TranDateVS     String? @db.VarChar(10)
+  TranDateAD     String? @db.VarChar(10)
+  TranTime       String? @db.VarChar(11)
+  InformedDateVS String? @db.VarChar(10)
+  InformedDateAD String? @db.VarChar(10)
+  LateReason     String? @db.VarChar(200)
+  ApprovedID     Int?
+  TimeFrom       String? @db.VarChar(5)
+  TimeTo         String? @db.VarChar(5)
+  LateBy         String? @db.VarChar(5)
+}
+
+model LEAVE_ADJUSTMENT {
+  ADJUSTMENTID   Int          @id(map: "PK__LEAVE_ADJUSTMENT__78D3EB5B")
+  ADJ_DATE       String?      @db.VarChar(10)
+  LEAVEID        Float        @default(0, map: "DF__LEAVE_ADJ__LEAVE__79C80F94")
+  STAFFID        Int          @default(0, map: "DF__LEAVE_ADJ__STAFF__7ABC33CD")
+  ADJ_VALUE      Float        @default(0, map: "DF__LEAVE_ADJ__ADJ_V__7BB05806")
+  LEAVEEARNINGID Int          @default(0, map: "DF__LEAVE_ADJ__LEAVE__7CA47C3F")
+  FYEAR          String?      @db.VarChar(9)
+  USERNAME       String?      @db.VarChar(50)
+  REMARKS        String?      @db.VarChar(150)
+  EXISTING_BAL   Float        @default(0, map: "DF__LEAVE_ADJ__EXIST__7D98A078")
+  REVISED_BAL    Float        @default(0, map: "DF__LEAVE_ADJ__REVIS__7E8CC4B1")
+  LeaveEarning   LeaveEarning @relation(fields: [LEAVEEARNINGID], references: [LeaveEarningId], onUpdate: NoAction, map: "FK_LEAVEEARNINGID_LA")
+  LeaveName      LeaveName    @relation(fields: [LEAVEID], references: [LeaveId], onUpdate: NoAction, map: "FK_LEAVEID_LA")
+  STAFF          STAFF        @relation(fields: [STAFFID], references: [STAFFID], onUpdate: NoAction, map: "FK_STAFFID_LA")
+}
+
+model Leave_Category {
+  Leave_CategoryID Int     @id(map: "PK__Leave_Category__4FD1D5C8")
+  Leave_Cat_Code   String? @db.VarChar(10)
+  Leave_Category   String? @db.VarChar(30)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model LEAVEAPP {
+  APPROVALID Float
+  STAFFID    Int?
+  DATEFROM   String? @db.VarChar(10)
+  LEAVEID    Int?
+  FORDAYS    Float?
+  APPDATE    String? @db.VarChar(10)
+  APPBY      String? @db.VarChar(30)
+
+  @@ignore
+}
+
+model LeaveEarning {
+  LeaveEarningId   Int                @id(map: "PK__LeaveEarning__1A9EF37A")
+  DateVS           String?            @db.VarChar(12)
+  DateAD           String?            @db.VarChar(12)
+  StaffId          Int?
+  LeaveId          Float?
+  EarnedLeave      Float?
+  Remarks          String?            @default(" ", map: "DF__LeaveEarn__Remar__1B9317B3") @db.VarChar(80)
+  Status           String?            @default("Active", map: "DF__LeaveEarn__Statu__6D9742D9") @db.VarChar(15)
+  LEAVE_ADJUSTMENT LEAVE_ADJUSTMENT[]
+}
+
+model LEAVEENCASH_DETAIL {
+  DETAILID           Int                 @id(map: "PK_EncashDetail")
+  MASTERID           Int?
+  LEAVEID            Float?
+  DAYSTOENCASH       Float               @default(0, map: "DF__LEAVEENCA__DAYST__1940BAED")
+  ENCASHVALUE        Float               @default(0, map: "DF__LEAVEENCA__ENCAS__1A34DF26")
+  LEAVETAKENID       Int                 @default(0, map: "DF__LEAVEENCA__LEAVE__1B29035F")
+  ACQUIRED           Float               @default(0, map: "DF__LEAVEENCA__ACQUI__1C1D2798")
+  UTILIZED           Float               @default(0, map: "DF__LEAVEENCA__UTILI__1D114BD1")
+  LEAVEENCASH_MASTER LEAVEENCASH_MASTER? @relation(fields: [MASTERID], references: [MASTERID], onDelete: NoAction, onUpdate: NoAction, map: "FK_ENCASH")
+  LeaveName          LeaveName?          @relation(fields: [LEAVEID], references: [LeaveId], onDelete: NoAction, onUpdate: NoAction, map: "FK_ENCASH_LEAVE")
+}
+
+model LEAVEENCASH_MASTER {
+  MASTERID           Int                  @id(map: "PK_ENCASH")
+  YEARMONTH          String               @db.VarChar(7)
+  STAFFID            Int?
+  DAYSTOENCASH       Float                @default(0, map: "DF__LEAVEENCA__DAYST__1387E197")
+  ENCASHVALUE        Float                @default(0, map: "DF__LEAVEENCA__ENCAS__147C05D0")
+  REMARKS            String?              @db.VarChar(100)
+  SALADDITIONID      Int?
+  SALARYAMT          Float                @default(0, map: "DF__LEAVEENCA__SALAR__15702A09")
+  Gross_Sal          Float                @default(0, map: "DF__LEAVEENCA__Gross__451F3D2B")
+  LEAVEENCASH_DETAIL LEAVEENCASH_DETAIL[]
+  STAFF              STAFF?               @relation(fields: [STAFFID], references: [STAFFID], onDelete: NoAction, onUpdate: NoAction, map: "FK_ENCASH_STAFF")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model LeaveJoinInfo {
+  JoinID     Int?
+  RequestId  Int?
+  JoinDateVS String? @db.VarChar(10)
+  JoinDateAD String? @db.VarChar(10)
+  JoinTime   String? @db.VarChar(12)
+  TranDateVS String? @db.VarChar(10)
+  TranDateAD String? @db.VarChar(10)
+
+  @@ignore
+}
+
+model LeaveName {
+  LeaveId            Float                @id(map: "PK__LeaveName__7EF6D905")
+  LeaveName          String?              @db.VarChar(50)
+  LeaveDayMale       Float?               @default(0, map: "DF__LeaveName__Leave__7FEAFD3E")
+  LeaveDayFemale     Float?               @default(0, map: "DF__LeaveName__Leave__00DF2177")
+  LeaveType          String?              @db.VarChar(12)
+  MaxLeave           Float?
+  CanTransfer        Int?                 @db.SmallInt
+  Leave_CategoryID   Int                  @default(0, map: "DF__LeaveName__Leave__52AE4273")
+  LEAVE_ADJUSTMENT   LEAVE_ADJUSTMENT[]
+  LEAVEENCASH_DETAIL LEAVEENCASH_DETAIL[]
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model LeaveOpening {
+  OpeningId      Int?
+  OpeningDateVS  String?  @db.VarChar(12)
+  OpeningDateAD  String?  @db.VarChar(12)
+  LeaveId        Int?
+  StaffId        Int?
+  OpeningDays    Float?
+  IsFirstOpening Boolean?
+  YearId         Int?
+  FromY          String?  @db.VarChar(11)
+  ToY            String?  @db.VarChar(11)
+
+  @@ignore
+}
+
+model LeaveRequest {
+  RequestID        Int     @id(map: "PK__LeaveRequest__03BB8E22")
+  StaffID          Int?
+  LeaveID          Float?
+  TranDateVS       String? @db.VarChar(12)
+  TranDateAD       String? @db.VarChar(12)
+  FromDateVS       String? @db.VarChar(12)
+  FromDateAD       String? @db.VarChar(12)
+  ToDateVS         String? @db.VarChar(12)
+  ToDateAD         String? @db.VarChar(12)
+  Reasons          String? @db.VarChar(200)
+  LeaveBalance     Float?
+  ApprovedDateVS   String? @db.VarChar(12)
+  ApprovedDateAD   String? @db.VarChar(12)
+  ApprovedTime     String? @db.VarChar(12)
+  IsApproved       Int?    @db.SmallInt
+  ApprovedByID     Int?
+  IsHalfDay        Int?    @db.SmallInt
+  ReplaceStaffCode String? @db.VarChar(50)
+  AbsEmailId       String? @db.VarChar(50)
+  AbsPhoneNo       String? @db.VarChar(40)
+}
+
+model leaveTaken {
+  TookleaveId     Int     @id(map: "PK__leaveTaken__05A3D694")
+  StaffId         Int?
+  LeaveId         Int?
+  RequestID       Int?
+  DateVS          String? @db.VarChar(12)
+  DateAD          String? @db.VarChar(12)
+  TotRequestLeave Float?
+  TotTakenLeave   Float?
+  CutLateWorkId   Int?
+  Status          String? @db.Char(1)
+  JoinId          Int?
+  Remarks         String? @db.VarChar(100)
+}
+
+model MonthlyAttend {
+  MonAttID         Int     @id(map: "PK__MonthlyAttend__6501FCD8")
+  YearMonth        String? @db.VarChar(7)
+  StaffCode        String? @db.VarChar(10)
+  StaffName        String? @db.VarChar(80)
+  PresentDay       Float?
+  AbsentDay        Float?
+  InformedUnpaid   Float?
+  UnInformedUnpaid Float?
+  WorkingDays      Float?
+  StaffId          Int     @default(0, map: "DF__MonthlyAt__Staff__4B0D20AB")
+  LeaveDays        Float   @default(0, map: "DF__MonthlyAt__Leave__4C0144E4")
+  LeaveBalance     Float   @default(0, map: "DF__MonthlyAt__Leave__4CF5691D")
+  NewJoinLOP       Float   @default(0, map: "DF__MonthlyAt__NewJo__4DE98D56")
+  LOP_Hrs          Float   @default(0, map: "DF__MonthlyAt__LOP_H__5C37ACAD")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model MonthlyAttendLeave {
+  MonAttID   Int?
+  LeaveName  String? @db.VarChar(50)
+  TakenLeave Float?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model MONTHNAME {
+  MONTHID   Int     @db.SmallInt
+  MONTHNAME String? @db.VarChar(15)
+  FYM_No    Int?
+
+  @@ignore
+}
+
+model Nationality {
+  NationalityID Int     @id(map: "PK__Nationality__5E8A0973")
+  Nationality   String? @db.VarChar(50)
+  Code          String? @db.VarChar(10)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model OffCalander {
+  CalDate     String? @db.VarChar(10)
+  CalDay      String? @db.VarChar(15)
+  DayStatus   String? @db.VarChar(1)
+  CloseReason String? @db.VarChar(200)
+  CalDateAD   String? @db.VarChar(10)
+  WorkHours   Float?
+
+  @@ignore
+}
+
+model PIS_BaseTable {
+  BaseTableID Int     @id(map: "PK__PIS_BaseTable__67A95F59")
+  Allowance   String? @db.VarChar(50)
+  AllowanceID Float?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model PISDEPARTMENT {
+  DEPARTMENTID   Int
+  DEPARTMENTNAME String? @db.VarChar(50)
+  DepCode        String? @db.VarChar(10)
+
+  @@ignore
+}
+
+model PISFUNCTIONS {
+  FUNCTIONID      Int     @id(map: "PK__PISFUNCTIONS__61F08603")
+  FUNCTIONCAPTION String? @db.VarChar(150)
+  REPORT1         String  @default("1", map: "DF__PISFUNCTI__REPOR__62E4AA3C") @db.Char(1)
+  PARENTID        Int
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model PISUSERFUNCTION {
+  FUNCTIONID     Int?
+  USERID         Int?
+  USERFUNCTIONID Int?
+
+  @@ignore
+}
+
+model PISUSERS {
+  USERID            Int     @id(map: "PK__PISUSERS__2D7CBDC4")
+  LEVEL_ID          Int     @default(0, map: "DF__PISUSERS__LEVEL___2E70E1FD")
+  USERNAME          String  @db.VarChar(30)
+  PASSWORDS         String  @db.VarChar(20)
+  NAME              String? @db.VarChar(30)
+  ISSALARYSHEETVIEW Int?    @default(0, map: "DF__PISUSERS__ISSALA__2F650636")
+  STAFFID           Int?    @default(0, map: "DF__PISUSERS__STAFFI__30592A6F")
+  ISACTIVE          String  @default("1", map: "DF__PISUSERS__ISACTI__314D4EA8") @db.Char(1)
+  CANLOCK           String? @default("N", map: "DF__PISUSERS__CANLOC__324172E1") @db.VarChar(1)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model PYEAR {
+  YEARID   Int     @db.SmallInt
+  YEARNAME String? @db.VarChar(10)
+
+  @@ignore
+}
+
+model Relation {
+  RelationID Int          @id(map: "PK_RelationID_Relation")
+  Relation   String?      @db.VarChar(100)
+  FamilyInfo FamilyInfo[]
+}
+
+model Religion {
+  ReligionID Int     @id(map: "PK_RELIGIONID_R")
+  Religion   String? @db.VarChar(30)
+  STAFF      STAFF[]
+}
+
+model RoutineStatus {
+  StatusID Int     @id(map: "PK_StatusID_RS")
+  Status   String? @db.VarChar(15)
+}
+
+model STAFF {
+  STAFFID                 Int                  @id(map: "PK_STAFF")
+  STAFFCODE               String?              @db.VarChar(10)
+  FIRSTNAME               String?              @db.VarChar(50)
+  LASTNAME                String?              @db.VarChar(30)
+  GENDER                  String?              @db.VarChar(10)
+  DOBVS                   String?              @db.VarChar(10)
+  DOBAD                   String?              @db.VarChar(10)
+  ZONEID                  Int?                 @db.SmallInt
+  DISTRICTID              Int?                 @db.SmallInt
+  VDCID                   Int?                 @db.SmallInt
+  TOLE                    String?              @db.VarChar(30)
+  BLOCKNO                 String?              @db.VarChar(5)
+  PHONE                   String?              @db.VarChar(30)
+  POSITIONID              Int?                 @db.SmallInt
+  DEPARTMENTID            Int?                 @db.SmallInt
+  JOINDATEVS              String?              @db.VarChar(10)
+  JOINDATEAD              String?              @db.VarChar(10)
+  LEAVEDATE               String?              @db.VarChar(10)
+  JOBTYPE                 String?              @db.VarChar(1)
+  JOBSTATUSID             Int?                 @db.SmallInt
+  JOBSHIFTID              Int?                 @db.SmallInt
+  BASICSALARY             Float?
+  NOOFGRADE               Int?                 @db.SmallInt
+  GRADEAMOUNT             Float?
+  CITNUMBER               String?              @db.VarChar(20)
+  CITRATE                 Float?
+  PFNUMBER                String?              @db.VarChar(20)
+  HOURRATE                Float?
+  SPASSWORD               String?              @db.VarChar(15)
+  MARRIED                 String?              @db.VarChar(1)
+  TAXAMOUNT               Float?
+  BANKACCOUNT             String?              @db.VarChar(30)
+  STAFFLEVEL              Int?
+  SEP_DATE                String?              @db.VarChar(10)
+  RETIREDATEVS            String?              @db.VarChar(10)
+  RETIREDATEAD            String?              @db.VarChar(10)
+  REMARKS                 String?              @db.VarChar(99)
+  PICPATH                 String?              @db.VarChar(200)
+  AniversaryDateVS        String?              @db.VarChar(10)
+  AniversaryDateAD        String?              @db.VarChar(10)
+  RetirementAge           Float?               @default(0, map: "DF__Staff__Retiremen__59C55456")
+  MaritalStatus           String?              @db.VarChar(10)
+  JobTypeId               Int?
+  MobileNo                String?              @db.VarChar(30)
+  PermanentMobileNo       String?              @db.VarChar(30)
+  StaffName               String?              @db.VarChar(100)
+  PermanentZoneId         Int?
+  PermanentDistrictId     Int?
+  PermanentVDCId          Int?
+  PassportNo              String?              @db.VarChar(50)
+  Village_Street          String?              @db.VarChar(50)
+  PermanentVillage_Street String?              @db.VarChar(50)
+  PermanentBlockNo        String?              @db.VarChar(20)
+  PermanentTole           String?              @db.VarChar(50)
+  Address                 String?              @db.VarChar(100)
+  PermanentAddress        String?              @db.VarChar(100)
+  PermanentPhoneNo        String?              @db.VarChar(30)
+  NationalityId           Int                  @default(0, map: "DF_STAFF_NationalityId")
+  Email                   String?              @db.VarChar(50)
+  PermanentEmail          String?              @db.VarChar(50)
+  StaffGroupId            Int?                 @default(0, map: "DF__Staff__StaffGrou__681373AD")
+  GrandFathersName        String?              @db.VarChar(50)
+  FathersName             String?              @db.VarChar(50)
+  HusbandsName            String?              @db.VarChar(50)
+  NomineesName            String?              @db.VarChar(50)
+  NomineesAddress         String?              @db.VarChar(100)
+  NomineeRelationship     String?              @db.VarChar(50)
+  GuardiansName           String?              @db.VarChar(50)
+  GuardiansAddress        String?              @db.VarChar(100)
+  GuardianRelationship    String?              @db.VarChar(50)
+  CitizenshipNo           String?              @db.VarChar(20)
+  CitizenshipDistrictId   Int?
+  HouseNo                 String?              @db.VarChar(50)
+  PermanentHouseNo        String?              @db.VarChar(50)
+  CastID                  Int                  @default(0, map: "DF__Staff__CastID__690797E6") @db.SmallInt
+  Child_Boys              Int                  @default(0, map: "DF__Staff__Child_Boy__69FBBC1F") @db.TinyInt
+  Child_Girl              Int                  @default(0, map: "DF__Staff__Child_Gir__6AEFE058") @db.TinyInt
+  BankId                  Int?                 @default(0, map: "DF_STAFF_BankId")
+  TaxAfter_Year           String?              @db.VarChar(10)
+  ReM_UnPaidLeave         Float?
+  GradeincDateAD          String?              @db.VarChar(10)
+  GradeincDateVS          String?              @db.VarChar(10)
+  MaxSalary               Float?
+  PermanentDateAD         String?              @db.VarChar(10)
+  PermanentDateVS         String?              @db.VarChar(10)
+  AdjustedSalary          Float                @default(0, map: "DF__Staff__AdjustedS__2AA05119")
+  IsWOffSaturday          Int                  @default(1, map: "DF__Staff__IsWOffSat__2B947552")
+  Leave_CategoryID        Int                  @default(1, map: "DF__Staff__Leave_Cat__51BA1E3A")
+  ScaleID                 Int                  @default(0, map: "DF__Staff__ScaleID__75035A77")
+  ReligionID              Int                  @default(0, map: "DF__STAFF__ReligionI__4AD81681")
+  BirthPlace              String?              @db.VarChar(50)
+  BloodGroup              String?              @db.VarChar(10)
+  Allergy                 String?              @db.VarChar(50)
+  USERNAME                String?              @db.VarChar(30)
+  PASSWORD                String?              @db.VarChar(30)
+  INSURANCE_PREMIUM       Int                  @default(0, map: "DF__STAFF__INSURANCE__658C0CBD")
+  PANNO                   String?              @db.VarChar(20)
+  attendanceid            Int?                 @default(0, map: "DF__STAFF__attendanc__31D75E8D")
+  ALLOWUPDATE             ALLOWUPDATE[]
+  ContractInfo            ContractInfo[]
+  FamilyInfo              FamilyInfo[]
+  IgnoredDelay            IgnoredDelay[]
+  Insurance               Insurance[]
+  LEAVE_ADJUSTMENT        LEAVE_ADJUSTMENT[]
+  LEAVEENCASH_MASTER      LEAVEENCASH_MASTER[]
+  LOP_Refund              LOP_Refund[]
+  Religion                Religion             @relation(fields: [ReligionID], references: [ReligionID], onUpdate: NoAction, map: "FK_RELIGIONID_S")
+
+  @@index([STAFFID, StaffName, STAFFCODE], map: "INDX_STAFF")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model STAFFALLOWANCE {
+  STAFFALLOWID  Float
+  STAFFID       Float?
+  ALLOWID       Float?
+  ALLOWAMT      Float?
+  OTHOUR        Float?
+  OTRATEPERHOUR Float?
+  YEARID        Int?
+  MONTHID       Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model StaffChildEdu {
+  ChildId    Int?
+  StaffId    Int?
+  WorkedTime Float?
+  Department String? @db.VarChar(50)
+  Childname  String? @db.VarChar(50)
+  ChildAge   Int?    @db.TinyInt
+  ChildSex   String? @db.VarChar(7)
+  Schoolname String? @db.VarChar(100)
+  Class      String? @db.VarChar(8)
+  Batch      Int?    @db.TinyInt
+  Remarks    String? @db.VarChar(20)
+
+  @@ignore
+}
+
+model StaffDEPARTMENT {
+  DEPARTMENTID   Int     @unique(map: "PK_DEPARTMENT")
+  DEPARTMENTNAME String? @db.VarChar(50)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model STAFFEDUCATION {
+  EDUCATIONID    Int
+  STAFFID        Int?
+  EDUCATION      String? @db.VarChar(50)
+  STUDYFROM      String? @db.VarChar(10)
+  STUDYTO        String? @db.VarChar(10)
+  DIVISION       String? @db.VarChar(10)
+  INSTITUTE      String? @db.VarChar(50)
+  REMARKS        String? @db.VarChar(50)
+  SPECIALIZATION String? @db.VarChar(50)
+  UNIVERSITY     String? @db.VarChar(50)
+  COUNTRY        String? @db.VarChar(50)
+  SPONSOR        String? @db.VarChar(50)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model STAFFEXPERIENCE {
+  EXPERIENCEID Int
+  STAFFID      Int?
+  JOINDATE     String? @db.VarChar(10)
+  LEFTDATE     String? @db.VarChar(10)
+  DISTRICT     String? @db.VarChar(25)
+  DCLASSTYPE   String? @db.VarChar(10)
+  WORKEDDAYS   Float?
+  REMARKS      String? @db.VarChar(50)
+
+  @@ignore
+}
+
+model StaffGroup {
+  StaffGroupId Int     @id(map: "PK__StaffGroup__671F4F74")
+  StaffGroup   String? @db.VarChar(50)
+  Code         String? @db.VarChar(20)
+}
+
+model StaffHistory {
+  HistoryId          Int     @id(map: "PK__StaffHistory__18B6AB08")
+  StaffId            Int?
+  Dates              String? @db.VarChar(12)
+  DepartmentId       Int?
+  DesignationId      Int?
+  Levels             String? @db.VarChar(3)
+  ShiftId            Int?
+  Statusid           Int?
+  TypeId             Int?
+  DatesAD            String? @db.VarChar(10)
+  IsArrear           String? @db.Char(1)
+  ExistingDate       String? @db.VarChar(10)
+  IsNewPermanent     String  @default("N", map: "DF__StaffHist__IsNew__351DDF8C") @db.Char(1)
+  Is_New_Join_Arrear String  @default("N", map: "DF__StaffHist__Is_Ne__361203C5") @db.Char(1)
+  StaffGroupID       Int     @default(0, map: "DF__StaffHist__Staff__740F363E")
+  Remarks            String? @db.VarChar(255)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model STAFFLEAVE {
+  STAFFLEAVEID Float
+  STAFFID      Float?
+  LEAVEID      Float?
+  TOTLEAVE     Float?
+  TOOKLEAVE    Float?
+  LEAVEACCESS  Float?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model STAFFPOSITION {
+  POSITIONID        Int     @db.SmallInt
+  POSITIONNAME      String? @db.VarChar(100)
+  BASICSALARY       Float?
+  NOOFGRADE         Int?    @db.SmallInt
+  GRADERATE         Float?
+  GRADEAFTEREFF     Float?
+  GRADERATEAFTEREFF Float?
+  LASTSALARY        Float?
+  STAFFLEVEL        Int
+  GRADEMONTH        String? @db.VarChar(2)
+  IsWOffSaturday    Int?    @default(1, map: "DF__StaffPosi__IsWOf__725BF7F6") @db.SmallInt
+  Staff_Level       String? @db.VarChar(20)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model StaffPrizes {
+  PrizesId Int?
+  StaffId  Int?
+  Rewards  String? @db.VarChar(500)
+  Years    String? @db.VarChar(12)
+  By_      String? @db.VarChar(100)
+  For_     String? @db.VarChar(250)
+  Remarks  String? @db.VarChar(400)
+
+  @@ignore
+}
+
+model StaffPublication {
+  PubId     Int     @id(map: "PK__StaffPublication__6F7F8B4B")
+  staffid   Int?
+  Dates     String? @db.VarChar(10)
+  PublishIn String? @db.VarChar(80)
+  Subject   String? @db.VarChar(150)
+  Remarks   String? @db.VarChar(100)
+  TITLE     String? @db.VarChar(50)
+  CO_AUTHOR String? @db.VarChar(50)
+  COUNTRY   String? @db.VarChar(50)
+  VOLUME    String? @db.VarChar(50)
+}
+
+model StaffRefrences {
+  RefId      Int     @id(map: "PK__StaffRefrences__7167D3BD")
+  staffid    Int?
+  RefName    String? @db.VarChar(80)
+  RefAddress String? @db.VarChar(80)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model StaffRoutine {
+  SRoutineID   Int?
+  StaffID      Int?
+  OffDateAD    String?  @db.VarChar(10)
+  OffdateVS    String?  @db.VarChar(10)
+  InsertBy     Int?
+  ModifyBy     Int?
+  Status       Boolean?
+  MorningShift String?  @db.VarChar(15)
+  DayShift     String?  @db.VarChar(15)
+  NightShift   String?  @db.VarChar(15)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model STAFFSCHEDULE {
+  SCHEDULEID    Int
+  STAFFID       Int?
+  ARRIVALTIME   String? @db.VarChar(20)
+  DEPARTURETIME String? @db.VarChar(20)
+  FLEXIBLETIME  String? @db.VarChar(5)
+
+  @@ignore
+}
+
+model STAFFSERVICE {
+  SERVICEID     Int     @id(map: "PK_STAFFSERVICE")
+  STAFFID       Int?
+  STAFFPOSITION String? @db.VarChar(100)
+  OFFICENAME    String? @db.VarChar(100)
+  OFFICEADDR    String? @db.VarChar(100)
+  FROMDATE      String? @db.VarChar(12)
+  TODATE        String? @db.VarChar(12)
+  DECISIONDATE  String? @db.VarChar(12)
+  CAMEPROCESS   String? @db.VarChar(50)
+  REMARKS       String? @db.VarChar(150)
+  SKILL_LEARNT  String? @db.VarChar(100)
+}
+
+model STAFFTRAINING {
+  TRANINGID        Int     @id(map: "PK_STAFFTRAINING")
+  STAFFID          Int?
+  SUBJECT          String? @db.VarChar(100)
+  INSTITUTENAME    String? @db.VarChar(200)
+  INSTITUTEADDR    String? @db.VarChar(100)
+  TRANFROM         String? @db.VarChar(12)
+  TRANTO           String? @db.VarChar(12)
+  TRATYPE          String? @db.VarChar(50)
+  REMARKS          String? @db.VarChar(200)
+  DURATION         String? @db.VarChar(50)
+  DIPLOMA_OBTAINED String? @db.VarChar(50)
+  SPONSOR          String? @db.VarChar(50)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model STAFFVISIT {
+  VisitID      Int?
+  AttendanceId Int?
+  OutTime      String? @default("00:00:00 AM", map: "DF__STAFFVISI__OutTi__7814D14C") @db.VarChar(12)
+  InTime       String? @default("00:00:00 AM", map: "DF__STAFFVISI__InTim__7908F585") @db.VarChar(12)
+  SequenceNo   Int?
+  RemarksIn    String? @db.VarChar(80)
+  RemarksOut   String? @db.VarChar(80)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model StaffWarning {
+  WarningId   Int?
+  StaffId     Int?
+  Dates       String? @db.VarChar(12)
+  WarningType String? @db.VarChar(50)
+  Reason      String? @db.VarChar(150)
+  Remarks     String? @db.VarChar(100)
+
+  @@ignore
+}
+
+model TBLATTLOG {
+  ID        Int     @id(map: "PK__TBLATTLO__3214EC272FEF161B")
+  CARDNO    String? @db.VarChar(10)
+  LOGDATE   String? @db.VarChar(10)
+  LOGTIME   String? @db.VarChar(10)
+  checktype String? @default("", map: "DF__TBLATTLOG__check__34B3CB38") @db.VarChar(1)
+}
+
+model TelephoneDirectory {
+  TDID             Float   @id(map: "PK_TDirectory")
+  OrganizationName String? @db.VarChar(50)
+  PersonName       String? @db.VarChar(50)
+  Address          String? @db.VarChar(100)
+  Email            String? @db.VarChar(50)
+  PhoneOffice      String? @db.VarChar(50)
+  PhoneResidence   String? @db.VarChar(20)
+  Mobile           String? @db.VarChar(20)
+  Fax              String? @db.VarChar(20)
+  Type             String? @db.VarChar(20)
+  EntryDate        String? @db.VarChar(10)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model TOOKLEAVE {
+  TOOKLEAVEID Float
+  STAFFID     Float?
+  LDATE       String? @db.VarChar(10)
+  LEAVEID     Float?
+  LEAVAPPID   Float?
+  LSTAT       String? @db.VarChar(1)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model VDC {
+  VDCID      Int     @db.SmallInt
+  ZONEID     Int?    @db.SmallInt
+  DISTRICTID Int?    @db.SmallInt
+  VDCNAME    String? @db.VarChar(35)
+  VDCNNAME   String? @db.VarChar(35)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ZONE {
+  ZONEID   Int     @db.SmallInt
+  ZONENAME String? @db.VarChar(50)
+  ZONENEP  String? @db.VarChar(50)
+
+  @@ignore
+}
+
+model AccCategory {
+  CategoryId Int     @id(map: "PK_Category")
+  CatName    String? @db.VarChar(50)
+  CatCode    String? @db.VarChar(10)
+}
+
+model AccessLevel {
+  LevelID     Int           @id(map: "PK_ALevel")
+  Level       String        @db.VarChar(10)
+  Description String?       @db.VarChar(20)
+  AccUSERMAIN AccUSERMAIN[]
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ACCMAINMENU {
+  MENUID      Int?
+  MENUNAME    String? @db.VarChar(50)
+  CAPTIONNAME String? @db.VarChar(50)
+
+  @@ignore
+}
+
+model AccountHeadCategory {
+  AccountHeadCategoryId Int     @id(map: "PK__AccountHeadCateg__245D67DE")
+  AccountId             Int?
+  VoucherHeadId         Int?
+  VoucherCode           String? @db.VarChar(20)
+  AccountType           String? @db.VarChar(10)
+}
+
+model AccSubCategory {
+  SubCategoryId Int     @id(map: "PK_SubCategory")
+  CategoryId    Int?
+  SubCatName    String? @db.VarChar(50)
+  SubCatCode    String? @db.VarChar(10)
+}
+
+model AccSUBMENU {
+  SUBMENUID   Int     @id(map: "PK_SUBMENU") @db.SmallInt
+  MENUID      Int?    @db.SmallInt
+  SUBMENU     String? @db.VarChar(50)
+  APROCEDURE  String? @db.VarChar(50)
+  CAPTIONNAME String? @db.VarChar(50)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ACCTEMP {
+  ID       Float?
+  ParentID Float?
+  Name     String? @db.VarChar(90)
+  LF       String? @db.VarChar(80)
+  State    Float?
+
+  @@ignore
+}
+
+model ACCTREE {
+  ID       Int     @id(map: "PK__ACCTREE__79A81403")
+  PARENTID Int?
+  NAME     String? @db.VarChar(200)
+  LF       String? @db.VarChar(30)
+  STATE    String? @default("1", map: "DF__ACCTREE__STATE__7A9C383C") @db.Char(10)
+}
+
+model AccUSERMAIN {
+  USERID       Int          @id(map: "PK_USERMAIN") @db.SmallInt
+  USERNAME     String?      @db.VarChar(50)
+  UPASSWORD    String?      @db.VarChar(10)
+  DEPCODE      String?      @db.VarChar(5)
+  UpdateStaff  Int?         @db.SmallInt
+  UpdateAttend Int?         @db.SmallInt
+  LevelID      Int?
+  AccessLevel  AccessLevel? @relation(fields: [LevelID], references: [LevelID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Level")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model AccUSERPREVILAGE {
+  USERID       Int? @db.SmallInt
+  MENUID       Int? @db.SmallInt
+  SUBMENUID    Int? @db.SmallInt
+  ACESSLEVELID Int? @db.SmallInt
+
+  @@ignore
+}
+
+model AllowanceSetup {
+  AllowanceSetupId Int    @id(map: "PK__AllowanceSetup__6166761E")
+  AllowanceId      Int?   @default(0, map: "DF__Allowance__Allow__625A9A57")
+  DepartmentId     Int?   @default(0, map: "DF__Allowance__Depar__634EBE90")
+  PositionId       Int?   @default(0, map: "DF__Allowance__Posit__6442E2C9")
+  Amount           Float? @default(0, map: "DF__Allowance__Amoun__65370702")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ALLOWLIST {
+  ALLOWLISTID   Int
+  ALLOWANCENAME String? @db.VarChar(30)
+  ALLOWCODE     String? @db.VarChar(10)
+
+  @@ignore
+}
+
+model ALLOWNAME {
+  ALLOWANCEID          Float   @id(map: "PK_AllowanceID_AN")
+  ALLOWNAME            String? @db.VarChar(25)
+  MTHALLOAMT           Float?
+  MONTHLYYN            String? @db.VarChar(1)
+  ALLOWCODE            String  @db.VarChar(10)
+  DepartmentID         Float?
+  PositionID           Float?
+  AllowType            String? @db.VarChar(20)
+  IsPercent            Int?    @db.SmallInt
+  DisplayOrder         Int     @default(0, map: "DF__AllowName__Displ__38EE7070")
+  IsDirectlyInSlaSheet String? @db.Char(1)
+  IsGross              String? @db.Char(2)
+  Contract             String? @default("N", map: "DF__ALLOWNAME__Contr__3D7E1B63") @db.Char(1)
+  Permanent            String? @default("N", map: "DF__ALLOWNAME__Perma__3E723F9C") @db.Char(1)
+  Extension            String? @default("N", map: "DF__ALLOWNAME__Exten__3F6663D5") @db.Char(1)
+  Probation            String? @default("N", map: "DF__ALLOWNAME__Proba__405A880E") @db.Char(1)
+}
+
+model ALLOWPREVILAGE {
+  PREVID     Float   @id(map: "PK__ALLOWPREVILAGE__60083D91")
+  ALLOWID    Int?
+  USERID     Int?
+  PREVMODE   String? @db.VarChar(10)
+  ISADDITION Int?
+}
+
+model ALLOWUPDATE {
+  ALLOWUPDATEID Int     @id(map: "PK__ALLOWUPDATE__408F9238")
+  STAFFID       Int?
+  ALLOWANCEID   Int?
+  ALLOWRATE     Float?
+  ISPERCENT     Int     @default(0, map: "DF__ALLOWUPDA__ISPER__4277DAAA")
+  STARTING_DATE String? @default("", map: "DF__ALLOWUPDA__START__436BFEE3") @db.VarChar(7)
+  STAFF         STAFF?  @relation(fields: [STAFFID], references: [STAFFID], onDelete: NoAction, onUpdate: NoAction, map: "FK__ALLOWUPDA__STAFF__4183B671")
+}
+
+model AMONTH {
+  MONTHID   Int     @id(map: "PK_AMONTH")
+  MONTHNAME String? @db.VarChar(50)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ApprovedBy {
+  AppId     Int?
+  App_Names String? @db.VarChar(150)
+
+  @@ignore
+}
+
+model ARREARCALCU {
+  ARREARID      Int     @id(map: "PK__ARREARCALCU__473C8FC7")
+  ARREARDATE    String? @db.VarChar(8)
+  STAFFID       Int?
+  EFFDATEAD     String? @db.VarChar(10)
+  EXISTINGBASIC Float?
+  EXISTINGGROSS Float?
+  REVISEDBASIC  Float?
+  REVISEDGROSS  Float?
+  MONTH         Int?
+  DAYS          Int?
+  PF            Float?
+  HOU_HOS       Float?
+  DESCRIPTION   String? @db.VarChar(10)
+  DAYSINMONTH   Int?
+}
+
+model Attendance_bKp {
+  ATTENDANCEID      Int     @id(map: "PK__Attendance__0D44F85D")
+  STAFFID           Int?
+  DateVS            String? @db.VarChar(12)
+  DateAD            String? @db.VarChar(12)
+  InTime            String  @default("00:00:00 AM", map: "DF__Attendanc__InTim__38845C1C") @db.VarChar(12)
+  OutTime           String  @default("00:00:00 AM", map: "DF__Attendanc__OutTi__39788055") @db.VarChar(12)
+  BreakInTime       String  @default("00:00:00 AM", map: "DF__Attendanc__Break__3A6CA48E") @db.VarChar(12)
+  BreakOutTime      String  @default("00:00:00 AM", map: "DF__Attendanc__Break__3B60C8C7") @db.VarChar(12)
+  FieldVisitInTime  String  @default("00:00:00 AM", map: "DF__Attendanc__Field__3C54ED00") @db.VarChar(12)
+  FieldVisitOutTime String  @default("00:00:00 AM", map: "DF__Attendanc__Field__3D491139") @db.VarChar(12)
+  WorkHour          String? @default("0.00", map: "DF__Attendanc__WorkH__3E3D3572") @db.VarChar(10)
+  Iflate            Float?  @default(0.00, map: "DF__Attendanc__Iflat__3F3159AB")
+  IsCutLate         Int?    @default(0, map: "DF__Attendanc__IsCut__40257DE4")
+  IsInformed        Int     @default(1, map: "DF__Attendanc__IsInf__4119A21D")
+  Remarks           String? @default(" ", map: "DF__Attendanc__Remar__420DC656") @db.VarChar(100)
+  Break2_Out        String  @default("00:00:00 AM", map: "DF__Attendanc__Break__4301EA8F") @db.VarChar(12)
+  Break2_In         String  @default("00:00:00 AM", map: "DF__Attendanc__Break__43F60EC8") @db.VarChar(12)
+  Break3_Out        String  @default("00:00:00 AM", map: "DF__Attendanc__Break__44EA3301") @db.VarChar(12)
+  Break3_In         String  @default("00:00:00 AM", map: "DF__Attendanc__Break__45DE573A") @db.VarChar(12)
+  Break4_Out        String  @default("00:00:00 AM", map: "DF__Attendanc__Break__46D27B73") @db.VarChar(12)
+  Break4_In         String  @default("00:00:00 AM", map: "DF__Attendanc__Break__47C69FAC") @db.VarChar(12)
+  Break5_Out        String  @default("00:00:00 AM", map: "DF__Attendanc__Break__48BAC3E5") @db.VarChar(12)
+  Break5_In         String  @default("00:00:00 AM", map: "DF__Attendanc__Break__49AEE81E") @db.VarChar(12)
+  Visithrs          Float?  @default(0, map: "DF__Attendanc__Visit__4AA30C57")
+  IsManual          String? @default("N", map: "DF__Attendanc__IsMan__4B973090") @db.VarChar(1)
+  RealofficeIN      String? @db.VarChar(12)
+  RealofficeOUT     String? @db.VarChar(12)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ATTENDANCEALLTEMP {
+  STAFFID      Int
+  TOTALTIME    String? @db.VarChar(12)
+  VARIANCETIME String? @db.VarChar(12)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ATTENDANCETEMP {
+  ATTENDANCEID Int
+  STAFFID      Int?
+  INDATETIME   DateTime? @db.DateTime
+  OUTDATETIME  DateTime? @db.DateTime
+  INREMARKS    String?   @db.VarChar(100)
+  OUTREMARKS   String?   @db.VarChar(100)
+
+  @@ignore
+}
+
+model AYEAR {
+  AYEARID     Int     @id(map: "PK_AYEAR")
+  AYEAR       String? @db.VarChar(18)
+  CURRENTYEAR String  @db.VarChar(1)
+}
+
+model BALANCESHEET {
+  BSID    Int     @id(map: "PK__BALANCESHEET__023D5A04")
+  SCHNO   Int?
+  SCHNAME String? @db.VarChar(50)
+  CAMOUNT Float?
+  PAMOUNT Float?
+  BYEAR   String? @db.VarChar(9)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model BankNames {
+  BankId    Int?
+  BankName  String? @db.VarChar(100)
+  BankCode  String? @db.VarChar(20)
+  Address   String? @db.VarChar(50)
+  BankAccNo String? @db.VarChar(20)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model BaseSalary {
+  BaseSalary          Float?
+  UpdatedDateTime     String? @db.VarChar(20)
+  PrevSalary          Float?
+  PEN_BASESALARY      Float   @default(0, map: "DF__BASESALAR__PEN_B__46136164")
+  PEN_UPDATEDDATETIME String? @db.VarChar(20)
+  PEN_PREVSALARY      Float   @default(0, map: "DF__BASESALAR__PEN_P__4707859D")
+
+  @@ignore
+}
+
+model BASETABLE {
+  ID          Int     @id(map: "PK__BASETABLE__0425A276")
+  ACCOUNTNAME String? @db.VarChar(50)
+  ACCOUNTID   Int?
+}
+
+model BUDGETBAL {
+  BUDGETBALID   Int   @id(map: "PK__BUDGETBAL__060DEAE8")
+  YEARID        Int?
+  ACTIVITYID    Int?
+  FUNDID        Int?
+  ACCOUNTHEADID Int
+  BUDGETBAL     Float
+}
+
+model BUDGETDETAIL {
+  BUDGETDETAILID Int    @id(map: "PK__BUDGETDETAIL__07F6335A")
+  BUDGETMASTERID Int
+  VDATEBS        String @db.VarChar(10)
+  VDATEAD        String @db.VarChar(10)
+  DRAMOUNT       Float
+  CRAMOUNT       Float
+  ACCOUNTHEADID  Int
+}
+
+model BUDGETMASTER {
+  BUDGETMASTERID Int     @id(map: "PK__BUDGETMASTER__09DE7BCC")
+  VDATEBS        String  @db.VarChar(10)
+  VDATEAD        String  @db.VarChar(10)
+  YEARID         Int?
+  ACTIVITYID     Int?
+  FUNDID         Int?
+  NARRATION      String? @db.VarChar(99)
+}
+
+model CashDetail {
+  CashDetailId    Int     @id(map: "PK__CashDetail__1F98B2C1")
+  VoucherMasterId Int?
+  OfficeId        Int?
+  UnitsOf1S       Float?
+  UnitsOf2S       Float?
+  UnitsOf5S       Float?
+  UnitsOf10S      Float?
+  UnitsOf20S      Float?
+  UnitsOf25S      Float?
+  UnitsOf50S      Float?
+  UnitsOf100S     Float?
+  UnitsOf250S     Float?
+  UnitsOf500S     Float?
+  UnitsOf1000S    Float?
+  Currency        String? @db.VarChar(10)
+}
+
+model CHILDLESSACC {
+  ID       Int     @id(map: "PK_CHILDLESSACC")
+  PARENTID Int?
+  NAME     String? @db.VarChar(100)
+  LF       String? @db.VarChar(20)
+}
+
+model COMPANYINFO {
+  NAME         String  @unique(map: "SYS_C001765") @db.VarChar(50)
+  ADDRESS      String? @db.VarChar(30)
+  PHONE        String? @db.VarChar(19)
+  FAX          String? @db.VarChar(19)
+  BUSINESSNO   String? @db.VarChar(20)
+  BUSINESSTYPE String? @db.VarChar(15)
+}
+
+model CostCentreDetail {
+  CostCentreDetailId Int    @id(map: "PK_CostCentreDetail")
+  LedgerID           Int?
+  AccountId          Int?
+  OfficeID           Int?
+  CategoryId         Int?
+  SubCategoryId      Int?
+  SubSubCategoryId   Int?
+  DRAmount           Float?
+  CRAmount           Float?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Currency {
+  IC  Float?
+  USD Float?
+  NR  Float?
+
+  @@ignore
+}
+
+model CURRENTOFFICE {
+  ITSID      Int     @id(map: "PK__CURRENTOFFICE__108B795B")
+  OFFICEID   Int?
+  OFFICENAME String? @db.VarChar(50)
+  OFFICECODE String? @db.VarChar(10)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model DEPOSITEDAMT {
+  DEPOSITID   Float
+  YEARID      Int?
+  MONTHID     Int?
+  FORWHAT     String? @db.VarChar(3)
+  DEPODATE    String? @db.VarChar(10)
+  DEPOACCOUNT String? @db.VarChar(20)
+  DEPOBANKERS String? @db.VarChar(30)
+  DEPOVOUCHER String? @db.VarChar(20)
+  DEPOAMT     Float?
+
+  @@ignore
+}
+
+model DEPRECIATION {
+  DPID          Int     @id(map: "PK__DEPRECIATION__15502E78")
+  ID            Int?
+  ODEPRECIATION Float?
+  DPERCENT      Float?
+  DYEAR         String? @db.VarChar(9)
+}
+
+model GLOBALSETTING {
+  ATTFIELD String  @id(map: "PK_GLOBALSETTING") @db.VarChar(50)
+  VALFIELD String? @db.VarChar(50)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model HOURLYSALARY {
+  SALARYID  Int
+  YEARID    Int?    @db.SmallInt
+  MONTHID   Int?    @db.SmallInt
+  STAFFID   Int?
+  TOTALTIME String? @db.VarChar(6)
+  HOURRATE  Float?
+  INCOMETAX Float?
+  STATUS    String? @db.VarChar(1)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model HOURLYSALARYTEMP {
+  SALARYID  Int
+  YEARID    Int?    @db.SmallInt
+  MONTHID   Int?    @db.SmallInt
+  STAFFID   Int?
+  TOTALTIME String? @db.VarChar(6)
+  HOURRATE  Float?
+  INCOMETAX Float?
+  STATUS    String? @db.VarChar(1)
+  STAFFCODE String? @db.VarChar(10)
+  STAFFNAME String? @db.VarChar(50)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model INCOMETAX {
+  TAXID      Float
+  AMOUNTFROM Float?
+  AMOUNTTO   Float?
+  TAXPERCENT Float?
+  ADDTAXPER  Float?
+  MARUNMAR   String? @db.VarChar(1)
+
+  @@ignore
+}
+
+model Insurance {
+  InsuranceID Int     @id(map: "PK_Ins")
+  StaffID     Int?
+  Company     String? @db.VarChar(30)
+  Amount      Float?  @default(0, map: "DF__Insurance__Amoun__1881A0DE")
+  Duration    Float?  @default(0, map: "DF__Insurance__Durat__1975C517")
+  Premium     Float?  @default(0, map: "DF__Insurance__Premi__1A69E950")
+  STAFF       STAFF?  @relation(fields: [StaffID], references: [STAFFID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Ins")
+}
+
+model IssueMaster {
+  IssueMasterId   Int     @id(map: "PK__IssueMaster__22751F6C")
+  LedgerId        Int?
+  AccountId       Int?
+  OfficeId        Int?
+  IssueNo         String? @db.VarChar(20)
+  IssueDate       String? @db.VarChar(10)
+  Department      String? @db.VarChar(50)
+  IssuedAmount    Float?
+  ReturnedAmount  Float?
+  NetIssuedAmount Float?
+  SaleMasterId    Float?
+  FYear           String? @db.VarChar(10)
+}
+
+model LEDGER {
+  SNO             Int     @id(map: "PK__LEDGER__1A14E395")
+  ACCOUNTHEADID   Int?
+  LDATE           String? @db.VarChar(10)
+  ADLDATE         String? @db.VarChar(10)
+  PARTICULARS     String? @db.VarChar(100)
+  VNO             Int?
+  DRAMOUNT        Float?
+  CRAMOUNT        Float?
+  DRCR            String? @db.VarChar(8)
+  FUNDID          Int?
+  OFFICEID        Int?
+  BUDGETBALID     Int?
+  BUDGETBAL       Float?
+  ACTIVITYID      Int?
+  COBJECTID       Int?
+  LEDSTAT         String? @db.VarChar(1)
+  REFNO           String? @db.VarChar(15)
+  CHEQUENO        String? @db.VarChar(50)
+  CHEQUEDATE      String? @db.VarChar(10)
+  IRAMOUNT        Float?
+  IRRATE          Float?
+  USDAMOUNT       Float?
+  USDRATE         Float?
+  NRAmount        Float?
+  AutoDescription String? @db.VarChar(255)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model LEDGERACCOUNT {
+  ACCOUNTHEADID Int
+  NAME          String? @db.VarChar(100)
+  LF            String? @db.VarChar(30)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model LOAN {
+  LOANID       Int
+  STAFFID      Int?
+  LOANDATE     String? @db.VarChar(10)
+  DESCRIPTION  String? @db.VarChar(50)
+  LOANAMOUNT   Float?
+  NOOFMONTH    Float?
+  INTERESTRATE Float?
+  BALANCE      Float?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Locks {
+  LockId Int?
+  Years  Int?
+  Months Int?
+  LockTo String? @db.VarChar(50)
+
+  @@ignore
+}
+
+model LOP_Refund {
+  LOP_RefundID   Int     @id(map: "PK_LOP_RefundId_LOPR")
+  YearMonth      String? @db.VarChar(10)
+  StaffID        Int     @default(0, map: "DF__LOP_Refun__Staff__2882FE7D")
+  MonthID        Int     @default(0, map: "DF__LOP_Refun__Month__297722B6")
+  LOP_Days       Float   @default(0, map: "DF__LOP_Refun__LOP_D__2A6B46EF")
+  Refund_Days    Float   @default(0, map: "DF__LOP_Refun__Refun__2B5F6B28")
+  LeaveID        Int     @default(0, map: "DF__LOP_Refun__Leave__2C538F61")
+  LeaveEarningID Int     @default(0, map: "DF__LOP_Refun__Leave__2D47B39A")
+  STAFF          STAFF   @relation(fields: [StaffID], references: [STAFFID], onUpdate: NoAction, map: "FK_StaffID_LOPR")
+}
+
+model MISCELLANEOUS {
+  VSDATE     String  @id(map: "PK_MISCELLANEOUS") @db.VarChar(10)
+  TITLE      String? @db.VarChar(50)
+  PARTICULAR String? @db.VarChar(200)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model MonthlySalAddition {
+  AdditionID  Int?
+  StaffId     Int?
+  AllowanceId Int?
+  Years       Int?    @db.SmallInt
+  Months      Int?    @db.TinyInt
+  Amount      Float?
+  Gross_Sal   Float   @default(0, map: "DF__MonthlySa__Gross__53A266AC")
+  Remarks     String? @db.VarChar(50)
+  Basic_Sal   Float   @default(0, map: "DF__MonthlySa__Basic__25A691D2")
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model MonthlySalDeducation {
+  DeducationID Int?
+  StaffId      Int?
+  AllowanceId  Int?
+  Years        Int?   @db.SmallInt
+  Months       Int?   @db.TinyInt
+  Amount       Float?
+  Gross_Sal    Float  @default(0, map: "DF__MonthlySa__Gross__54968AE5")
+  Basic_Sal    Float  @default(0, map: "DF__MonthlySa__Basic__24B26D99")
+
+  @@ignore
+}
+
+model NEWJOINARREARCALCU {
+  ARREARID      Int     @id(map: "PK__NEWJOINARREARCAL__4924D839")
+  ARREARDATE    String? @db.VarChar(8)
+  STAFFID       Int?
+  EFFDATEAD     String? @db.VarChar(10)
+  EXISTINGBASIC Float?
+  EXISTINGGROSS Float?
+  MONTH         Int?
+  DAYS          Int?
+  PF            Float?
+  HOU_HOS       Float?
+  DESCRIPTION   String? @db.VarChar(10)
+  DAYSINMONTH   Int?
+}
+
+model OFFICES {
+  OFFICEID   Int     @id(map: "PK__OFFICES__1ED998B2")
+  OFFICECODE String  @db.VarChar(10)
+  OFFICENAME String  @db.VarChar(50)
+  OFFICEADDR String? @db.VarChar(99)
+  OFFICEPHON String? @db.VarChar(16)
+}
+
+model OpeningAssets {
+  OpeningAssetsId Int     @id(map: "PK_OpeningAssets")
+  ID              Int?
+  DepRate         Float?
+  CostValue       Float?
+  Depreciation    Float?
+  FYear           String? @db.VarChar(10)
+}
+
+model OPENINGBALANCE {
+  OID           Int     @id(map: "PK__OPENINGBALANCE__20C1E124")
+  ACCOUNTHEADID Int?
+  OYEAR         String? @db.VarChar(18)
+  DRAMOUNT      Float?
+  CRAMOUNT      Float?
+}
+
+model OPENINGSALARY {
+  OPENINGID           Int     @id(map: "PK__OPENINGSALARY__6F4A8121")
+  STAFFID             Int?
+  BASICTAX            Float?
+  BASICNONTAX         Float?
+  GROSSTAX            Float?
+  GROSSNONTAX         Float?
+  OVERTIMETAX         Float?
+  OVERTIMENONTAX      Float?
+  DASHAINALLTAX       Float?
+  DASHAINALLNONTAX    Float?
+  LEAVEENCASHTAX      Float?
+  LEAVEENCASHNONTAX   Float?
+  LTFTAX              Float?
+  LTFNONTAX           Float?
+  CHILDEDUALLTAX      Float?
+  CHILDEDUALLNONTAX   Float?
+  BONUSTAX            Float?
+  BONUSNONTAX         Float?
+  ONETIMETRAALLTAX    Float?
+  ONETIMETRAALLNONTAX Float?
+  PFTAX               Float?
+  PFNONTAX            Float?
+  CITTAX              Float?
+  CITNONTAX           Float?
+  TAX                 Float?
+  LIFEINSTAX          Float?
+  LIFEINSNONTAX       Float?
+  FYEAR               String? @db.VarChar(9)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model OVERTIME {
+  OTID    Float
+  STAFFID Float?
+  OTDATE  String? @db.VarChar(10)
+  OTHOURS Float?
+  OTSTAT  String? @db.VarChar(1)
+  DAYID   Int?
+  DAYSTAT String? @db.VarChar(1)
+  RECOBY  String? @db.VarChar(20)
+  RECOPOS String? @db.VarChar(15)
+  APPBY   String? @db.VarChar(20)
+  APPPOS  String? @db.VarChar(15)
+  YEARID  Int?
+  MONTHID Int?
+
+  @@ignore
+}
+
+model PaymentDetail {
+  PaymentDetailId  Int     @id(map: "PK_PaymentDetail")
+  LedgerId         Int?
+  AccountId        Int?
+  OfficeId         Int?
+  GRN              Int?
+  MRN              String? @db.VarChar(20)
+  BillNo           String? @db.VarChar(20)
+  BillDate         String? @db.VarChar(10)
+  GrandTotal       Float?
+  ReceivedMasterId Float?
+  FYear            String? @db.VarChar(10)
+  MRN_GRNDate      String? @db.VarChar(10)
+  SupplierName     String? @db.VarChar(100)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model PhoneCalls {
+  CallID      Int?
+  DateVS      String? @db.VarChar(10)
+  DateAD      String? @db.VarChar(10)
+  Times       String? @db.VarChar(10)
+  PFrom       String? @db.VarChar(100)
+  PTo         String? @db.VarChar(100)
+  ISIncomeing String? @db.Char(1)
+  Remarks     String? @db.VarChar(200)
+  Duration    Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model POSITIONTREE {
+  POSITIONID   Int
+  PARENTID     Int?
+  POSITIONLIST String? @db.VarChar(50)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model POSLEAVE {
+  POSLEAVEID Int
+  LEAVEID    Int?
+  POSITIONID Int?
+  ABSENTDAYS Float?
+  MAXLEAVE   Float?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model POSSALARY {
+  POSSALARYID Int
+  POSITIONID  Int?
+  BASICSALARY Float?
+  GRADERATE1  Float?
+  GRADELIMIT1 Int?
+  GRADERATE2  Float?
+  GRADELIMIT2 Int?
+
+  @@ignore
+}
+
+model PurchaseBillMaster {
+  PurchaseBillMasterId Int     @id(map: "PK_PurchaseBillMaster")
+  LedgerId             Int?
+  AccountId            Int?
+  OfficeId             Int?
+  GRN                  Int?
+  MRN                  String? @db.VarChar(20)
+  BillNo               String? @db.VarChar(20)
+  BillDate             String? @db.VarChar(10)
+  TotalAmount          Float?
+  Discount             Float?
+  Tax                  Float?
+  Extra                Float?
+  GrandTotal           Float?
+  TDSAmount            Float?
+  TermsOfPayment       String? @db.VarChar(200)
+  PaymentDays          Int?
+  ReceivedMasterId     Float?
+  FYear                String? @db.VarChar(10)
+  MRN_GRNDate          String? @db.VarChar(10)
+  SupplierName         String? @db.VarChar(100)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model RevisedDates {
+  RevisedID Int?
+  StartDate String? @db.VarChar(10)
+  EndDate   String? @db.VarChar(10)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model SALARY {
+  SALARYID       Int
+  YEARID         Int     @db.SmallInt
+  MONTHID        Int     @db.SmallInt
+  STAFFID        Int
+  POSITIONID     Int
+  STAFFLEVEL     Int
+  BANKACCOUNT    String? @db.VarChar(30)
+  PFNUMBER       String? @db.VarChar(20)
+  CITNUMBER      String? @db.VarChar(20)
+  BASICSALARY    Float
+  NOOFGRADE      Int?    @db.SmallInt
+  GRADERATE      Float?
+  GRADEAMOUNT    Float?
+  SALARY         Float?
+  RESIDENCE      Float?
+  TIFFIN         Float?
+  ACCOUNT        Float?
+  FLIGHT         Float?
+  HARDSHIP       Float?
+  NIGHT          Float?
+  TECH           Float?
+  ADM            Float?
+  ADJ            Float?
+  RENT           Float?
+  UNIFORM        Float?
+  ABROAD         Float?
+  VEHICLE        Float?
+  OTHER1         Float?
+  OTHER2         Float?
+  DASHAINEXP     Float?
+  PFINCRATE      Float?
+  PFUNDINCAMT    Float?
+  TOTALSALARY    Float?
+  PFDEDRATE      Float?
+  PFUNDDEDAMT    Float?
+  CITRATE        Float?
+  CITAMOUNT      Float?
+  INCOMETAX      Float?
+  OVERLEAVEUNIT  Float?
+  OVERLEAVERATE  Float?
+  OVERLEAVEDED   Float?
+  LOANDED        Float?
+  OTHERDED       Float?
+  TOTALDED       Float?
+  STATUS         String? @db.VarChar(1)
+  OTHERDEDUCTION Float?
+  OTHERINCREMENT Float?
+  LOANdeduction  Float?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model SALARYDETAIL {
+  SALARYDETAILID Int?
+  TOTAMT         Float?
+  ISADDITION     Int?
+  ALLOWANCEID    Int?
+  SALARYMAIN     SALARYMAIN? @relation(fields: [SALARYDETAILID], references: [SALARYDETAILID], onDelete: NoAction, onUpdate: NoAction, map: "FK__SALARYDET__SALAR__3EA749C6")
+
+  @@ignore
+}
+
+model SALARYMAIN {
+  SALARYDETAILID Int            @id(map: "PK__SALARYMAIN__3BCADD1B")
+  YEARMONTH      String?        @db.VarChar(8)
+  STAFFID        Int?
+  STAFFNAME      String?        @db.VarChar(80)
+  BASICSALARY    Float?
+  TOTALGRADE     Float?
+  CITAMT         Float?
+  UNPAIDLEAVEAMT Float?
+  PFNUMBER       String?        @db.VarChar(20)
+  ACCNO          String?        @db.VarChar(20)
+  JOINDATEAD     String?        @db.VarChar(10)
+  JOINDATEVS     String?        @db.VarChar(10)
+  DEPID          Int?
+  BANKID         Int?
+  POSITIONID     Int?
+  STAFFGROUPID   Int?
+  CIFNO          String?        @db.VarChar(20)
+  LOP_Days       Float          @default(0, map: "DF__SalaryMai__LOP_D__5D2BD0E6")
+  LOP_Hrs        Float          @default(0, map: "DF__SalaryMai__LOP_H__5E1FF51F")
+  JOBTYPE        String?        @map("(JOBTYPE") @db.VarChar(20)
+  SALARYDETAIL   SALARYDETAIL[] @ignore
+}
+
+model SalarySheetDetail {
+  SalSheetDetailID     Float              @id(map: "PK_SalSheetDetail")
+  SalSheetMasterID     Float?
+  StaffID              Int?
+  BasicSalary          Float?
+  Grades               Float?
+  SalDaily             Float?
+  SalHourly            Float?
+  DaysToDeduct         Int?
+  HoursToDeduct        Int?
+  EarnedSalary         Float?
+  PFCont               Float?
+  Med                  Float?
+  Hou                  Float?
+  GrossDA              Float?
+  GrossDaily           Float?
+  GrossHourly          Float?
+  NetDA                Float?
+  TotalBeforeDeduction Float?
+  PF                   Float?
+  Tax                  Float?
+  Savings              Float?
+  NetAmount            Float?
+  SalarySheetMaster    SalarySheetMaster? @relation(fields: [SalSheetMasterID], references: [SalSheetMasterID], onDelete: NoAction, onUpdate: NoAction, map: "FK_SalSheetDetail")
+}
+
+model SalarySheetMaster {
+  SalSheetMasterID  Float               @id(map: "PK_SalSheetMaster")
+  YearMonth         String?             @db.VarChar(7)
+  SalarySheetDetail SalarySheetDetail[]
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model SALARYSTOP {
+  SALARYSTOPID Int
+  STAFFID      Int?
+  STOPDATE     String? @db.VarChar(10)
+  OPENDATE     String? @db.VarChar(10)
+  NOOFDAYS     Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model SALARYTEMP {
+  SALARYID       Int
+  YEARID         Int?    @db.SmallInt
+  MONTHID        Int?    @db.SmallInt
+  STAFFID        Int?
+  BASICSALARY    Float?
+  NOOFGRADE      Int?    @db.SmallInt
+  GRADERATE      Float?
+  PFINCRATE      Float?
+  OVERTIMEUNIT   Float?
+  OVERTIMERATE   Float?
+  OTHERINCREMENT Float?
+  PFDEDRATE      Float?
+  CITRATE        Float?
+  INCOMETAX      Float?
+  OVERLEAVEUNIT  Float?
+  OVERLEAVERATE  Float?
+  LOANDEDUCTION  Float?
+  OTHERDEDUCTION Float?
+  STATUS         String? @db.VarChar(1)
+  STAFFCODE      String? @db.VarChar(10)
+  STAFFNAME      String? @db.VarChar(50)
+  GRADEAMOUNT    Float?
+  PFUNDINCAMT    Float?
+  TOTALSALARY    Float?
+  PFUNDDEDAMT    Float?
+  TOTALDED       Float?
+  CITAMOUNT      Float?
+  POSITIONID     Int?
+  POSITIONNAME   String? @db.VarChar(50)
+  GRADEMONTH     String? @db.VarChar(10)
+  BANKACCOUNT    String? @db.VarChar(30)
+  PFNUMBER       String? @db.VarChar(20)
+  CITNUMBER      String? @db.VarChar(20)
+  SALARY         Float?
+  DASHAINEXP     Float?
+  STAFFLEVEL     Int
+
+  @@ignore
+}
+
+model SalaryUpdateLog {
+  LogID             Int     @id(map: "PK_LogID_SUL")
+  Ref_Date          String? @db.VarChar(10)
+  Ref_Sal_Month     String? @db.VarChar(7)
+  Rate              Float   @default(0, map: "DF__SalaryUpda__Rate__21D600EE")
+  Is_Amount         String? @db.Char(1)
+  StaffGroupID      Int     @default(0, map: "DF__SalaryUpd__Staff__22CA2527")
+  Entered_By        String? @db.VarChar(30)
+  Entered_Date_Time String? @db.VarChar(20)
+  PositionID        Int     @default(0, map: "DF_SalaryUpdateLog_PositionID")
+  JobTypeID         Int     @default(0, map: "DF_SalaryUpdateLog_JobTypeID")
+  Arrear_Date       String? @db.VarChar(10)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ScaleDetail {
+  SDetailId  Int?
+  ScaleId    Int?
+  AllowID    Int?
+  TotPercent Float?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ScalePay {
+  ScaleId         Int?
+  ScalePay        String? @db.VarChar(100)
+  TotPercent      Float?
+  IsTeachingScale Int     @default(0, map: "DF__ScalePay__IsTeac__3335971A")
+  ScaleFor        Int?    @default(0, map: "DF__ScalePay__ScaleF__3429BB53")
+
+  @@ignore
+}
+
+model SCHEDULE {
+  SCHID   Int     @id(map: "PK__SCHEDULE__24927208")
+  SCHNO   String? @db.VarChar(15)
+  SCHNAME String? @db.VarChar(50)
+  STATUS  Int?    @db.SmallInt
+}
+
+model SETUPBS {
+  SETUPBSID Int     @id(map: "PK__SETUPBS__267ABA7A")
+  SCHNO     Int?    @db.SmallInt
+  SCHNAME   String? @db.VarChar(50)
+  CAMOUNT   Float?
+  PAMOUNT   Float?
+  BYEAR     String? @db.VarChar(9)
+  STATUS    Int?    @db.SmallInt
+}
+
+model SHIFTTIME {
+  SHIFTTIMEID Int     @id(map: "PK_SHIFTTIMEID_ST")
+  SHIFTID     Int?
+  FROMTIME    String? @db.VarChar(12)
+  TOTIME      String? @db.VarChar(12)
+}
+
+model SUBSCHEDULE {
+  SUBSCHID   Int     @id(map: "PK__SUBSCHEDULE__29572725")
+  SCHID      Int?
+  SUBSCHNAME String? @db.VarChar(50)
+  HEADID     Int?
+}
+
+model SubSubCategory {
+  SubSubCategoryId Int     @id(map: "PK_SubSubCategory")
+  SubCategoryId    Int?
+  SubSubCatName    String? @db.VarChar(50)
+  SubSubCatCode    String? @db.VarChar(10)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model SYSTEMUSER {
+  USERID    Int
+  USERNAME  String? @db.VarChar(30)
+  UPASSWORD String? @db.VarChar(30)
+  SALARY    String? @db.VarChar(1)
+  SETUP     String? @db.VarChar(1)
+  UTILITY   String? @db.VarChar(1)
+  ADDUSER   String? @db.VarChar(1)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Table1 {
+  abc String? @db.VarChar(50)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Tax_Deduction {
+  Std_Dedu_Married   Float?
+  Std_Dedu_UnMarried Float?
+  Discount_Male      Float?
+  Discount_FeMale    Float?
+  FYEAR              String? @db.VarChar(10)
+
+  @@ignore
+}
+
+model TAX_RATE {
+  Tax_RateID     Int     @id(map: "PK__TAX_RATE__6991A7CB")
+  Tax_Rate       Float   @default(0, map: "DF__TAX_RATE__Tax_Ra__6A85CC04")
+  Amount         Float   @default(0, map: "DF__TAX_RATE__Amount__6B79F03D")
+  MARRIED_AMOUNT Float?  @default(0, map: "DF__TAX_RATE__MARRIE__63A3C44B")
+  SINGLE_AMOUNT  Float?  @default(0, map: "DF__TAX_RATE__SINGLE__6497E884")
+  FYEAR          String? @db.VarChar(10)
+}
+
+model TAXFORECAST {
+  FORECASTID             Int     @id(map: "PK__TAXFORECAST__45544755")
+  STAFFID                Int?
+  FISCALYEAR             String? @db.VarChar(10)
+  MONTHS                 Int?
+  REMMONTH               Int?
+  BASIC                  Float?
+  BASICPROJECTION        Float?
+  GROSS                  Float?
+  GROSSPROJECTION        Float?
+  OVERTIME               Float?
+  DASHAINALL             Float?
+  LEAVEENCASH            Float?
+  LTF                    Float?
+  CHILDEDUALL            Float?
+  BONUS                  Float?
+  ONETIMETRANSALL        Float?
+  PFADDITIONS            Float?
+  PFADDPROJECTION        Float?
+  STDDEDU                Float?
+  PFDEDU                 Float?
+  PFDEDUPROJECTION       Float?
+  CIT                    Float?
+  CITPROJECTION          Float?
+  LIFEINS                Float?
+  DEDUTAX                Float?
+  MEDTAXCREDIT           Float?
+  REMARKS                String? @db.VarChar(20)
+  TAXPMONTH              Float?
+  Tax_Discount           Float   @default(0, map: "DF__TAXFORECA__Tax_D__6D6238AF")
+  Medical_Grant          Float   @default(0, map: "DF__TAXFORECA__Medic__47FBA9D6")
+  Night_Allowance        Float   @default(0, map: "DF__TAXFORECA__Night__4CC05EF3")
+  Inchargeship_Allowance Float   @default(0, map: "DF__TAXFORECA__Incha__4DB4832C")
+  MISC_PAID              Float   @default(0, map: "DF_TAXFORECAST_MISC_PAID")
+}
+
+model TaxFree {
+  TFID    Int     @id(map: "PK_TF")
+  MStatus String? @db.VarChar(10)
+  TFree   Float?
+}
+
+model TaxRate {
+  TRID      Int    @id(map: "PK_TR")
+  MinAmount Float?
+  MaxAmount Float?
+  PC        Float?
+}
+
+model TBL_CURRENCYRATE {
+  CURRENCYRATEID      Int     @id(map: "PK__TBL_CURRENCYRATE__2C3393D0")
+  CURRENCYTYPEID      Int?
+  RATETYPEID          Int?
+  RATEDATE            String? @db.VarChar(10)
+  FOREIGNCURRENCYUNIT Int?
+  SALLINGRATE         Float?
+  BUYINGRATE          Float?
+}
+
+model TBL_RATETYPE {
+  RATETYPEID  Int     @id(map: "PK__TBL_RATETYPE__2E1BDC42")
+  RATETYPE    String? @db.VarChar(255)
+  DESCRIPTION String? @db.VarChar(255)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model VOUCHERCOUNTER {
+  AYEARID        Int
+  VCODE          String @db.VarChar(20)
+  VOUCHERCOUNTER Float?
+
+  @@ignore
+}
+
+model VOUCHERMASTER {
+  ID           Int     @id(map: "PK__VOUCHERMASTER__34C8D9D1")
+  VDATE        String? @db.VarChar(10)
+  ADVDATE      String? @db.VarChar(10)
+  NARRATION    String? @db.VarChar(200)
+  VTYPE        String? @db.VarChar(20)
+  INWORD       String? @db.VarChar(100)
+  ENCLOSER     String? @db.VarChar(10)
+  VNO          String? @db.VarChar(15)
+  CHEQUENO     String? @db.VarChar(30)
+  FUNDID       Int?
+  OFFICEID     Int?
+  ACTIVITYID   Int?
+  COBJECTID    Int?
+  VERIFIED     String? @default("0", map: "DF__VOUCHERMA__VERIF__35BCFE0A") @db.Char(1)
+  ReceiptType  String? @db.VarChar(30)
+  ChequeDate   String? @db.VarChar(10)
+  Cleared      Int?
+  ClearingDate String? @db.VarChar(10)
+  Amount       Float?
+  FYear        String? @db.VarChar(10)
+}
+
+model VOURCHERHEADS {
+  VOURCHERHEADID   Int
+  VCODE            String  @id(map: "PK__VOURCHERHEADS__37A5467C") @db.VarChar(20)
+  VOURCHERHEADNAME String? @db.VarChar(50)
+  VTYPE            String? @db.VarChar(1)
+  VOUCHERCOUNTER   Int?
+}
+
+model VOURCHERTYPE {
+  VOURCHERTYPEID   Int     @id(map: "PK_VOURCHERTYPE")
+  VOURCHERTYPENAME String? @db.VarChar(50)
+  VOUCHERCODE      String? @db.VarChar(15)
+}

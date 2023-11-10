@@ -1,0 +1,43 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("MAIN_DATABASE_URL")
+}
+
+model User {
+  userid    String  @id
+  username  String
+  onboarded Boolean  @default(false) 
+  department Department? @relation(fields: [depid], references: [depid])
+  depid Int?
+  transfer Transfer[]
+}
+
+model Department {
+  depid Int @id @default(autoincrement())
+  depname String
+  isactive Boolean @default(false) 
+  users User[]
+}
+
+model Product {
+  productid String @id
+  productname String
+  isactive Boolean @default(false) 
+  transfers Transfer[]
+}
+
+model Transfer {
+  transferid Int @id @default(autoincrement())
+  productid String
+  product Product @relation(fields: [productid], references: [productid])
+  fromuserid String
+  fromuser User @relation(fields: [fromuserid], references: [userid])
+  touserid String
+}

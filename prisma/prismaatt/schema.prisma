@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+  output = "../../node_modules/@prismaatt"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("ATT_DATABASE_URL")
+}
+
+model CHECKINOUT {
+  USERID     Int
+  CHECKTIME  DateTime @default(now(), map: "DF__CHECKINOU__CHECK__76969D2E") @db.DateTime
+  CHECKTYPE  String?  @default("I", map: "DF__CHECKINOU__CHECK__778AC167") @db.VarChar(1)
+  VERIFYCODE Int?     @default(0, map: "DF__CHECKINOU__VERIF__787EE5A0")
+  SENSORID   String?  @db.VarChar(5)
+  LOGID      Int      @default(autoincrement())
+  MachineId  Int?
+  UserExtFmt Int?
+  WorkCode   Int?
+  Memoinfo   String?  @db.VarChar(20)
+  sn         String?  @db.VarChar(20)
+
+  @@id([USERID, CHECKTIME], map: "USERCHECKTIME")
+}
+
+model Todo {
+  id       Int      @id(map: "PK__Todo__3213E83F70DDC3D8") @default(autoincrement())
+  title    String
+  complete Boolean
+  CreateAt DateTime @default(now(), map: "DF__Todo__CreateAt__72C60C4A")
+}
+
+model USERINFO {
+  USERID              Int       @id(map: "USERIDS") @default(autoincrement())
+  BADGENUMBER         String    @db.VarChar(12)
+  SSN                 String?   @db.VarChar(20)
+  NAME                String?   @db.VarChar(24)
+  GENDER              String?   @db.VarChar(2)
+  TITLE               String?   @db.VarChar(20)
+  PAGER               String?   @db.VarChar(20)
+  BIRTHDAY            DateTime? @db.DateTime
+  HIREDDAY            DateTime? @db.DateTime
+  STREET              String?   @db.VarChar(40)
+  CITY                String?   @db.VarChar(2)
+  STATE               String?   @db.VarChar(2)
+  ZIP                 String?   @db.VarChar(12)
+  OPHONE              String?   @db.VarChar(20)
+  FPHONE              String?   @db.VarChar(20)
+  VERIFICATIONMETHOD  Int?      @db.SmallInt
+  DEFAULTDEPTID       Int?      @default(1, map: "DF__USERINFO__DEFAUL__7B5B524B") @db.SmallInt
+  SECURITYFLAGS       Int?      @db.SmallInt
+  ATT                 Int       @default(1, map: "DF__USERINFO__ATT__7C4F7684") @db.SmallInt
+  INLATE              Int       @default(1, map: "DF__USERINFO__INLATE__7D439ABD") @db.SmallInt
+  OUTEARLY            Int       @default(1, map: "DF__USERINFO__OUTEAR__7E37BEF6") @db.SmallInt
+  OVERTIME            Int       @default(1, map: "DF__USERINFO__OVERTI__7F2BE32F") @db.SmallInt
+  SEP                 Int       @default(1, map: "DF__USERINFO__SEP__00200768") @db.SmallInt
+  HOLIDAY             Int       @default(1, map: "DF__USERINFO__HOLIDA__01142BA1") @db.SmallInt
+  MINZU               String?   @db.VarChar(8)
+  PASSWORD            String?   @db.VarChar(20)
+  LUNCHDURATION       Int       @default(1, map: "DF__USERINFO__LUNCHD__02084FDA") @db.SmallInt
+  MVerifyPass         String?   @db.VarChar(10)
+  PHOTO               Bytes?    @db.Image
+  Notes               Bytes?    @db.Image
+  privilege           Int?      @default(0, map: "DF__USERINFO__privil__02FC7413")
+  reserve             Int?      @default(0, map: "DF__USERINFO__reserv__03F0984C")
+  InheritDeptSch      Int?      @default(1, map: "DF__USERINFO__Inheri__04E4BC85") @db.SmallInt
+  InheritDeptSchClass Int?      @default(1, map: "DF__USERINFO__Inheri__05D8E0BE") @db.SmallInt
+  AutoSchPlan         Int?      @default(1, map: "DF__USERINFO__AutoSc__06CD04F7") @db.SmallInt
+  MinAutoSchInterval  Int?      @default(24, map: "DF__USERINFO__MinAut__07C12930")
+  RegisterOT          Int?      @default(1, map: "DF__USERINFO__Regist__08B54D69") @db.SmallInt
+  InheritDeptRule     Int?      @default(1, map: "DF__USERINFO__Inheri__09A971A2") @db.SmallInt
+  EMPRIVILEGE         Int?      @default(0, map: "DF__USERINFO__EMPRIV__0A9D95DB") @db.SmallInt
+  CardNo              String?   @db.VarChar(20)
+}
