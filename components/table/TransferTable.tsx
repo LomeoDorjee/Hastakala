@@ -7,14 +7,13 @@ import { deleteDepartment } from "@/lib/actions/config/department.actions"
 import Link from "next/link"
 
 type Transfer = {
-    productname: string
-    fromuser: string
-    touser: string
-    status: string
-    transferid: number
+    transfermasterid: number
     productid: number
-    fromuserid: string
-    touserid: string
+    productname: string
+    startbyuser: string
+    startbyuserid: string
+    startdate: string
+    status: string
 }
 type TransferProps = {
     transfers: Transfer[] | undefined
@@ -185,11 +184,11 @@ export default function TransferTable({ transfers }: TransferProps) {
                 return (
                     <Chip color={item.status ? "success" : "danger"} variant="bordered"> {item.status ? "Active" : "Inactive"}</Chip>
                 )
-            case "actions":
+            case "action":
                 return (
                     <div className="relative flex items-center gap-5">
                         <Tooltip content="Edit Transfer" color="secondary">
-                            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                            <span className="text-lg text-default-400 cursor-pointer active:opacity-50" onClick={() => { }}>
                                 <EditIcon />
                             </span>
                         </Tooltip>
@@ -221,20 +220,20 @@ export default function TransferTable({ transfers }: TransferProps) {
                 }}
                 bottomContentPlacement="outside"
                 topContent={topContent}
-            // topContentPlacement="outside"
+                // topContentPlacement="outside"
             >
                 <TableHeader>
                     <TableColumn key="productname" align="start" allowsSorting={true}>Product</TableColumn>
-                    <TableColumn key="transferdate" align="center" allowsSorting={true}>Date</TableColumn>
-                    <TableColumn key="fromuser" align="center" allowsSorting={true}>From</TableColumn>
-                    <TableColumn key="touser" align="center" allowsSorting={true}>To</TableColumn>
+                    <TableColumn key="startdate" align="center" allowsSorting={true}>Date</TableColumn>
+                    <TableColumn key="startbyuser" align="center" allowsSorting={true}>Started By</TableColumn>
                     <TableColumn key="status" align="center" allowsSorting={true}>Status</TableColumn>
+                    <TableColumn key="action" align="center" allowsSorting={true}>Action</TableColumn>
                 </TableHeader>
                 <TableBody emptyContent={"No Transfers found"}
                     items={sortedData}
                 >
                     {(item) => (
-                        <TableRow key={item.transferid}>
+                        <TableRow key={item.transfermasterid}>
                             {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
                         </TableRow>
                     )}

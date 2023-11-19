@@ -27,20 +27,31 @@ model Department {
 }
 
 model Product {
-  productid String @id
+  productid Int @id @default(autoincrement())
+  productcode String
   productname String
+  createdby String @default("")
   isactive Boolean @default(false) 
   transfers TransferMaster[]
 }
 
+model Images {
+  id Int @id @default(autoincrement())
+  masterid Int
+  path String
+  type String
+}
+
+
 model TransferMaster {
   transfermasterid Int @id @default(autoincrement())
-  productid String
+  productid Int
   product Product @relation(fields: [productid], references: [productid])
   startdate String
   startbyuserid String
   startuser User @relation(fields: [startbyuserid], references: [userid])
   transferdetails TransferDetail[]
+  status String
 }
 
 model TransferDetail {
@@ -51,5 +62,5 @@ model TransferDetail {
   fromuserid String
   touserid String
   status String @default("")
-  reamrks String @default("")
+  remarks String @default("")
 }

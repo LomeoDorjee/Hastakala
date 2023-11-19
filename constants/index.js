@@ -9,6 +9,16 @@ export const sidebarLinks = [
     route: "/pis",
     label: "PIS",
   },
+  {
+    imgURL: "/assets/members.svg",
+    route: "/transfer",
+    label: "Tracking",
+  },
+  {
+    imgURL: "/assets/members.svg",
+    route: "/config",
+    label: "Setup",
+  },
   // {
   //   imgURL: "/assets/search.svg",
   //   route: "/search",

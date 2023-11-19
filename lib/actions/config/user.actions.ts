@@ -18,21 +18,6 @@ export async function onBoardUser({
 }: UserProp){
 
     try {
-    
-        // await prisma.user.upsert({
-        //     where: {
-        //         userid: userid
-        //     },
-        //     update: {
-        //         username,
-        //         onboarded: true,
-        //     },
-        //     create: {
-        //         userid,
-        //         username,
-        //         onboarded: true
-        //     }
-        // })
 
         await prisma.$queryRaw`INSERT INTO "USER" VALUES (${userid},${username},1,NULL)`
         
@@ -137,6 +122,7 @@ export async function getAllUsers() {
     }
 
 }
+
 
 // export async function searchUsers({
 //     userId,
