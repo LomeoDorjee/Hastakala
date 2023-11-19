@@ -9,12 +9,15 @@ export async function getAllTransfers() {
             transfermasterid: number
             productid: number
             productname: string
+            productcode: string
+            remarks: string
             startbyuser: string
             startbyuserid: string
             startdate: string
             status: string
         }[] = await prisma.$queryRaw`SELECT 
         (SELECT PRODUCTNAME FROM PRODUCT WHERE PRODUCTID = T.PRODUCTID) productname,
+        (SELECT PRODUCTCODE FROM PRODUCT WHERE PRODUCTID = T.PRODUCTID) productcode,
         (SELECT USERNAME FROM "USER" WHERE USERID = T.STARTBYUSERID) startbyuser,
         T.*
         FROM TRANSFERMASTER T`
@@ -73,6 +76,45 @@ export async function createNewTransfer({
     } catch (e: unknown) {
         return {
             error: catchErrorMessage(e)
+        }
+    }
+
+}
+
+export async function getTransferDetail(masterid: number) {
+
+    try {
+
+        const data: {
+            transferdetailid: number
+            transferdate: string
+            fromuserid: string
+            fromusername: string
+            fromuserdep: string
+            touserid: string
+            tousername: string
+            touserdep: string
+            status: string
+        }[] = await prisma.$queryRaw`SELECT TD.*, 
+        (SELECT USERNAME FROM "USER" WHERE USERID = TD.FROMUSERID) fromusername, 
+        (SELECT 
+            (SELECT DEPNAME FROM DEPARTMENT WHERE DEPID = UA.DEPID) 
+        FROM "USER" UA WHERE USERID = TD.FROMUSERID) fromuserdep, 
+        (SELECT USERNAME FROM "USER" WHERE USERID = TD.TOUSERID) tousername, 
+        (SELECT 
+            (SELECT DEPNAME FROM DEPARTMENT WHERE DEPID = UB.DEPID) 
+        FROM "USER" UB WHERE USERID = TD.TOUSERID) touserdep
+        FROM TRANSFERDETAIL TD
+        WHERE TRANSFERMASTERID = ${masterid}
+        ORDER BY TRANSFERDETAILID DESC`
+
+        return {
+            data: data
+        }
+
+    } catch (error: unknown) {
+        return {
+            error: catchErrorMessage(error)
         }
     }
 

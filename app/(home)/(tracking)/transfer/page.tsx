@@ -6,6 +6,8 @@ type TransferData = {
         transfermasterid: number
         productid: number
         productname: string
+        productcode: string
+        remarks: string
         startbyuser: string
         startbyuserid: string
         startdate: string
