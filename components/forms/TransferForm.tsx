@@ -1,39 +1,175 @@
 "use client"
-import { useState } from 'react';
 
-const TransferForm = () => {
-    const [sourceDept, setSourceDept] = useState('');
-    const [destDept, setDestDept] = useState('');
-    const [productId, setProductId] = useState('');
+import { Card, CardHeader, CardBody, Button, Input, Divider, Select, SelectItem, Avatar, Checkbox } from "@nextui-org/react"
+import { useFormStatus } from "react-dom"
+import toast from "react-hot-toast"
+import Link from "next/link"
+import { TransferValidation } from "@/lib/validations/transfer"
+import { createNewTransfer } from "@/lib/actions/transfer/transfer.actions"
+import { redirect } from "next/navigation"
 
-    const handleTransfer = () => {
-        // Handle form submission (e.g., send data to API route)
-        console.log('Transfer submitted:', { sourceDept, destDept, productId });
-    };
+type Props = {
+    products: {
+        productid: number
+        productname: string
+    }[] | undefined
+    users: {
+        userid: string
+        username: string
+        depname: string | null
+        fullname: string
+        image: string
+    }[] | undefined
+    sessionUserId: string
+    sessionUserName: string
+
+}
+
+export default function TransferForm({
+    products,
+    users,
+    sessionUserId,
+    sessionUserName
+}: Props) {
+
+    const formSubmit = async (formData: FormData) => {
+
+        const newTransfer = {
+            depname: formData.get("departmentName"),
+            productid: parseInt(formData.get("product") as string),
+            fromuserid: sessionUserId,
+            touserid: formData.get("toTransferUser"),
+            remarks: formData.get("Remarks"),
+            status: "ISSUE"
+        }
+
+        // Validation
+        const zod = TransferValidation.safeParse(newTransfer)
+        if (!zod.success) {
+
+            let errorMessage = "";
+
+            zod.error.issues.forEach((issue) => {
+                errorMessage = errorMessage + "[" + issue.path[0] + "]: " + issue.message + "."
+            })
+            toast.error(errorMessage)
+            return;
+        }
+
+        // serverside function call
+        const response = await createNewTransfer(zod.data)
+        if (response?.error) {
+            toast.error(response.error)
+            return
+        }
+
+        toast.success("Data Saved")
+
+        if (formData.get("backToList") == "1") {
+            redirect("/transfer")
+        }
+        redirect("/transfer/new")
+    }
 
     return (
-        <div>
-            <input
-                type="text"
-                placeholder="Source Department"
-                value={sourceDept}
-                onChange={(e) => setSourceDept(e.target.value)}
-            />
-            <input
-                type="text"
-                placeholder="Destination Department"
-                value={destDept}
-                onChange={(e) => setDestDept(e.target.value)}
-            />
-            <input
-                type="text"
-                placeholder="Product ID"
-                value={productId}
-                onChange={(e) => setProductId(e.target.value)}
-            />
-            <button onClick={handleTransfer}>Transfer</button>
-        </div>
-    );
-};
+        <Card className="">
+            <CardHeader className="flex gap-1 justify-center">
+                New Transfer
+            </CardHeader>
+            <Divider />
+            <CardBody>
+                <form
+                    action={formSubmit}
+                    // onSubmit={handleSubmit}
+                    className="flex flex-col justify-start gap-5" >
 
-export default TransferForm;
+                    <Select
+                        autoFocus
+                        items={products}
+                        label="Product"
+                        placeholder="Select a product to begin Transfer"
+                        name="product"
+                        isRequired
+                        variant="bordered"
+                    >
+                        {(product) => <SelectItem key={product.productid}>{product.productname}</SelectItem>}
+                    </Select>
+
+                    <div className="flex gap-5">
+                        <Input
+                            readOnly
+                            label="Transfering From"
+                            variant="bordered"
+                            value={sessionUserName}
+                            disabled
+                        /> 
+
+                        <Select
+                            autoFocus
+                            items={users}
+                            label="Transfer To"
+                            placeholder="Select a user to Transfer to"
+                            name="toTransferUser"
+                            isRequired
+                            disabledKeys={[sessionUserId]}
+                            variant="bordered"
+                        >
+                            {
+                                (user) => {
+                                    return (
+                                        <SelectItem key={user.userid} textValue={user.fullname + " - " + user.depname}>
+                                            <div className="flex gap-2 items-center">
+                                                <Avatar alt={user.fullname} className="flex-shrink-0" size="sm" src={user.image} />
+                                                <div className="flex flex-col">
+                                                    <span className="text-small">{user.fullname}</span>
+                                                    <span className="text-tiny text-default-400">{user.depname}</span>
+                                                </div>
+                                            </div>
+                                        </SelectItem>
+                                    )
+                                }
+                            }
+                        </Select>
+                    </div>
+
+                    <Input
+                        label="Remarks"
+                        variant="bordered"
+                        placeholder="Enter Remarks"
+                        name="Remarks"
+                    />
+
+                    <div className="flex gap-5 justify-center">
+                        <SubmitButton />
+                        <Checkbox
+                            defaultSelected
+                            color="warning"
+                            className="w-full"
+                            name="backToList"
+                            value="1"
+                        >Back to Transfer List</Checkbox>
+                        <Button
+                            href="/transfer"
+                            as={Link}
+                            color="danger"
+                            variant="solid"
+                        >
+                            Back
+                        </Button>
+                    </div>
+                </form>
+            </CardBody>
+            <Divider />
+        </Card>
+    );
+}
+
+
+function SubmitButton() {
+    const { pending } = useFormStatus()
+    return (
+        <Button type="submit" color="secondary" isDisabled={pending} className="w-full">
+            {pending ? "Transferring" : "Start Transfer"}
+        </Button>
+    )
+}
