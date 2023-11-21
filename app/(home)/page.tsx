@@ -60,7 +60,7 @@ export default async function Home() {
             </Card>
 
             <Card className="col-span-6 sm:col-span-4 h-[250px]">
-                <Link href="/tracking" color="danger">
+                <Link href="/config" color="danger">
                     <CardHeader className="absolute z-10 top-1 flex-col !items-start">
                         <p className="text-tiny uppercase font-bold">Setup</p>
                         <h4 className="font-medium text-large">Configure Items</h4>
@@ -69,7 +69,7 @@ export default async function Home() {
                         removeWrapper
                         alt="Card background"
                         className="z-0 w-full h-full object-cover"
-                        src="/assets/more.svg"
+                        src="/assets/svg/gear.svg"
                     />
                 </Link>
             </Card>

@@ -37,7 +37,7 @@ export default function RootLayout({
             <SignedIn>
               <LeftSidebar />
             </SignedIn>
-            <section className='flex min-h-screen flex-1 flex-col items-center px-4 pb-10 pt-5 max-md:pb-32 sm:px-5'>
+            <section className='flex min-h-screen flex-1 flex-col items-center px-5 pb-10 pt-6 max-md:pb-32 sm:px-6'>
               <div className='w-full'>
                 <Providers>
                   {children}
