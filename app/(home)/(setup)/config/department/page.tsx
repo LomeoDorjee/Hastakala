@@ -8,7 +8,7 @@ export default async function Page() {
 
     return (
         <>
-            <h1 className="text-bold text-center mb-3 pb-2 uppercase text-2xl border-b-3 border-pink-800 rounded-lg">Department List</h1>
+            <h1 className="widgettitle">Department List</h1>
             <DepartmentTable departments={ data.data } />
         </>
     )

@@ -1,9 +1,8 @@
 "use client"
 
-import { Card, CardHeader, CardBody, Button, Input, Divider, Select, SelectItem, Avatar, Checkbox } from "@nextui-org/react"
+import { Card, CardHeader, CardBody, Button, Input, Divider, Select, SelectItem, Avatar, Checkbox, Link } from "@nextui-org/react"
 import { useFormStatus } from "react-dom"
 import toast from "react-hot-toast"
-import Link from "next/link"
 import { TransferValidation } from "@/lib/validations/transfer"
 import { createNewTransfer } from "@/lib/actions/transfer/transfer.actions"
 import { redirect } from "next/navigation"
@@ -12,6 +11,8 @@ type Props = {
     products: {
         productid: number
         productname: string
+        productcode: string
+        imgpath: string
     }[] | undefined
     users: {
         userid: string
@@ -73,8 +74,17 @@ export default function TransferForm({
 
     return (
         <Card className="">
-            <CardHeader className="flex gap-1 justify-center">
-                New Transfer
+            <CardHeader className="flex gap-1 justify-between">
+                <h4 className="text-xl px-2 ">
+                    New Transfer 
+                </h4>
+                <Link
+                    isExternal
+                    href="/config/product"
+                    showAnchorIcon
+                >
+                    Products
+                </Link>
             </CardHeader>
             <Divider />
             <CardBody>
@@ -92,7 +102,15 @@ export default function TransferForm({
                         isRequired
                         variant="bordered"
                     >
-                        {(product) => <SelectItem key={product.productid}>{product.productname}</SelectItem>}
+                        {(product) => <SelectItem key={product.productid} textValue={product.productname}>
+                            <div className="flex gap-2 items-center">
+                                <Avatar alt={product.productname} className="flex-shrink-0" size="sm" src={product.imgpath} />
+                                <div className="flex flex-col">
+                                    <span className="text-small">{product.productname}</span>
+                                    <span className="text-tiny text-default-400">{product.productcode}</span>
+                                </div>
+                            </div>
+                        </SelectItem>}
                     </Select>
 
                     <div className="flex gap-5">

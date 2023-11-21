@@ -1,7 +1,7 @@
 "use client"
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, Input, Button, useDisclosure, SortDescriptor, Tooltip, Chip } from "@nextui-org/react"
 import { Key, useCallback, useMemo, useState } from "react"
-import { DeleteIcon, EditIcon, SearchIcon } from "@/components/icons/icons"
+import { DeleteIcon, EditIcon, EyeIcon, SearchIcon } from "@/components/icons/icons"
 import DepartmentForm from "@/components/forms/DepartmentForm"
 import { deleteDepartment } from "@/lib/actions/config/department.actions"
 import Link from "next/link"
@@ -10,6 +10,7 @@ type Transfer = {
     transfermasterid: number
     productid: number
     productname: string
+    productcode: string
     startbyuser: string
     startbyuserid: string
     startdate: string
@@ -187,7 +188,25 @@ export default function TransferTable({ transfers }: TransferProps) {
             case "action":
                 return (
                     <div className="relative flex items-center gap-5">
-                        <Tooltip content="Edit Transfer" color="secondary">
+                        <Tooltip content="View Transfer" color="secondary">
+                            <Link
+                                href={{
+                                    pathname: `/transfer/detail/${item.transfermasterid}`,
+                                    query: {
+                                        status: item.status,
+                                        startdate: item.startdate,
+                                        startusername: item.startbyuser,
+                                        productname: item.productname,
+                                        productcode: item.productcode,
+                                        productid: item.productid
+                                    }
+                                }} >
+                                <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                    <EyeIcon />
+                                </span>
+                            </Link>
+                        </Tooltip>
+                        {/* <Tooltip content="Edit Transfer" color="secondary">
                             <span className="text-lg text-default-400 cursor-pointer active:opacity-50" onClick={() => { }}>
                                 <EditIcon />
                             </span>
@@ -196,7 +215,7 @@ export default function TransferTable({ transfers }: TransferProps) {
                             <span className="text-lg text-danger cursor-pointer active:opacity-50">
                                 <DeleteIcon />
                             </span>
-                        </Tooltip>
+                        </Tooltip> */}
                     </div>
                 );
             default:

@@ -25,7 +25,7 @@ function LeftSidebar() {
                         return (
                             <Link
                                 href={link.route}
-                                className={`relative flex justify-start gap-4 rounded-lg p-4 ${isActive && 'border-b-2 border-r-2 border-pink-700'} `}
+                                className={`relative flex justify-start gap-4 rounded-lg p-4 hover:bg-pink-100 ${isActive && 'border-b-2 border-l-2 border-pink-700'} `}
                                 key={link.label}
                             >
                                 <Image
@@ -51,7 +51,7 @@ function LeftSidebar() {
                         router.push('/sign-in')
                     }}>
                         <div className="flex cursor-pointer gap-4 p-4">
-                            <Image src="/assets/logout.svg"
+                            <Image src="/assets/svg/logout.svg"
                                 alt='logout'
                                 width={24}
                                 height={24}

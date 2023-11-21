@@ -7,3 +7,10 @@ export const TransferValidation = z.object({
     remarks: z.string().min(1).max(30),
     status: z.string().min(3).max(30)
 })
+
+export const IssueValidation = z.object({
+    masterid: z.number(),
+    fromuserid: z.string(),
+    touserid: z.string(),
+    remarks: z.string().min(1).max(30)
+})

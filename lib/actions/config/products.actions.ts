@@ -14,18 +14,13 @@ export async function getAllProducts(isactive = false) {
 
     try {
 
-        let query = `SELECT * FROM PRODUCT`
-
-        if (isactive) {
-            query += ` WHERE ISACTIVE = 1`
-        }
-
         const data: {
             productid: number
             productcode: string
             productname: string
             isactive: boolean
-        }[] = await prisma.$queryRaw`SELECT * FROM PRODUCT ${isactive ? Prisma.sql` WHERE ISACTIVE = 1` : Prisma.empty}`
+            imgpath: string
+        }[] = await prisma.$queryRaw`SELECT P.*, (SELECT TOP(1) "PATH" FROM IMAGES WHERE p.productid = masterid AND TYPE = 'PRODUCT' ORDER BY ID DESC ) imgpath FROM PRODUCT P ${isactive ? Prisma.sql` WHERE ISACTIVE = 1` : Prisma.empty}`
 
         return {
             data: data

@@ -12,7 +12,7 @@ function Topbar() {
     return (
         <nav className='fixed top-0 z-30 flex w-full items-center justify-between p-4'>
             <Link href="/" className='flex items-center gap-4'>
-                <Image src="/assets/logo.svg" alt="logo" width={28} height={28} />
+                <Image src="/assets/svg/logo.svg" alt="logo" width={28} height={28} />
                 <p className='font-bold text-light-1 max-xs:hidden'>{process.env.NEXT_PUBLIC_APP_NAME}</p>
             </Link>
 

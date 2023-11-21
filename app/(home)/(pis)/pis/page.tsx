@@ -2,7 +2,7 @@ import {Card, CardFooter, Image, Button, Link} from "@nextui-org/react";
 export default function Page() {
     
     return (
-        <div className="max-w-[900px] gap-5 grid grid-cols-12 grid-rows-2 px-8">
+        <div className="max-w-[1200px] gap-10 grid grid-cols-12">
             <Card
                 isFooterBlurred
                 radius="lg"
@@ -11,9 +11,9 @@ export default function Page() {
                 <Image
                     alt="Personal Information System"
                     className="object-cover"
-                    height={300}
+                    height={500}
                     src="/assets/svg/device-log.svg"
-                    width={200}
+                    width={500}
                 />
                 <CardFooter className="justify-between before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
                     <p className="text-tiny">Attendance Device Logs.</p>
@@ -30,9 +30,9 @@ export default function Page() {
                 <Image
                     alt="Personal Information System"
                     className="object-cover"
-                    height={300}
+                    height={500}
                     src="/assets/svg/development.svg"
-                    width={200}
+                    width={500}
                 />
                 <CardFooter className="justify-between before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
                     <p className="text-tiny">Other Report.</p>

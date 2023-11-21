@@ -123,11 +123,7 @@ export default function ProductTable({ products }: ProductProps) {
           <div className="relative flex items-center gap-3">
             <Tooltip content="View Images" color="primary">
               <Link href={{
-                pathname: `/config/product/upload`,
-                query: {
-                  name: "a",
-                  id: product.productid
-                },
+                pathname: `/config/product/upload/${product.productid}`
               }} color="primary">
                 <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                   <ImageIcon />
@@ -139,11 +135,11 @@ export default function ProductTable({ products }: ProductProps) {
                 <EditIcon />
               </span>
             </Tooltip>
-            <Tooltip color="danger" content="Delete Product">
+            {/* <Tooltip color="danger" content="Delete Product">
               <span className="text-lg text-danger cursor-pointer active:opacity-50">
                 <DeleteIcon />
               </span>
-            </Tooltip>
+            </Tooltip> */}
           </div>
         );
       default:
