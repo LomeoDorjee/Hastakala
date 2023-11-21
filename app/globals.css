@@ -26,6 +26,9 @@ body {
     rgb(var(--background-start-rgb)); */
 }
 
+.widgettitle {
+  @apply text-lg font-bold border-b-2 border-pink-800 mb-3 p-2 mb-5 shadow-xl text-pink-800
+}
 @layer utilities {
   .css-invert {
     @apply invert-[50%] brightness-200;

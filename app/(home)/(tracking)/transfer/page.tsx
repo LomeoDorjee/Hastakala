@@ -7,7 +7,6 @@ type TransferData = {
         productid: number
         productname: string
         productcode: string
-        remarks: string
         startbyuser: string
         startbyuserid: string
         startdate: string
@@ -27,7 +26,7 @@ export default async function Page() {
 
     return (
         <>
-            <h1 className="text-lg border-b-2 border-pink-800 rounded-lg text-center mb-3 p-2">Product Transfer List</h1>
+            <h1 className="widgettitle">Product Transfer List</h1>
             <TransferTable transfers={data} />
         </>
     )

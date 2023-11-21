@@ -11,7 +11,6 @@ type Transfer = {
     productid: number
     productname: string
     productcode: string
-    remarks: string
     startbyuser: string
     startbyuserid: string
     startdate: string
@@ -195,11 +194,11 @@ export default function TransferTable({ transfers }: TransferProps) {
                                     pathname: `/transfer/detail/${item.transfermasterid}`,
                                     query: {
                                         status: item.status,
-                                        remarks: item.remarks,
                                         startdate: item.startdate,
                                         startusername: item.startbyuser,
                                         productname: item.productname,
-                                        productcode: item.productcode
+                                        productcode: item.productcode,
+                                        productid: item.productid
                                     }
                                 }} >
                                 <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
@@ -207,7 +206,7 @@ export default function TransferTable({ transfers }: TransferProps) {
                                 </span>
                             </Link>
                         </Tooltip>
-                        <Tooltip content="Edit Transfer" color="secondary">
+                        {/* <Tooltip content="Edit Transfer" color="secondary">
                             <span className="text-lg text-default-400 cursor-pointer active:opacity-50" onClick={() => { }}>
                                 <EditIcon />
                             </span>
@@ -216,7 +215,7 @@ export default function TransferTable({ transfers }: TransferProps) {
                             <span className="text-lg text-danger cursor-pointer active:opacity-50">
                                 <DeleteIcon />
                             </span>
-                        </Tooltip>
+                        </Tooltip> */}
                     </div>
                 );
             default:

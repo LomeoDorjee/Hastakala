@@ -9,6 +9,8 @@ type ProductList = {
     data?: {
         productid: number
         productname: string
+        productcode: string
+        imgpath: string
     }[] | undefined
     error?: string
 }

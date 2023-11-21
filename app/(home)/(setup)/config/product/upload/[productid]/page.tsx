@@ -1,6 +1,6 @@
 import ProductImage from "@/components/forms/ProductImage";
 import { getProductImages } from "@/lib/actions/config/products.actions";
-import { Card, Image, Skeleton } from "@nextui-org/react";
+import { Button, Card, Image, Link, Skeleton } from "@nextui-org/react";
 import NextImage from "next/image";
 
 export default async function Page({ params }: { params: { productid: number } }) {
@@ -18,7 +18,19 @@ export default async function Page({ params }: { params: { productid: number } }
 
     return (
         <>
-            <h3 className="text-bold text-2xl uppercase text-center mb-4 border-b-2 rounded-lg border-pink-800">Product Images</h3>
+            <div className="flex gap-2 justify-between">
+                <h2 className="m-2 text-center text-2xl text-pink-800">Product Images</h2>
+
+                <div className="flex gap-2 z-50">
+                    <Button
+                        showAnchorIcon
+                        as={Link}
+                        href="/config/product"
+                        color="success" variant="light" >
+                        Back to product List
+                    </Button>
+                </div>
+            </div>
             <ProductImage productid={params.productid} />
             <div className="grid grid-cols-4 gap-4 py-4">
                 {

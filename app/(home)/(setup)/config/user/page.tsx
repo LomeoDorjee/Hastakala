@@ -12,7 +12,7 @@ export default async function Page() {
 
     return (
         <>
-            <h3 className="text-bold text-2xl uppercase text-center mb-4 border-b-2 rounded-lg border-pink-800">User List</h3>
+            <h3 className="widgettitle">User List</h3>
             <UserTable users={users.data} departments={ departments.data } />
         </>
     )

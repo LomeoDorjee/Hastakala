@@ -1,30 +1,32 @@
 "use client"
-import { Card, CardBody, CardHeader, Divider, Snippet } from '@nextui-org/react'
+import { Card, CardBody, CardHeader, Chip, Divider, Link, Snippet, Tooltip } from '@nextui-org/react'
 import { useSearchParams } from 'next/navigation'
 
 export default function TransferDetailHeader() {
 
     const searchParams = useSearchParams()
 
-    const search = searchParams.get('search')
-
     return (
         <>
-
             <Card className="py-4">
                 <CardHeader className='flex gap-2 justify-between pt-0'>
                     <div className="flex justify-start items-center">
                         <p className=''>Product Code:</p>
-                        <Snippet symbol="" variant="bordered" className='border-0 py-0 text-xl'>{searchParams.get("productcode")}</Snippet>
+                        <Tooltip content="Images">
+                            <Link isBlock color="success" showAnchorIcon
+                                href={`/config/product/upload/${searchParams.get("productid")}`}
+                                target='_blank'>
+                                {searchParams.get("productcode")}
+                            </Link>
+                        </Tooltip>
                     </div>
                     <div className="flex justify-start items-center">
                         <p className=''>Product Name:</p>
-                        <Snippet symbol="" variant="bordered" className='border-0 py-0 text-xl'>{searchParams.get("productname")}</Snippet>
+                        <Chip variant="bordered" className='border-0 py-0 text-xl'>{searchParams.get("productname")}</Chip>
                     </div>
                 </CardHeader>
                 <Divider />
-                <CardBody className="overflow-visible py-2 flex flex-col gap-2 pb-0">
-                    <p>Remarks: {searchParams.get("remarks")}</p>
+                <CardBody className="overflow-visible pt-2 flex flex-col gap-2 pb-0">
                     <div className="flex justify-between">
                         <p>Status: <b>{searchParams.get("status")}</b></p>
                         <p>Start Date: <b>{searchParams.get("startdate")}</b></p>
