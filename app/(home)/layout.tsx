@@ -7,7 +7,7 @@ import LeftSidebar from '@/components/shared/LeftSidebar'
 import RightSidebar from '@/components/shared/RightSidebar'
 import Bottombar from '@/components/shared/Bottombar'
 
-import { ClerkProvider, SignedIn } from '@clerk/nextjs'
+import { ClerkProvider, SignedIn, SignedOut } from '@clerk/nextjs'
 import { dark } from '@clerk/themes'
 import { Providers } from '@/providers/providers'
 import { Toaster } from 'react-hot-toast'
@@ -37,7 +37,10 @@ export default function RootLayout({
             <SignedIn>
               <LeftSidebar />
             </SignedIn>
-            <section className='flex min-h-screen flex-1 flex-col items-center px-5 pb-10 pt-6 max-md:pb-32 sm:px-6'>
+            <SignedOut>
+              <div className="w-[50px] flex max-md:w-[15px]"></div>
+            </SignedOut>
+            <section className='flex min-h-screen flex-1 flex-col items-center px-5 pb-10 pt-6 max-md:pb-32 sm:px-6 max-md:pt-16'>
               <div className='w-full'>
                 <Providers>
                   {children}

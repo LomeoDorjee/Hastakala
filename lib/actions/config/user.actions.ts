@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/db/main_db"
 import { clerkClient } from "@clerk/nextjs"
 import { catchErrorMessage } from "../../utils"
+import { revalidatePath } from "next/cache"
 
 
 type UserProp = {
@@ -55,6 +56,7 @@ export async function fetchUserInfo(userId: string) {
 type userDepProps = {
     depid: number
     userid: string
+    pathname: string
 }
 
 export async function updateUserDepartment(userDep: userDepProps) {
@@ -62,6 +64,8 @@ export async function updateUserDepartment(userDep: userDepProps) {
     try {
 
         await prisma.$queryRaw`UPDATE "USER" SET DEPID = ${userDep.depid} WHERE USERID=${userDep.userid}`
+
+        revalidatePath(userDep.pathname)
 
         return {
             status: "User's Department has been updated"

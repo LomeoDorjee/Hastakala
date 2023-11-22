@@ -25,7 +25,7 @@ function LeftSidebar() {
                         return (
                             <Link
                                 href={link.route}
-                                className={`relative flex justify-start gap-4 rounded-lg p-4 hover:bg-pink-100 ${isActive && 'border-b-2 border-l-2 border-pink-700'} `}
+                                className={`relative flex justify-start gap-4 rounded-lg p-4 hover:shadow-inner ${isActive && 'shadow-xl border-b-2 border-l-2 border-pink-700'} `}
                                 key={link.label}
                             >
                                 <Image

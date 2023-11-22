@@ -73,7 +73,7 @@ export default function TransferForm({
     }
 
     return (
-        <Card className="">
+        <Card className="mt-5">
             <CardHeader className="flex gap-1 justify-between">
                 <h4 className="text-xl px-2 ">
                     New Transfer 
