@@ -6,7 +6,6 @@ import { useFormStatus } from "react-dom"
 import toast from "react-hot-toast"
 import { updateUserDepartment } from "@/lib/actions/config/user.actions"
 import { usePathname } from 'next/navigation'
-import { revalidatePath } from "next/cache"
 
 type Props = {
     onOpen: () => void
@@ -49,7 +48,8 @@ export default function UserDepartForm({
         
         const newUserDep = {
             depid: parseInt(formData.get("departmentId") as string),
-            userid: ToEditUserId
+            userid: ToEditUserId,
+            pathname: pathname
         }
         
         // serverside function call 
@@ -62,8 +62,6 @@ export default function UserDepartForm({
         if (response.status) toast.success(response.status)
         
         onClose()
-
-        revalidatePath(pathname)
     }
 
     // const handleValueChange = useCallback((value?: string) => {
