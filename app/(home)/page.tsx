@@ -1,7 +1,5 @@
 import {Card, CardHeader, CardBody, CardFooter, Image, Button, Link} from "@nextui-org/react"
-import { SignIn, SignedIn, currentUser } from "@clerk/nextjs"
-import { fetchUserInfo } from "@/lib/actions/config/user.actions"
-import { redirect } from "next/navigation"
+import { SignedIn } from "@clerk/nextjs"
 
 export default async function Home() {
 
@@ -26,7 +24,7 @@ export default async function Home() {
                 </Card>
 
                 <Card className="col-span-6 sm:col-span-4 h-[250px]">
-                    <Link href="/tracking" color="warning">
+                    <Link href="/transfer" color="warning">
                         <CardHeader className="absolute z-10 top-1 flex-col !items-start">
                             <p className="text-4xl uppercase font-bold">Tracking</p>
                             <h4 className="font-medium text-large">Product Issue & Transfer Tracking</h4>

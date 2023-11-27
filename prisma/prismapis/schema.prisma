@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output = "../../node_modules/@prismapis"
+  output   = "../../node_modules/@prismapis"
 }
 
 datasource db {
@@ -1692,41 +1692,6 @@ model SALARY {
   @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model SALARYDETAIL {
-  SALARYDETAILID Int?
-  TOTAMT         Float?
-  ISADDITION     Int?
-  ALLOWANCEID    Int?
-  SALARYMAIN     SALARYMAIN? @relation(fields: [SALARYDETAILID], references: [SALARYDETAILID], onDelete: NoAction, onUpdate: NoAction, map: "FK__SALARYDET__SALAR__3EA749C6")
-
-  @@ignore
-}
-
-model SALARYMAIN {
-  SALARYDETAILID Int            @id(map: "PK__SALARYMAIN__3BCADD1B")
-  YEARMONTH      String?        @db.VarChar(8)
-  STAFFID        Int?
-  STAFFNAME      String?        @db.VarChar(80)
-  BASICSALARY    Float?
-  TOTALGRADE     Float?
-  CITAMT         Float?
-  UNPAIDLEAVEAMT Float?
-  PFNUMBER       String?        @db.VarChar(20)
-  ACCNO          String?        @db.VarChar(20)
-  JOINDATEAD     String?        @db.VarChar(10)
-  JOINDATEVS     String?        @db.VarChar(10)
-  DEPID          Int?
-  BANKID         Int?
-  POSITIONID     Int?
-  STAFFGROUPID   Int?
-  CIFNO          String?        @db.VarChar(20)
-  LOP_Days       Float          @default(0, map: "DF__SalaryMai__LOP_D__5D2BD0E6")
-  LOP_Hrs        Float          @default(0, map: "DF__SalaryMai__LOP_H__5E1FF51F")
-  JOBTYPE        String?        @map("(JOBTYPE") @db.VarChar(20)
-  SALARYDETAIL   SALARYDETAIL[] @ignore
-}
-
 model SalarySheetDetail {
   SalSheetDetailID     Float              @id(map: "PK_SalSheetDetail")
   SalSheetMasterID     Float?
@@ -2034,4 +1999,27 @@ model VOURCHERTYPE {
   VOURCHERTYPEID   Int     @id(map: "PK_VOURCHERTYPE")
   VOURCHERTYPENAME String? @db.VarChar(50)
   VOUCHERCODE      String? @db.VarChar(15)
+}
+
+model PE_MARKS {
+  MARKSID   Int  @id(map: "pv_marks_pkey") @default(autoincrement())
+  STAFFID   Int
+  FYEARID   Int
+  HOD_Q1    Int?
+  HOD_Q2    Int?
+  HOD_Q3    Int?
+  HOD_Q4    Int?
+  HOD_Q5    Int?
+  HOD_Q6    Int?
+  HOD_Q7    Int?
+  HOD_Q8    Int?
+  HOD_Q9    Int?
+  HOD_Q10   Int?
+  TOTAL_HOD Int?
+  SUP_Q1    Int?
+  SUP_Q2    Int?
+  SUP_Q3    Int?
+  SUP_Q4    Int?
+  SUP_Q5    Int?
+  TOTAL_SUP Int?
 }
