@@ -19,3 +19,8 @@ export const MarksValidation = z.object({
     sup_q4: z.number().lte(5).nonnegative(),
     sup_q5: z.number().lte(5).nonnegative()
 })
+
+export const AppraisalValidation = z.object({
+    staffid: z.number(),
+    fyearid: z.number(),
+})

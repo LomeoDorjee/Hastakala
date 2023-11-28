@@ -26,9 +26,9 @@ import {
     Divider
 } from "@nextui-org/react";
 import { ChangeEvent, Key, useCallback, useEffect, useMemo, useState } from "react";
-import { ChevronDownIcon, DeleteIcon, EditIcon, EyeIcon, SearchIcon } from "../icons/icons";
+import { ChevronDownIcon, DeleteIcon, EditIcon, EyeIcon, SearchIcon } from "../../icons/icons";
 import { getAllMarks } from "@/lib/actions/performance/evaluation.actions";
-import StaffMarksForm from "../forms/StaffMarksForm";
+import StaffMarksForm from "../../forms/StaffMarksForm";
 
 type MARKS = {
     MARKSID: number,
@@ -117,6 +117,8 @@ export default function MarksTable({ years }: YearProps) {
         }
         if (records)
             setMarks(records.data)
+
+        setPage(1)
     }
 
     useEffect(() => {
@@ -126,7 +128,7 @@ export default function MarksTable({ years }: YearProps) {
     const [filterValue, setFilterValue] = useState("");
     const [rowsPerPage, setRowsPerPage] = useState(7);
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-        column: "NAME",
+        column: "STAFFNAME",
         direction: "ascending",
     });
     const [page, setPage] = useState(1);
@@ -284,34 +286,31 @@ export default function MarksTable({ years }: YearProps) {
 
     const topContent = useMemo(() => {
         return (
-            <div className="flex flex-col gap-4">
-                <div className="flex justify-between gap-3 items-end">
-                    <Input
-                        isClearable
-                        className="w-full"
-                        placeholder="Search by Staff Name..."
-                        startContent={<SearchIcon className="text-default-300" />}
-                        value={filterValue}
-                        variant="bordered"
-                        onClear={() => setFilterValue("")}
-                        onValueChange={onSearchChange}
-                    />
-                    <Select
-                        label="Fiscal Year"
-                        className="max-w-xs"
-                        size="sm"
-                        variant="bordered"
-                        placeholder="Select Fiscal Year"
-                        onChange={handleFyearChange}
-                        defaultSelectedKeys={[selectedYear]}
-                    >
-                        {years.map((year) => (
-                            <SelectItem key={year.FYEARID} value={year.FYEAR}>
-                                {year.FYEAR}
-                            </SelectItem>
-                        ))}
-                    </Select>
-                </div>
+            <div className="flex flex-row gap-4 justify-between items-end">
+                <Input
+                    isClearable
+                    className="w-full"
+                    placeholder="Search by Staff Name..."
+                    startContent={<SearchIcon className="text-default-300" />}
+                    value={filterValue}
+                    onClear={() => setFilterValue("")}
+                    onValueChange={onSearchChange}
+                    size="lg"
+                />
+                <Select
+                    label="Fiscal Year"
+                    className="max-w-xs"
+                    placeholder="Select Fiscal Year"
+                    onChange={handleFyearChange}
+                    defaultSelectedKeys={[selectedYear]}
+                    size="sm"
+                >
+                    {years.map((year) => (
+                        <SelectItem key={year.FYEARID} value={year.FYEAR}>
+                            {year.FYEAR}
+                        </SelectItem>
+                    ))}
+                </Select>
             </div>
         );
     }, [
@@ -326,18 +325,21 @@ export default function MarksTable({ years }: YearProps) {
         return (
             <div className="py-2 px-2 flex justify-between items-center">
                 <span className="text-default-400 text-small">Total {marks?.length} Users</span>
-                <Pagination
-                    showControls
-                    classNames={{
-                        cursor: "bg-foreground text-background",
-                    }}
-                    color="default"
-                    isDisabled={hasSearchFilter}
-                    page={page}
-                    total={pages}
-                    variant="light"
-                    onChange={setPage}
-                />
+                {pages > 0 ? (
+                    <Pagination
+                        showControls
+                        classNames={{
+                            cursor: "bg-foreground text-background",
+                        }}
+                        color="secondary"
+                        isDisabled={hasSearchFilter}
+                        page={page}
+                        total={pages}
+                        variant="light"
+                        onChange={setPage}
+                    />
+                ) : null
+                }
                 <label className="flex items-center text-default-400 text-small">
                     Rows per page:
                     <select

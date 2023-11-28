@@ -19,6 +19,11 @@ export const sidebarLinks = [
     route: "/config",
     label: "Setup",
   },
+  {
+    imgURL: "/assets/svg/list.svg",
+    route: "/evaluation",
+    label: "Evaluation",
+  },
   // {
   //   imgURL: "/assets/search.svg",
   //   route: "/search",
