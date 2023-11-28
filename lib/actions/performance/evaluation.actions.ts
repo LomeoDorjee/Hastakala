@@ -2,7 +2,7 @@
 import { attprisma } from "@/lib/db/att_db"
 import { pisprisma } from "@/lib/db/pis_db"
 import { catchErrorMessage } from "@/lib/utils"
-import { AppraisalValidation, MarksValidation } from "@/lib/validations/evaluation"
+import { AppraisalValidation, AppreciationValidation, EducationValidation, LeaveEvalValidation, MarksValidation, WarningValidation } from "@/lib/validations/evaluation"
 import { revalidatePath } from "next/cache"
 
 // ========================= COMMON ========================== //
@@ -13,6 +13,28 @@ export async function getAllFiscalYears() {
             FYEARID: number,
             FYEAR: string
         }[] = await pisprisma.$queryRaw`SELECT * FROM ENG_FYEAR_PIS ORDER BY FYEARID DESC`
+
+        return {
+            data: data,
+            error: ""
+        }
+
+    } catch (error) {
+        return {
+            data: [],
+            error: catchErrorMessage(error)
+        }
+    }
+
+}
+
+export async function getCriterias(ctype: string) {
+
+    try {
+        const data: {
+            CVALUE: number,
+            CNAME: string
+        }[] = await pisprisma.$queryRaw`SELECT CNAME, CVALUE FROM PE_CRITERIAS WHERE CTYPE = ${ctype}`
 
         return {
             data: data,
@@ -330,7 +352,8 @@ export async function getServicePeriod(fyearid: number) {
                     CASE WHEN ISNULL(A.FYEARID,'') = 0 THEN 0 
                     WHEN ${fyearid} - A.FYEARID > 10 THEN 10
                     ELSE ${fyearid} - A.FYEARID END ) POINTS
-                FROM STAFF S LEFT JOIN PE_APPRAISAL A ON A.STAFFID = S.STAFFID`
+                FROM STAFF S LEFT JOIN PE_APPRAISAL A ON A.STAFFID = S.STAFFID
+                WHERE S.JOBSTATUSID = 1`
 
         return {
             data: data,
@@ -364,7 +387,8 @@ export async function getAppraisals() {
                 A.APPRAISALID, A.FYEARID,
                 (CASE WHEN ISNULL(A.FYEARID,'') = '' THEN 'NA' ELSE  
                 (SELECT FYEAR FROM ENG_FYEAR_PIS WHERE FYEARID = A.FYEARID ) END ) LAST_APPRAISAL
-                FROM STAFF S LEFT JOIN PE_APPRAISAL A ON A.STAFFID = S.STAFFID`
+                FROM STAFF S LEFT JOIN PE_APPRAISAL A ON A.STAFFID = S.STAFFID
+                WHERE S.JOBSTATUSID = 1`
 
         return {
             data: data,
@@ -419,6 +443,310 @@ export async function createUpdateAppraisal(formData: unknown) {
 
 }
 
+// ========================= Education ========================== //
+export async function getEducationRecord(fyearid: number) {
+    try {
+        const data: {
+            STAFFID: number,
+            STAFFNAME: string
+            STAFFCODE: string
+            DEPARTMENT: string
+            DESIGNATION: string
+            FYEARID: number
+            QUALIFICATION: string
+            FYEAR: string
+        }[] = await pisprisma.$queryRaw`SELECT S.STAFFNAME, S.STAFFCODE, S.STAFFID,
+                (SELECT DEPARTMENTNAME FROM PISDEPARTMENT WHERE DEPARTMENTID = S.DEPARTMENTID) DEPARTMENT, 
+                (SELECT POSITIONNAME FROM STAFFPOSITION WHERE POSITIONID = S.POSITIONID) DESIGNATION,
+                E.FYEARID, E.QUALIFICATION,
+                (CASE WHEN ISNULL(E.FYEARID,'') = '' THEN '~' ELSE  
+                (SELECT FYEAR FROM ENG_FYEAR_PIS WHERE FYEARID = E.FYEARID ) END ) FYEAR
+                FROM STAFF S LEFT JOIN PE_EDUCATION E ON E.STAFFID = S.STAFFID
+                WHERE S.JOBSTATUSID = 1 AND (E.FYEARID = ${fyearid} OR E.FYEARID IS NULL)`
+
+        return {
+            data: data,
+            error: ""
+        }
+
+    } catch (error) {
+        return {
+            data: [],
+            error: catchErrorMessage(error)
+        }
+    }
+
+}
+
+export async function createUpdateEducation(formData: unknown) {
+
+    try {
+        const zod = EducationValidation.safeParse(formData)
+        if (!zod.success) {
+
+            let errorMessage = "";
+
+            zod.error.issues.forEach((issue) => {
+                errorMessage = errorMessage + "[" + issue.path[0] + "]: " + issue.message + "."
+            })
+            return {
+                error: errorMessage
+            };
+        }
+
+        let points = 5;
+        if (zod.data.qualification == "UNDER") {
+            points = 0
+        } else if (zod.data.qualification == "OVER") {
+            points = 10
+        }
+
+        await pisprisma.$queryRaw`MERGE PE_EDUCATION AS tgt  
+            USING (
+                SELECT ${zod.data.fyearid}, ${zod.data.staffid}, ${zod.data.qualification}, ${points}
+            ) AS SRC (FYEARID, STAFFID, QUALIFICATION, POINTS)  
+            ON (TGT.STAFFID = SRC.STAFFID AND TGT.FYEARID = SRC.FYEARID)  
+            WHEN MATCHED THEN 
+                UPDATE SET QUALIFICATION = SRC.QUALIFICATION, POINTS = SRC.POINTS
+            WHEN NOT MATCHED THEN   
+                INSERT (FYEARID, STAFFID, QUALIFICATION, POINTS) 
+                VALUES (SRC.FYEARID, SRC.STAFFID, SRC.QUALIFICATION, SRC.POINTS);`
+
+        // revalidatePath("/evaluation/education")
+        return
+
+    } catch (error) {
+        return {
+            data: [],
+            error: catchErrorMessage(error)
+        }
+    }
+
+}
+
+
+// ========================= Administration: Leaves ========================== //
+export async function getLeaveEvalRecord(fyearid: number) {
+    try {
+        const data: {
+            STAFFID: number,
+            STAFFNAME: string
+            STAFFCODE: string
+            DEPARTMENT: string
+            DESIGNATION: string
+            FYEARID: number
+            CATEGORY: string
+            FYEAR: string
+        }[] = await pisprisma.$queryRaw`SELECT S.STAFFNAME, S.STAFFCODE, S.STAFFID,
+                (SELECT DEPARTMENTNAME FROM PISDEPARTMENT WHERE DEPARTMENTID = S.DEPARTMENTID) DEPARTMENT, 
+                (SELECT POSITIONNAME FROM STAFFPOSITION WHERE POSITIONID = S.POSITIONID) DESIGNATION,
+                AL.FYEARID, AL.CATEGORY,
+                (CASE WHEN ISNULL(AL.FYEARID,'') = '' THEN '~' ELSE  
+                (SELECT FYEAR FROM ENG_FYEAR_PIS WHERE FYEARID = AL.FYEARID ) END ) FYEAR
+                FROM STAFF S LEFT JOIN PE_LEAVEEVAL AL ON AL.STAFFID = S.STAFFID
+                WHERE S.JOBSTATUSID = 1 AND (AL.FYEARID = ${fyearid} OR AL.FYEARID IS NULL)`
+
+        return {
+            data: data,
+            error: ""
+        }
+
+    } catch (error) {
+        return {
+            data: [],
+            error: catchErrorMessage(error)
+        }
+    }
+
+}
+
+export async function createUpdateAnnualLeaveData(formData: unknown) {
+
+    try {
+        const zod = LeaveEvalValidation.safeParse(formData)
+        if (!zod.success) {
+
+            let errorMessage = "";
+
+            zod.error.issues.forEach((issue) => {
+                errorMessage = errorMessage + "[" + issue.path[0] + "]: " + issue.message + "."
+            })
+            return {
+                error: errorMessage
+            };
+        }
+
+        await pisprisma.$queryRaw`MERGE PE_LEAVEEVAL AS tgt  
+            USING (
+                SELECT ${zod.data.fyearid}, ${zod.data.staffid}, ${zod.data.category}, ${zod.data.point}
+            ) AS SRC (FYEARID, STAFFID, CATEGORY, POINTS)  
+            ON (TGT.STAFFID = SRC.STAFFID AND TGT.FYEARID = SRC.FYEARID)  
+            WHEN MATCHED THEN 
+                UPDATE SET CATEGORY = SRC.CATEGORY, POINTS = SRC.POINTS
+            WHEN NOT MATCHED THEN   
+                INSERT (FYEARID, STAFFID, CATEGORY, POINTS) 
+                VALUES (SRC.FYEARID, SRC.STAFFID, SRC.CATEGORY, SRC.POINTS);`
+
+        // revalidatePath("/evaluation/leave")
+        return
+
+    } catch (error) {
+        return {
+            data: [],
+            error: catchErrorMessage(error)
+        }
+    }
+
+}
+
+// ========================= Administration: Appreciation ========================== //
+export async function getAppreciationRecord(fyearid: number) {
+    try {
+        const data: {
+            STAFFID: number,
+            STAFFNAME: string
+            STAFFCODE: string
+            DEPARTMENT: string
+            DESIGNATION: string
+            FYEARID: number
+            CATEGORY: string
+            FYEAR: string
+        }[] = await pisprisma.$queryRaw`SELECT S.STAFFNAME, S.STAFFCODE, S.STAFFID,
+                (SELECT DEPARTMENTNAME FROM PISDEPARTMENT WHERE DEPARTMENTID = S.DEPARTMENTID) DEPARTMENT, 
+                (SELECT POSITIONNAME FROM STAFFPOSITION WHERE POSITIONID = S.POSITIONID) DESIGNATION,
+                AL.FYEARID, AL.CATEGORY,
+                (CASE WHEN ISNULL(AL.FYEARID,'') = '' THEN '~' ELSE  
+                (SELECT FYEAR FROM ENG_FYEAR_PIS WHERE FYEARID = AL.FYEARID ) END ) FYEAR
+                FROM STAFF S LEFT JOIN PE_APPRECIATION AL ON AL.STAFFID = S.STAFFID
+                WHERE S.JOBSTATUSID = 1 AND (AL.FYEARID = ${fyearid} OR AL.FYEARID IS NULL)`
+
+        return {
+            data: data,
+            error: ""
+        }
+
+    } catch (error) {
+        return {
+            data: [],
+            error: catchErrorMessage(error)
+        }
+    }
+
+}
+
+export async function createUpdateAppreciation(formData: unknown) {
+
+    try {
+        const zod = AppreciationValidation.safeParse(formData)
+        if (!zod.success) {
+
+            let errorMessage = "";
+
+            zod.error.issues.forEach((issue) => {
+                errorMessage = errorMessage + "[" + issue.path[0] + "]: " + issue.message + "."
+            })
+            return {
+                error: errorMessage
+            };
+        }
+
+        await pisprisma.$queryRaw`MERGE PE_APPRECIATION AS tgt  
+            USING (
+                SELECT ${zod.data.fyearid}, ${zod.data.staffid}, ${zod.data.category}, ${zod.data.point}
+            ) AS SRC (FYEARID, STAFFID, CATEGORY, POINTS)  
+            ON (TGT.STAFFID = SRC.STAFFID AND TGT.FYEARID = SRC.FYEARID)  
+            WHEN MATCHED THEN 
+                UPDATE SET CATEGORY = SRC.CATEGORY, POINTS = SRC.POINTS
+            WHEN NOT MATCHED THEN   
+                INSERT (FYEARID, STAFFID, CATEGORY, POINTS) 
+                VALUES (SRC.FYEARID, SRC.STAFFID, SRC.CATEGORY, SRC.POINTS);`
+
+        // revalidatePath("/evaluation/appreciation")
+        return
+
+    } catch (error) {
+        return {
+            data: [],
+            error: catchErrorMessage(error)
+        }
+    }
+
+}
+
+// ========================= Administration: Warning ========================== //
+export async function getWarningRecord(fyearid: number) {
+    try {
+        const data: {
+            STAFFID: number,
+            STAFFNAME: string
+            STAFFCODE: string
+            DEPARTMENT: string
+            DESIGNATION: string
+            FYEARID: number
+            CATEGORY: string
+            FYEAR: string
+        }[] = await pisprisma.$queryRaw`SELECT S.STAFFNAME, S.STAFFCODE, S.STAFFID,
+                (SELECT DEPARTMENTNAME FROM PISDEPARTMENT WHERE DEPARTMENTID = S.DEPARTMENTID) DEPARTMENT, 
+                (SELECT POSITIONNAME FROM STAFFPOSITION WHERE POSITIONID = S.POSITIONID) DESIGNATION,
+                AL.FYEARID, AL.CATEGORY,
+                (CASE WHEN ISNULL(AL.FYEARID,'') = '' THEN '~' ELSE  
+                (SELECT FYEAR FROM ENG_FYEAR_PIS WHERE FYEARID = AL.FYEARID ) END ) FYEAR
+                FROM STAFF S LEFT JOIN PE_WARNING AL ON AL.STAFFID = S.STAFFID
+                WHERE S.JOBSTATUSID = 1 AND (AL.FYEARID = ${fyearid} OR AL.FYEARID IS NULL)`
+
+        return {
+            data: data,
+            error: ""
+        }
+
+    } catch (error) {
+        return {
+            data: [],
+            error: catchErrorMessage(error)
+        }
+    }
+
+}
+
+export async function createUpdateWarning(formData: unknown) {
+
+    try {
+        const zod = WarningValidation.safeParse(formData)
+        if (!zod.success) {
+
+            let errorMessage = "";
+
+            zod.error.issues.forEach((issue) => {
+                errorMessage = errorMessage + "[" + issue.path[0] + "]: " + issue.message + "."
+            })
+            return {
+                error: errorMessage
+            };
+        }
+
+        await pisprisma.$queryRaw`MERGE PE_WARNING AS tgt  
+            USING (
+                SELECT ${zod.data.fyearid}, ${zod.data.staffid}, ${zod.data.category}, ${zod.data.point}
+            ) AS SRC (FYEARID, STAFFID, CATEGORY, POINTS)  
+            ON (TGT.STAFFID = SRC.STAFFID AND TGT.FYEARID = SRC.FYEARID)  
+            WHEN MATCHED THEN 
+                UPDATE SET CATEGORY = SRC.CATEGORY, POINTS = SRC.POINTS
+            WHEN NOT MATCHED THEN   
+                INSERT (FYEARID, STAFFID, CATEGORY, POINTS) 
+                VALUES (SRC.FYEARID, SRC.STAFFID, SRC.CATEGORY, SRC.POINTS);`
+
+        // revalidatePath("/evaluation/warning")
+        return
+
+    } catch (error) {
+        return {
+            data: [],
+            error: catchErrorMessage(error)
+        }
+    }
+
+}
+
 
 // ========================= FINAL ========================== //
 type FinalData = {
@@ -430,6 +758,8 @@ type FinalData = {
     AVERAGE: number
     STAFFNAME: string
     FYEAR: string
+    SERVICE: number
+    EDUCATION: number
 }
 
 type FinalMain = {
@@ -451,6 +781,8 @@ type FinalMain = {
         YEAR3: string
         YEAR4: string
         YEAR5: string
+        SERVICE: number
+        EDUCATION: number
     }
 }
 export async function getFinalRecord(fyearid: number) {
@@ -464,7 +796,22 @@ export async function getFinalRecord(fyearid: number) {
         // YEAR 1 //
         const year1: FinalData[] = await pisprisma.$queryRaw`SELECT S.STAFFCODE, S.STAFFNAME, A.*, S.STAFFID,
                 (SELECT DEPARTMENTNAME FROM PISDEPARTMENT WHERE DEPARTMENTID = S.DEPARTMENTID) DEPARTMENT, 
-                (SELECT POSITIONNAME FROM STAFFPOSITION WHERE POSITIONID = S.POSITIONID) DESIGNATION
+                (SELECT POSITIONNAME FROM STAFFPOSITION WHERE POSITIONID = S.POSITIONID) DESIGNATION,
+                (
+                    SELECT (
+                        CASE WHEN ISNULL(AP.FYEARID,'') = 0 THEN 0
+                        WHEN ${fyearid} - AP.FYEARID > 10 THEN 10
+                        ELSE ${fyearid} - AP.FYEARID END 
+                    ) FROM PE_APPRAISAL AP 
+                    WHERE AP.STAFFID = S.STAFFID
+                ) SERVICE,
+                (
+                    SELECT (
+                        CASE WHEN ISNULL(POINTS,0) = 0 THEN 0
+                        ELSE POINTS END
+                    ) FROM PE_EDUCATION
+                    WHERE FYEARID = ${fyearid} AND STAFFID = S.STAFFID
+                ) EDUCATION
                 FROM STAFF S INNER JOIN PE_AVERAGE A ON S.STAFFID = A.STAFFID 
                 WHERE S.JOBSTATUSID = 1 AND FYEARID = ${fyearid}`
 
@@ -489,6 +836,8 @@ export async function getFinalRecord(fyearid: number) {
                 YEAR3: "",
                 YEAR4: "",
                 YEAR5: "",
+                SERVICE: res.SERVICE,
+                EDUCATION: res.EDUCATION,
             }
         });
 

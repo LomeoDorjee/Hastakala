@@ -21,61 +21,63 @@ import {
     SortDescriptor,
     Spinner,
     Select,
-    SelectItem
+    SelectItem,
+    Tooltip,
+    useDisclosure
 } from "@nextui-org/react";
-import { SearchIcon } from "../../icons/icons";
-import { getAverageMarks, getFinalRecord } from "@/lib/actions/performance/evaluation.actions";
+import { EditIcon, SearchIcon } from "../../icons/icons";
+import { getEducationRecord, getLeaveEvalRecord } from "@/lib/actions/performance/evaluation.actions";
+import EducationForm from "@/components/forms/EducationForm";
+import LeaveEvalForm from "@/components/forms/LeaveEvalForm";
 
 type YEAR = {
     FYEARID: number
     FYEAR: string
 }
+type CRITERIA = {
+    CVALUE: number
+    CNAME: string
+}
 type Props = {
     years: YEAR[]
+    criterias: CRITERIA[]
 }
 
 type RECORD = {
-    STAFFID: number
+    STAFFID: number,
+    STAFFNAME: string
     STAFFCODE: string
     DEPARTMENT: string
     DESIGNATION: string
     FYEARID: number
-    AVERAGE1: number
-    AVERAGE2: number
-    AVERAGE3: number
-    AVERAGE4: number
-    AVERAGE5: number
-    AVERAGE: number
-    STAFFNAME: string
-    YEAR1: string
-    YEAR2: string
-    YEAR3: string
-    YEAR4: string
-    YEAR5: string
-    SERVICE: number
-    EDUCATION: number
+    CATEGORY: string
+    FYEAR: string
 }
 
 const columns = [
     { name: "NAME", uid: "STAFFNAME", sortable: true },
     { name: "DEPARTMENT", uid: "DEPARTMENT", sortable: true },
     { name: "DESIGNATION", uid: "DESIGNATION", sortable: true },
-    { name: "PERFORMANCE", uid: "AVERAGE", sortable: true },
-    { name: "SERVICE", uid: "SERVICE", sortable: true },
-    { name: "EDUCATION", uid: "EDUCATION", sortable: true },
+    { name: "YEAR", uid: "FYEAR", sortable: true },
+    { name: "CATEGORY", uid: "CATEGORY", sortable: true },
     { name: "ACTIONS", uid: "actions" },
 ];
-export default function FinalTable({ years }: Props) {
+export default function LeaveEvalTable({ years, criterias }: Props) {
+
+    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+
+    const [staffname, setstaffname] = useState("")
+    const [staffid, setstaffid] = useState(0)
 
     const [Data, setData] = useState<RECORD[]>([])
     const [isLoading, setIsLoading] = useState(true);
 
-    const [selectedYear, setSelectedYear] = useState((years.length) ? "" + years[0].FYEARID : "1")
+    const [toSelectFyearid, setToSelectFyearid] = useState((years.length) ? "" + years[0].FYEARID : "1")
 
-    const fetchData = async (yearid: number) => {
-        let records = await getFinalRecord(yearid)
+    const fetchData = async (fyearid: number) => {
+        let records = await getLeaveEvalRecord(fyearid)
         if (records == null) {
-            records = await getFinalRecord(yearid)
+            records = await getLeaveEvalRecord(fyearid)
         }
 
         setIsLoading(false)
@@ -89,13 +91,13 @@ export default function FinalTable({ years }: Props) {
     }
 
     useEffect(() => {
-        fetchData(selectedYear as unknown as number)
+        fetchData(toSelectFyearid as unknown as number)
     }, [])
 
     const [filterValue, setFilterValue] = useState("");
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-        column: "age",
+        column: "STAFFNAME",
         direction: "ascending",
     });
 
@@ -134,6 +136,15 @@ export default function FinalTable({ years }: Props) {
         });
     }, [sortDescriptor, items]);
 
+    const handleEdit = (item: RECORD) => {
+        if (item.FYEARID > 0) {
+            setToSelectFyearid(item.FYEARID as unknown as string)
+        }
+        setstaffid(item.STAFFID)
+        setstaffname(item.STAFFNAME)
+        onOpen()
+    }
+
     const renderCell = useCallback((data: RECORD, columnKey: Key) => {
         const cellValue = data[columnKey as keyof RECORD];
 
@@ -147,19 +158,12 @@ export default function FinalTable({ years }: Props) {
                 );
             case "actions":
                 return (
-                    <div className="relative flex justify-end items-center gap-2">
-                        <Dropdown>
-                            <DropdownTrigger>
-                                <Button size="sm" variant="light">
-                                    More
-                                </Button>
-                            </DropdownTrigger>
-                            <DropdownMenu>
-                                <DropdownItem>View</DropdownItem>
-                                <DropdownItem>Edit</DropdownItem>
-                                <DropdownItem>Delete</DropdownItem>
-                            </DropdownMenu>
-                        </Dropdown>
+                    <div className="flex justify-center items-center gap-2">
+                        <Tooltip content="Edit Annual Leave" color="secondary">
+                            <span className="text-lg text-default-400 cursor-pointer active:opacity-50" onClick={() => handleEdit(data)}>
+                                <EditIcon />
+                            </span>
+                        </Tooltip>
                     </div>
                 );
             default:
@@ -190,7 +194,6 @@ export default function FinalTable({ years }: Props) {
         if (e.target.value) {
             setIsLoading(true)
             fetchData(e.target.value as unknown as number)
-            setSelectedYear(e.target.value)
         }
     };
 
@@ -210,10 +213,10 @@ export default function FinalTable({ years }: Props) {
                 <Select
                     label="Fiscal Year"
                     className="max-w-xs"
-                    size="sm"
                     placeholder="Select Fiscal Year"
                     onChange={handleFyearChange}
-                    defaultSelectedKeys={[selectedYear]}
+                    defaultSelectedKeys={[toSelectFyearid]}
+                    size="sm"
                 >
                     {years.map((year) => (
                         <SelectItem key={year.FYEARID} value={year.FYEAR}>
@@ -267,41 +270,55 @@ export default function FinalTable({ years }: Props) {
     }, [items.length, page, pages, hasSearchFilter]);
 
     return (
-        <Table
-            aria-label="Example table with custom cells, pagination and sorting"
-            isHeaderSticky
-            bottomContent={bottomContent}
-            bottomContentPlacement="outside"
-            selectionMode="single"
-            color="success"
-            sortDescriptor={sortDescriptor}
-            topContent={topContent}
-            topContentPlacement="inside"
-            onSortChange={setSortDescriptor}
-        >
-            <TableHeader columns={columns}>
-                {(column) => (
-                    <TableColumn
-                        key={column.uid}
-                        align={column.uid === "actions" ? "center" : "start"}
-                        allowsSorting={column.sortable}
-                    >
-                        {column.name}
-                    </TableColumn>
-                )}
-            </TableHeader>
-            <TableBody
-                emptyContent={"No Data found"}
-                items={sortedItems}
-                isLoading={isLoading}
-                loadingContent={<Spinner color="secondary" />}
+        <>
+            <LeaveEvalForm
+                onOpen={onOpen}
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+                onClose={onClose}
+                staffid={staffid}
+                staffname={staffname}
+                toSelectFyearid={toSelectFyearid}
+                fetchData={fetchData}
+                years={years}
+                criterias={criterias}
+            />
+            <Table
+                aria-label="Example table with custom cells, pagination and sorting"
+                isHeaderSticky
+                bottomContent={bottomContent}
+                bottomContentPlacement="outside"
+                selectionMode="single"
+                color="success"
+                sortDescriptor={sortDescriptor}
+                topContent={topContent}
+                topContentPlacement="inside"
+                onSortChange={setSortDescriptor}
             >
-                {(item) => (
-                    <TableRow key={item.STAFFCODE}>
-                        {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
-                    </TableRow>
-                )}
-            </TableBody>
-        </Table>
+                <TableHeader columns={columns}>
+                    {(column) => (
+                        <TableColumn
+                            key={column.uid}
+                            align={column.uid === "actions" ? "center" : "start"}
+                            allowsSorting={column.sortable}
+                        >
+                            {column.name}
+                        </TableColumn>
+                    )}
+                </TableHeader>
+                <TableBody
+                    emptyContent={"No Data found"}
+                    items={sortedItems}
+                    isLoading={isLoading}
+                    loadingContent={<Spinner color="secondary" />}
+                >
+                    {(item) => (
+                        <TableRow key={item.STAFFCODE}>
+                            {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
+        </>
     );
 }

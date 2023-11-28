@@ -1,5 +1,5 @@
 import AverageTable from "@/components/table/evaluation/AverageTable"
-import { getAllFiscalYears, getAverageMarks } from "@/lib/actions/performance/evaluation.actions"
+import { getAllFiscalYears } from "@/lib/actions/performance/evaluation.actions"
 
 type YEARS = {
     data: {

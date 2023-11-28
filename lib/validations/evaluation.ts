@@ -24,3 +24,30 @@ export const AppraisalValidation = z.object({
     staffid: z.number(),
     fyearid: z.number(),
 })
+
+export const EducationValidation = z.object({
+    staffid: z.number(),
+    fyearid: z.number(),
+    qualification: z.string(),
+})
+
+export const LeaveEvalValidation = z.object({
+    staffid: z.number(),
+    fyearid: z.number(),
+    category: z.string(),
+    point: z.number(),
+})
+
+export const AppreciationValidation = z.object({
+    staffid: z.number(),
+    fyearid: z.number(),
+    category: z.string(),
+    point: z.number(),
+})
+
+export const WarningValidation = z.object({
+    staffid: z.number(),
+    fyearid: z.number(),
+    category: z.string(),
+    point: z.number(),
+})

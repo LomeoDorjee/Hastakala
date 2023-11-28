@@ -33,17 +33,8 @@ type YEAR = {
     FYEARID: number
     FYEAR: string
 }
-type STAFF = {
-    STAFFID: number,
-    STAFFNAME: string,
-    STAFFCODE: string,
-    DEPARTMENT: string,
-    DESIGNATION: string
-    GENDER: string
-}
 type Props = {
     years: YEAR[]
-    staffs: STAFF[]
 }
 
 type RECORD = {
@@ -64,7 +55,7 @@ const columns = [
     { name: "LAST APPRAISAL", uid: "LAST_APPRAISAL", sortable: true },
     { name: "ACTIONS", uid: "actions" },
 ];
-export default function AppraisalTable({ years, staffs }: Props) {
+export default function AppraisalTable({ years }: Props) {
 
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 

@@ -1,6 +1,5 @@
-import AppraisalTable from "@/components/table/evaluation/AppraisalTable"
+import EducationTable from "@/components/table/evaluation/EducationTable"
 import { getAllFiscalYears } from "@/lib/actions/performance/evaluation.actions"
-import { getAllStaffs } from "@/lib/actions/pis/staffs.actions"
 
 type YEARS = {
     data: {
@@ -16,8 +15,9 @@ export default async function Page() {
 
     return (
         <>
-            <h3 className="widgettitle">Last Appraisal Report</h3>
-            <AppraisalTable years={years.data} />
+            <h3 className="widgettitle">Education Record</h3>
+            <EducationTable years={years.data} />
         </>
     )
+
 }
