@@ -126,8 +126,7 @@ export default function AttendanceTable() {
         filterValue,
         onSearchChange,
         hasSearchFilter,
-        logs.length,
-        hasSearchFilter
+        logs.length
     ]);
 
     const bottomContent = useMemo(() => {

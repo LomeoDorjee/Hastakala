@@ -1,4 +1,4 @@
-import MarksTable from "@/components/table/evaluation/MarksTable"
+import EducationTable from "@/components/table/evaluation/EducationTable"
 import { getAllFiscalYears } from "@/lib/actions/performance/evaluation.actions"
 
 type YEARS = {
@@ -15,8 +15,8 @@ export default async function Page() {
 
     return (
         <>
-            <h3 className="widgettitle">Evaluation Marks</h3>
-            <MarksTable years={years.data} />
+            <h3 className="widgettitle">Education Record</h3>
+            <EducationTable years={years.data} />
         </>
     )
 

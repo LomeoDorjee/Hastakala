@@ -2023,3 +2023,20 @@ model PE_MARKS {
   SUP_Q5    Int?
   TOTAL_SUP Int?
 }
+
+model PE_APPRAISAL {
+  APPRAISALID Int  @id(map: "pe_appraise_pkey")
+  FYEARID     Int?
+  STAFFID     Int?
+}
+
+model PE_AVERAGE {
+  AVERAGEID  Int    @id(map: "pe_yearavg_pkey") @default(autoincrement())
+  FYEARID    Int?
+  STAFFID    Int?
+  HOD_TOTAL  Int?
+  HOD_WEIGHT Int?
+  SUP_TOTAL  Int?
+  SUP_WEIGHT Int?
+  AVERAGE    Float?
+}
