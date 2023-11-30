@@ -1,4 +1,4 @@
-import FinalEvaluationTable from "@/components/table/evaluation/FinalEvaluationTable"
+import AdminavgTable from "@/components/table/evaluation/AdminavgTable"
 import { getAllFiscalYears } from "@/lib/actions/performance/evaluation.actions"
 
 type YEARS = {
@@ -9,14 +9,16 @@ type YEARS = {
     error: string
 }
 
+
 export default async function Page() {
 
     const years: YEARS = await getAllFiscalYears()
 
     return (
         <>
-            <h3 className="widgettitle">Final Evaluation</h3>
-            <FinalEvaluationTable years={years.data} />
+            <h3 className="widgettitle">Administration Total</h3>
+            <AdminavgTable years={years.data} />
         </>
     )
+
 }

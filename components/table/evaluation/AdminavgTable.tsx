@@ -24,7 +24,7 @@ import {
     SelectItem
 } from "@nextui-org/react";
 import { SearchIcon } from "../../icons/icons";
-import { getAverageMarks, getFinalRecord } from "@/lib/actions/performance/evaluation.actions";
+import { getAdminAverage } from "@/lib/actions/performance/evaluation.actions";
 
 type YEAR = {
     FYEARID: number
@@ -39,33 +39,21 @@ type RECORD = {
     STAFFCODE: string
     DEPARTMENT: string
     DESIGNATION: string
-    FYEARID: number
-    AVERAGE1: number
-    AVERAGE2: number
-    AVERAGE3: number
-    AVERAGE4: number
-    AVERAGE5: number
-    AVERAGE: number
     STAFFNAME: string
-    YEAR1: string
-    YEAR2: string
-    YEAR3: string
-    YEAR4: string
-    YEAR5: string
-    SERVICE: number
-    EDUCATION: number
+    ATTENDANCE: number
+    APPRECIATION: number
+    WARNING: number
 }
 
 const columns = [
     { name: "NAME", uid: "STAFFNAME", sortable: true },
     { name: "DEPARTMENT", uid: "DEPARTMENT", sortable: true },
-    { name: "DESIGNATION", uid: "DESIGNATION", sortable: true },
-    { name: "PERFORMANCE", uid: "AVERAGE", sortable: true },
-    { name: "SERVICE", uid: "SERVICE", sortable: true },
-    { name: "EDUCATION", uid: "EDUCATION", sortable: true },
-    { name: "ACTIONS", uid: "actions" },
+    { name: "ATTENDANCE", uid: "ATTENDANCE", sortable: true },
+    { name: "APPRECIATION", uid: "APPRECIATION", sortable: true },
+    { name: "WARNING", uid: "WARNING", sortable: true },
+    // { name: "ACTIONS", uid: "actions" },
 ];
-export default function FinalTable({ years }: Props) {
+export default function AdminavgTable({ years }: Props) {
 
     const [Data, setData] = useState<RECORD[]>([])
     const [isLoading, setIsLoading] = useState(true);
@@ -73,9 +61,9 @@ export default function FinalTable({ years }: Props) {
     const [selectedYear, setSelectedYear] = useState((years.length) ? "" + years[0].FYEARID : "1")
 
     const fetchData = async (yearid: number) => {
-        let records = await getFinalRecord(yearid)
+        let records = await getAdminAverage(yearid)
         if (records == null) {
-            records = await getFinalRecord(yearid)
+            records = await getAdminAverage(yearid)
         }
 
         setIsLoading(false)
@@ -141,7 +129,7 @@ export default function FinalTable({ years }: Props) {
             case "STAFFNAME":
                 return (
                     <User
-                        description={data.STAFFCODE}
+                        description={data.STAFFCODE + " | " + data.DESIGNATION}
                         name={data.STAFFNAME}
                     />
                 );
