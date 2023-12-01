@@ -244,11 +244,11 @@ export default function MarksTable({ years }: YearProps) {
             case "actions":
                 return (
                     <div className="relative flex items-center gap-3">
-                        <Tooltip content="View Detail" color="success">
+                        {/* <Tooltip content="View Detail" color="success">
                             <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                                 <EyeIcon />
                             </span>
-                        </Tooltip>
+                        </Tooltip> */}
                         <Tooltip content="Edit Marks" color="secondary">
                             <span className="text-lg text-default-400 cursor-pointer active:opacity-50" onClick={() => handleMarksEdit(staff)}>
                                 <EditIcon />
@@ -295,7 +295,7 @@ export default function MarksTable({ years }: YearProps) {
                     value={filterValue}
                     onClear={() => setFilterValue("")}
                     onValueChange={onSearchChange}
-                    size="lg"
+                    size="sm"
                 />
                 <Select
                     label="Fiscal Year"

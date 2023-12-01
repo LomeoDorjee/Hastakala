@@ -19,7 +19,8 @@ import {
     ChipProps,
     SortDescriptor,
     Tooltip,
-    useDisclosure
+    useDisclosure,
+    Link
 } from "@nextui-org/react";
 import { ChangeEvent, Key, useCallback, useMemo, useState } from "react";
 import { DeleteIcon, EditIcon, EyeIcon, SearchIcon } from "../icons/icons";
@@ -109,7 +110,6 @@ export default function StaffTable({ staffs }: StaffProps) {
             case "STAFFNAME":
                 return (
                     <User
-                        // avatarProps={{ radius: "full", size: "sm", src: staff.image }}
                         classNames={{
                             description: "text-default-500",
                         }}
@@ -117,17 +117,17 @@ export default function StaffTable({ staffs }: StaffProps) {
                         name={staff.STAFFNAME}
                     />
                 );
-            // case "depname":
-            //     return (
-            //         <Chip color={(user.depname != "Unassigned") ? "success" : "warning"} variant="flat">{user.depname}</Chip>
-            //     );
             case "actions":
                 return (
                     <div className="relative flex items-center gap-3">
-                        <Tooltip content="View Detail" color="success">
-                            <span className="text-lg text-default-400 cursor-pointer active:opacity-50" onClick={() => handleUserEdit(staff)}>
-                                <EyeIcon />
-                            </span>
+                        <Tooltip content="View Detail" color="warning">
+                            <Link
+                                isExternal
+                                href={`/pis/staffs/${staff.STAFFID}`}
+                                showAnchorIcon
+                                color="warning"
+                            >
+                            </Link>
                         </Tooltip>
                     </div>
                 );
