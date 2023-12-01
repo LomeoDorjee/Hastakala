@@ -80,8 +80,8 @@ export async function getAllMarks(fyearid: number) {
             TOTAL_SUP: number,
         }[] = await pisprisma.$queryRaw`SELECT S.STAFFNAME, S.STAFFCODE, M.*, S.STAFFID,
 		(SELECT FYEAR FROM ENG_FYEAR_PIS WHERE FYEARID = M.FYEARID) FYEAR
-		FROM STAFF S LEFT JOIN PE_MARKS M ON M.STAFFID = S.STAFFID 
-        WHERE JOBSTATUSID = 1 AND ( M.FYEARID = ${fyearid} OR M.FYEARID IS NULL ) `
+		FROM STAFF S LEFT JOIN PE_MARKS M ON M.STAFFID = S.STAFFID AND M.FYEARID = ${fyearid}
+        WHERE JOBSTATUSID = 1`
 
         return {
             data: data,
@@ -456,13 +456,26 @@ export async function getEducationRecord(fyearid: number) {
             QUALIFICATION: string
             FYEAR: string
         }[] = await pisprisma.$queryRaw`SELECT S.STAFFNAME, S.STAFFCODE, S.STAFFID,
-                (SELECT DEPARTMENTNAME FROM PISDEPARTMENT WHERE DEPARTMENTID = S.DEPARTMENTID) DEPARTMENT, 
-                (SELECT POSITIONNAME FROM STAFFPOSITION WHERE POSITIONID = S.POSITIONID) DESIGNATION,
-                E.FYEARID, E.QUALIFICATION,
-                (CASE WHEN ISNULL(E.FYEARID,'') = '' THEN '~' ELSE  
-                (SELECT FYEAR FROM ENG_FYEAR_PIS WHERE FYEARID = E.FYEARID ) END ) FYEAR
-                FROM STAFF S LEFT JOIN PE_EDUCATION E ON E.STAFFID = S.STAFFID
-                WHERE S.JOBSTATUSID = 1 AND (E.FYEARID = ${fyearid} OR E.FYEARID IS NULL)`
+        (SELECT DEPARTMENTNAME FROM PISDEPARTMENT WHERE DEPARTMENTID = S.DEPARTMENTID) DEPARTMENT,
+        (SELECT POSITIONNAME FROM STAFFPOSITION WHERE POSITIONID = S.POSITIONID) DESIGNATION,
+        (
+        	SELECT (
+        		CASE WHEN ISNULL(AP.FYEARID,'') = '' THEN '~'
+        		ELSE (
+        			SELECT FYEAR FROM ENG_FYEAR_PIS
+        			WHERE FYEARID = AP.FYEARID
+        		) END
+        	) FROM PE_EDUCATION AP
+        	WHERE AP.STAFFID = S.STAFFID
+        	AND AP.FYEARID = ${fyearid}
+        ) FYEAR, 
+        (
+        	SELECT QUALIFICATION FROM PE_EDUCATION AP 
+        	WHERE AP.STAFFID = S.STAFFID
+        	AND AP.FYEARID = ${fyearid}
+        ) QUALIFICATION, ${fyearid} FYEARID
+        FROM STAFF S
+        WHERE S.JOBSTATUSID = 1`
 
         return {
             data: data,
@@ -538,13 +551,26 @@ export async function getLeaveEvalRecord(fyearid: number) {
             CATEGORY: string
             FYEAR: string
         }[] = await pisprisma.$queryRaw`SELECT S.STAFFNAME, S.STAFFCODE, S.STAFFID,
-                (SELECT DEPARTMENTNAME FROM PISDEPARTMENT WHERE DEPARTMENTID = S.DEPARTMENTID) DEPARTMENT, 
-                (SELECT POSITIONNAME FROM STAFFPOSITION WHERE POSITIONID = S.POSITIONID) DESIGNATION,
-                AL.FYEARID, AL.CATEGORY,
-                (CASE WHEN ISNULL(AL.FYEARID,'') = '' THEN '~' ELSE  
-                (SELECT FYEAR FROM ENG_FYEAR_PIS WHERE FYEARID = AL.FYEARID ) END ) FYEAR
-                FROM STAFF S LEFT JOIN PE_LEAVEEVAL AL ON AL.STAFFID = S.STAFFID
-                WHERE S.JOBSTATUSID = 1 AND (AL.FYEARID = ${fyearid} OR AL.FYEARID IS NULL)`
+        (SELECT DEPARTMENTNAME FROM PISDEPARTMENT WHERE DEPARTMENTID = S.DEPARTMENTID) DEPARTMENT,
+        (SELECT POSITIONNAME FROM STAFFPOSITION WHERE POSITIONID = S.POSITIONID) DESIGNATION,
+        (
+        	SELECT (
+        		CASE WHEN ISNULL(AP.FYEARID,'') = '' THEN '~'
+        		ELSE (
+        			SELECT FYEAR FROM ENG_FYEAR_PIS
+        			WHERE FYEARID = AP.FYEARID
+        		) END
+        	) FROM PE_LEAVEEVAL AP
+        	WHERE AP.STAFFID = S.STAFFID
+        	AND AP.FYEARID = ${fyearid}
+        ) FYEAR, 
+        (
+        	SELECT CATEGORY FROM PE_LEAVEEVAL AP 
+        	WHERE AP.STAFFID = S.STAFFID
+        	AND AP.FYEARID = ${fyearid}
+        ) CATEGORY, ${fyearid} FYEARID
+        FROM STAFF S
+        WHERE S.JOBSTATUSID = 1`
 
         return {
             data: data,
@@ -612,13 +638,26 @@ export async function getAppreciationRecord(fyearid: number) {
             CATEGORY: string
             FYEAR: string
         }[] = await pisprisma.$queryRaw`SELECT S.STAFFNAME, S.STAFFCODE, S.STAFFID,
-                (SELECT DEPARTMENTNAME FROM PISDEPARTMENT WHERE DEPARTMENTID = S.DEPARTMENTID) DEPARTMENT, 
-                (SELECT POSITIONNAME FROM STAFFPOSITION WHERE POSITIONID = S.POSITIONID) DESIGNATION,
-                AL.FYEARID, AL.CATEGORY,
-                (CASE WHEN ISNULL(AL.FYEARID,'') = '' THEN '~' ELSE  
-                (SELECT FYEAR FROM ENG_FYEAR_PIS WHERE FYEARID = AL.FYEARID ) END ) FYEAR
-                FROM STAFF S LEFT JOIN PE_APPRECIATION AL ON AL.STAFFID = S.STAFFID
-                WHERE S.JOBSTATUSID = 1 AND (AL.FYEARID = ${fyearid} OR AL.FYEARID IS NULL)`
+        (SELECT DEPARTMENTNAME FROM PISDEPARTMENT WHERE DEPARTMENTID = S.DEPARTMENTID) DEPARTMENT,
+        (SELECT POSITIONNAME FROM STAFFPOSITION WHERE POSITIONID = S.POSITIONID) DESIGNATION,
+        (
+        	SELECT (
+        		CASE WHEN ISNULL(AP.FYEARID,'') = '' THEN '~'
+        		ELSE (
+        			SELECT FYEAR FROM ENG_FYEAR_PIS
+        			WHERE FYEARID = AP.FYEARID
+        		) END
+        	) FROM PE_APPRECIATION AP
+        	WHERE AP.STAFFID = S.STAFFID
+        	AND AP.FYEARID = ${fyearid}
+        ) FYEAR, 
+        (
+        	SELECT CATEGORY FROM PE_APPRECIATION AP 
+        	WHERE AP.STAFFID = S.STAFFID
+        	AND AP.FYEARID = ${fyearid}
+        ) CATEGORY, ${fyearid} FYEARID
+        FROM STAFF S
+        WHERE S.JOBSTATUSID = 1`
 
         return {
             data: data,
@@ -686,13 +725,26 @@ export async function getWarningRecord(fyearid: number) {
             CATEGORY: string
             FYEAR: string
         }[] = await pisprisma.$queryRaw`SELECT S.STAFFNAME, S.STAFFCODE, S.STAFFID,
-                (SELECT DEPARTMENTNAME FROM PISDEPARTMENT WHERE DEPARTMENTID = S.DEPARTMENTID) DEPARTMENT, 
-                (SELECT POSITIONNAME FROM STAFFPOSITION WHERE POSITIONID = S.POSITIONID) DESIGNATION,
-                AL.FYEARID, AL.CATEGORY,
-                (CASE WHEN ISNULL(AL.FYEARID,'') = '' THEN '~' ELSE  
-                (SELECT FYEAR FROM ENG_FYEAR_PIS WHERE FYEARID = AL.FYEARID ) END ) FYEAR
-                FROM STAFF S LEFT JOIN PE_WARNING AL ON AL.STAFFID = S.STAFFID
-                WHERE S.JOBSTATUSID = 1 AND (AL.FYEARID = ${fyearid} OR AL.FYEARID IS NULL)`
+        (SELECT DEPARTMENTNAME FROM PISDEPARTMENT WHERE DEPARTMENTID = S.DEPARTMENTID) DEPARTMENT,
+        (SELECT POSITIONNAME FROM STAFFPOSITION WHERE POSITIONID = S.POSITIONID) DESIGNATION,
+        (
+        	SELECT (
+        		CASE WHEN ISNULL(AP.FYEARID,'') = '' THEN '~'
+        		ELSE (
+        			SELECT FYEAR FROM ENG_FYEAR_PIS
+        			WHERE FYEARID = AP.FYEARID
+        		) END
+        	) FROM PE_WARNING AP
+        	WHERE AP.STAFFID = S.STAFFID
+        	AND AP.FYEARID = ${fyearid}
+        ) FYEAR, 
+        (
+        	SELECT CATEGORY FROM PE_WARNING AP 
+        	WHERE AP.STAFFID = S.STAFFID
+        	AND AP.FYEARID = ${fyearid}
+        ) CATEGORY, ${fyearid} FYEARID
+        FROM STAFF S
+        WHERE S.JOBSTATUSID = 1`
 
         return {
             data: data,
@@ -747,6 +799,116 @@ export async function createUpdateWarning(formData: unknown) {
 
 }
 
+// ========================= Administration: Total ========================== //
+
+type AdminvgData = {
+    [key: number]: {
+        STAFFID: number
+        STAFFCODE: string
+        DEPARTMENT: string
+        DESIGNATION: string
+        STAFFNAME: string
+        ATTENDANCE: number
+        APPRECIATION: number
+        WARNING: number
+    }
+}
+
+export async function getAdminAverage(fyearid: number) {
+
+    try {
+
+        const attendance: {
+            STAFFID: number
+            STAFFNAME: string
+            STAFFCODE: string
+            DEPARTMENT: string
+            DESIGNATION: string
+            POINTS: number
+        }[] = await pisprisma.$queryRaw`SELECT S.STAFFNAME, S.STAFFCODE, S.STAFFID,
+        (SELECT DEPARTMENTNAME FROM PISDEPARTMENT WHERE DEPARTMENTID = S.DEPARTMENTID) DEPARTMENT,
+        (SELECT POSITIONNAME FROM STAFFPOSITION WHERE POSITIONID = S.POSITIONID) DESIGNATION, 
+        (
+        	SELECT POINTS FROM PE_LEAVEEVAL AP 
+        	WHERE AP.STAFFID = S.STAFFID
+        	AND AP.FYEARID = ${fyearid}
+        ) POINTS
+        FROM STAFF S
+        WHERE S.JOBSTATUSID = 1`
+
+        let data: AdminvgData = []
+
+        attendance.forEach(res => {
+            data[res.STAFFID] = {
+                STAFFID: res.STAFFID,
+                STAFFCODE: res.STAFFCODE,
+                DEPARTMENT: res.DEPARTMENT,
+                DESIGNATION: res.DESIGNATION,
+                STAFFNAME: res.STAFFNAME,
+                ATTENDANCE: res.POINTS,
+                APPRECIATION: 0,
+                WARNING: 0,
+            }
+        });
+
+        const appreciation: {
+            STAFFID: number
+            AVERAGE: number
+        }[] = await pisprisma.$queryRaw`SELECT SUM( ISNULL(POINTS,0)  ) AVERAGE, STAFFID
+        FROM (    
+            SELECT A.*, (
+            	CASE WHEN ${fyearid} - ISNULL(LAST_APPRAISAL,0) < 3 THEN (LAST_APPRAISAL + 1)  
+            	ELSE ${fyearid} - 2 END
+            ) SUM_FROM      
+                FROM (
+                SELECT APP.* ,(
+                	SELECT ( CASE WHEN FYEARID > 0 THEN FYEARID ELSE 0 END ) FROM PE_APPRAISAL
+                	WHERE STAFFID = APP.STAFFID
+                ) LAST_APPRAISAL FROM PE_APPRECIATION APP
+            ) A
+        )B WHERE FYEARID BETWEEN SUM_FROM AND ${fyearid} 
+        GROUP BY STAFFID`
+
+        appreciation.forEach(res => {
+            data[res.STAFFID].APPRECIATION = res.AVERAGE
+        });
+
+
+        const warning: {
+            STAFFID: number
+            AVERAGE: number
+        }[] = await pisprisma.$queryRaw`SELECT SUM( ISNULL(POINTS,0)  ) AVERAGE, STAFFID
+        FROM (    
+            SELECT A.*, (
+            	CASE WHEN ${fyearid} - ISNULL(LAST_APPRAISAL,0) < 3 THEN (LAST_APPRAISAL + 1)  
+            	ELSE ${fyearid} - 2 END
+            ) SUM_FROM      
+                FROM (
+                SELECT APP.* ,(
+                	SELECT ( CASE WHEN FYEARID > 0 THEN FYEARID ELSE 0 END ) FROM PE_APPRAISAL
+                	WHERE STAFFID = APP.STAFFID
+                ) LAST_APPRAISAL FROM PE_WARNING APP
+            ) A
+        )B WHERE FYEARID BETWEEN SUM_FROM AND ${fyearid} 
+        GROUP BY STAFFID`
+
+        warning.forEach(res => {
+            data[res.STAFFID].WARNING = res.AVERAGE
+        });
+
+        return {
+            data: Object.values(data),
+            error: ""
+        }
+
+    } catch (error) {
+        return {
+            data: [],
+            error: catchErrorMessage(error)
+        }
+    }
+
+}
 
 // ========================= FINAL ========================== //
 type FinalData = {
@@ -760,6 +922,9 @@ type FinalData = {
     FYEAR: string
     SERVICE: number
     EDUCATION: number
+    ATTENDANCE: number
+    APPRECIATION: number
+    WARNING: number
 }
 
 type FinalMain = {
@@ -783,6 +948,9 @@ type FinalMain = {
         YEAR5: string
         SERVICE: number
         EDUCATION: number
+        ATTENDANCE: number
+        APPRECIATION: number
+        WARNING: number
     }
 }
 export async function getFinalRecord(fyearid: number) {
@@ -811,7 +979,28 @@ export async function getFinalRecord(fyearid: number) {
                         ELSE POINTS END
                     ) FROM PE_EDUCATION
                     WHERE FYEARID = ${fyearid} AND STAFFID = S.STAFFID
-                ) EDUCATION
+                ) EDUCATION,
+                (
+                    SELECT (
+                        CASE WHEN ISNULL(POINTS,0) = 0 THEN 0
+                        ELSE POINTS END
+                    ) FROM PE_LEAVEEVAL
+                    WHERE FYEARID = ${fyearid} AND STAFFID = S.STAFFID
+                ) ATTENDANCE,
+                (
+                    SELECT (
+                        CASE WHEN ISNULL(POINTS,0) = 0 THEN 0
+                        ELSE POINTS END
+                    ) FROM PE_APPRECIATION
+                    WHERE FYEARID = ${fyearid} AND STAFFID = S.STAFFID
+                ) APPRECIATION,
+                (
+                    SELECT (
+                        CASE WHEN ISNULL(POINTS,0) = 0 THEN 0
+                        ELSE POINTS END
+                    ) FROM PE_WARNING
+                    WHERE FYEARID = ${fyearid} AND STAFFID = S.STAFFID
+                ) WARNING
                 FROM STAFF S INNER JOIN PE_AVERAGE A ON S.STAFFID = A.STAFFID 
                 WHERE S.JOBSTATUSID = 1 AND FYEARID = ${fyearid}`
 
@@ -838,6 +1027,9 @@ export async function getFinalRecord(fyearid: number) {
                 YEAR5: "",
                 SERVICE: res.SERVICE,
                 EDUCATION: res.EDUCATION,
+                ATTENDANCE: res.ATTENDANCE,
+                APPRECIATION: res.APPRECIATION,
+                WARNING: res.WARNING
             }
         });
 
