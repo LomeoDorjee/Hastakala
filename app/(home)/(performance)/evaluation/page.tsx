@@ -165,7 +165,7 @@ export default function Page() {
                         />
                         <CardFooter className="justify-start before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small z-10">
                             <Link href="/evaluation/appraisal" className="rounded-sm px-4 py-2 w-full font-bold">
-                                Appraisals
+                                Promotion
                             </Link>
                             <Link href="/evaluation/appraisal" isExternal showAnchorIcon color="secondary"></Link>
                         </CardFooter>

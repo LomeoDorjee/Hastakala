@@ -25,6 +25,7 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../../icons/icons";
 import { getAverageMarks, getFinalRecord } from "@/lib/actions/performance/evaluation.actions";
+import toast from "react-hot-toast";
 
 type YEAR = {
     FYEARID: number
@@ -76,7 +77,7 @@ export default function FinalEvalutionTable({ years }: Props) {
     const [Data, setData] = useState<RECORD[]>([])
     const [isLoading, setIsLoading] = useState(true);
 
-    const [selectedYear, setSelectedYear] = useState((years.length) ? "" + years[0].FYEARID : "1")
+    const [selectedYear, setSelectedYear] = useState((years.length) ? "" + years[1].FYEARID : "1")
 
     const fetchData = async (yearid: number) => {
         let records = await getFinalRecord(yearid)
@@ -85,9 +86,8 @@ export default function FinalEvalutionTable({ years }: Props) {
         }
 
         setIsLoading(false)
-        console.log(records)
         if (records && records.error != "") {
-            console.log(records.error)
+            toast.error(records.error)
             return;
         }
         if (records)
@@ -211,7 +211,7 @@ export default function FinalEvalutionTable({ years }: Props) {
                     value={filterValue}
                     onClear={() => onClear()}
                     onValueChange={onSearchChange}
-                    size="lg"
+                    size="sm"
                 />
                 <Select
                     label="Fiscal Year"

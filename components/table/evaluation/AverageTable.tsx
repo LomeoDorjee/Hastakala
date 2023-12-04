@@ -25,6 +25,7 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../../icons/icons";
 import { getAverageMarks } from "@/lib/actions/performance/evaluation.actions";
+import { sessionUser } from "@/lib/actions/config/user.actions";
 
 type YEAR = {
     FYEARID: number
@@ -32,6 +33,7 @@ type YEAR = {
 }
 type Props = {
     years: YEAR[]
+    sessionUser: sessionUser
 }
 
 type RECORD = {
@@ -50,6 +52,7 @@ type RECORD = {
     YEAR3: string
     YEAR4: string
     YEAR5: string
+    YEARSTAKEN: number
 }
 
 const columns = [
@@ -59,24 +62,22 @@ const columns = [
     { name: "YEAR 3", uid: "AVERAGE3", sortable: true },
     { name: "YEAR 4", uid: "AVERAGE4", sortable: true },
     { name: "YEAR 5", uid: "AVERAGE5", sortable: true },
+    { name: "YEARS TAKEN", uid: "YEARSTAKEN", sortable: true },
     { name: "AVERAGE", uid: "AVERAGE", sortable: true },
-    { name: "ACTIONS", uid: "actions" },
+    // { name: "ACTIONS", uid: "actions" },
 ];
-export default function AverageTable({ years }: Props) {
+export default function AverageTable({ years, sessionUser }: Props) {
 
     const [Data, setData] = useState<RECORD[]>([])
     const [isLoading, setIsLoading] = useState(true);
 
-    const [selectedYear, setSelectedYear] = useState((years.length) ? "" + years[0].FYEARID : "1")
+    const [selectedYear, setSelectedYear] = useState((years.length) ? "" + years[1].FYEARID : "1")
 
     const fetchData = async (yearid: number) => {
-        let records = await getAverageMarks(yearid)
-        if (records == null) {
-            records = await getAverageMarks(yearid)
-        }
+        let records = await getAverageMarks(yearid, sessionUser)
 
         setIsLoading(false)
-        console.log(records)
+
         if (records && records.error != "") {
             console.log(records.error)
             return;
@@ -202,7 +203,7 @@ export default function AverageTable({ years }: Props) {
                     value={filterValue}
                     onClear={() => onClear()}
                     onValueChange={onSearchChange}
-                    size="lg"
+                    size="sm"
                 />
                 <Select
                     label="Fiscal Year"

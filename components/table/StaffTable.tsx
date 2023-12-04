@@ -25,8 +25,7 @@ import {
 import { ChangeEvent, Key, useCallback, useMemo, useState } from "react";
 import { DeleteIcon, EditIcon, EyeIcon, SearchIcon } from "../icons/icons";
 import UserDepartForm from "../forms/UserDepartForm";
-
-
+import { sessionUser } from "@/lib/actions/config/user.actions";
 
 type STAFF = {
     STAFFID: number,
@@ -38,7 +37,8 @@ type STAFF = {
 }
 
 type StaffProps = {
-    staffs: STAFF[]
+    staffs: STAFF[],
+    sessionUser: sessionUser
 }
 
 
@@ -52,9 +52,9 @@ const columns = [
 ];
 
 
-export default function StaffTable({ staffs }: StaffProps) {
+export default function StaffTable({ staffs, sessionUser }: StaffProps) {
 
-    const { isOpen, onClose, onOpen, onOpenChange } = useDisclosure()
+    // const { isOpen, onClose, onOpen, onOpenChange } = useDisclosure()
 
     const [filterValue, setFilterValue] = useState("");
     const [rowsPerPage, setRowsPerPage] = useState(7);
@@ -120,7 +120,8 @@ export default function StaffTable({ staffs }: StaffProps) {
             case "actions":
                 return (
                     <div className="relative flex items-center gap-3">
-                        <Tooltip content="View Detail" color="warning">
+                        {(['ADMIN', 'MANAGEMENT'].includes(sessionUser.usertype)) ? (
+                            <Tooltip content="View Detail" color="warning">
                             <Link
                                 isExternal
                                 href={`/pis/staffs/${staff.STAFFID}`}
@@ -129,6 +130,8 @@ export default function StaffTable({ staffs }: StaffProps) {
                             >
                             </Link>
                         </Tooltip>
+                        ) : (<></>)}
+
                     </div>
                 );
             default:

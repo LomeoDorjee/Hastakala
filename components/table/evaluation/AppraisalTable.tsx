@@ -28,6 +28,8 @@ import {
 import { EditIcon, SearchIcon } from "../../icons/icons";
 import { getAppraisals, getAverageMarks } from "@/lib/actions/performance/evaluation.actions";
 import AppraisalForm from "@/components/forms/AppraisalForm";
+import { sessionUser } from "@/lib/actions/config/user.actions";
+import toast from "react-hot-toast";
 
 type YEAR = {
     FYEARID: number
@@ -35,6 +37,7 @@ type YEAR = {
 }
 type Props = {
     years: YEAR[]
+    sessionUser: sessionUser
 }
 
 type RECORD = {
@@ -52,10 +55,10 @@ const columns = [
     { name: "NAME", uid: "STAFFNAME", sortable: true },
     { name: "DEPARTMENT", uid: "DEPARTMENT", sortable: true },
     { name: "DESIGNATION", uid: "DESIGNATION", sortable: true },
-    { name: "LAST APPRAISAL", uid: "LAST_APPRAISAL", sortable: true },
+    { name: "LAST PROMOTION", uid: "LAST_APPRAISAL", sortable: true },
     { name: "ACTIONS", uid: "actions" },
 ];
-export default function AppraisalTable({ years }: Props) {
+export default function AppraisalTable({ years, sessionUser }: Props) {
 
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
@@ -65,18 +68,14 @@ export default function AppraisalTable({ years }: Props) {
     const [Data, setData] = useState<RECORD[]>([])
     const [isLoading, setIsLoading] = useState(true);
 
-    const [toSelectFyearid, setToSelectFyearid] = useState((years.length) ? "" + years[0].FYEARID : "1")
+    const [toSelectFyearid, setToSelectFyearid] = useState((years.length) ? "" + years[1].FYEARID : "1")
 
     const fetchData = async () => {
-        let records = await getAppraisals()
-        if (records == null) {
-            records = await getAppraisals()
-        }
+        let records = await getAppraisals(sessionUser)
 
         setIsLoading(false)
-        console.log(records)
         if (records && records.error != "") {
-            console.log(records.error)
+            toast.error(records.error)
             return;
         }
         if (records)
@@ -201,7 +200,7 @@ export default function AppraisalTable({ years }: Props) {
                     value={filterValue}
                     onClear={() => onClear()}
                     onValueChange={onSearchChange}
-                    size="lg"
+                    size="sm"
                 />
             </div>
         );

@@ -28,6 +28,7 @@ import {
 import { EditIcon, SearchIcon } from "../../icons/icons";
 import { getEducationRecord } from "@/lib/actions/performance/evaluation.actions";
 import EducationForm from "@/components/forms/EducationForm";
+import { sessionUser } from "@/lib/actions/config/user.actions";
 
 type YEAR = {
     FYEARID: number
@@ -35,6 +36,7 @@ type YEAR = {
 }
 type Props = {
     years: YEAR[]
+    sessionUser: sessionUser
 }
 
 type RECORD = {
@@ -56,7 +58,7 @@ const columns = [
     { name: "QUALIFICATION", uid: "QUALIFICATION", sortable: true },
     { name: "ACTIONS", uid: "actions" },
 ];
-export default function EducationTable({ years }: Props) {
+export default function EducationTable({ years, sessionUser }: Props) {
 
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
@@ -66,16 +68,12 @@ export default function EducationTable({ years }: Props) {
     const [Data, setData] = useState<RECORD[]>([])
     const [isLoading, setIsLoading] = useState(true);
 
-    const [toSelectFyearid, setToSelectFyearid] = useState((years.length) ? "" + years[0].FYEARID : "1")
+    const [toSelectFyearid, setToSelectFyearid] = useState((years.length) ? "" + years[1].FYEARID : "1")
 
     const fetchData = async (fyearid: number) => {
-        let records = await getEducationRecord(fyearid)
-        if (records == null) {
-            records = await getEducationRecord(fyearid)
-        }
+        let records = await getEducationRecord(fyearid, sessionUser)
 
         setIsLoading(false)
-        console.log(records)
         if (records && records.error != "") {
             console.log(records.error)
             return;
@@ -202,7 +200,7 @@ export default function EducationTable({ years }: Props) {
                     value={filterValue}
                     onClear={() => onClear()}
                     onValueChange={onSearchChange}
-                    size="lg"
+                    size="sm"
                 />
                 <Select
                     label="Fiscal Year"

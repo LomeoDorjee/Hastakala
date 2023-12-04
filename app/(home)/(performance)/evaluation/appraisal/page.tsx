@@ -1,6 +1,8 @@
 import AppraisalTable from "@/components/table/evaluation/AppraisalTable"
 import { getAllFiscalYears } from "@/lib/actions/performance/evaluation.actions"
-import { getAllStaffs } from "@/lib/actions/pis/staffs.actions"
+import { getUserDetail, sessionUser } from "@/lib/actions/config/user.actions"
+import { currentUser } from "@clerk/nextjs"
+import { redirect } from "next/navigation"
 
 type YEARS = {
     data: {
@@ -14,10 +16,18 @@ export default async function Page() {
 
     const years: YEARS = await getAllFiscalYears()
 
+    const currentuser = await currentUser()
+    if (!currentuser) redirect("/")
+
+    const sessionUser: {
+        data: sessionUser[]
+        error: string
+    } = await getUserDetail(currentuser.id, 1)
+
     return (
         <>
-            <h3 className="widgettitle">Last Appraisal Report</h3>
-            <AppraisalTable years={years.data} />
+            <h3 className="widgettitle">Last Promotion Report</h3>
+            <AppraisalTable years={years.data} sessionUser={sessionUser.data[0]} />
         </>
     )
 }

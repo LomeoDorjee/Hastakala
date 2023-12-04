@@ -25,6 +25,8 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../../icons/icons";
 import { getAverageMarks, getServicePeriod } from "@/lib/actions/performance/evaluation.actions";
+import { sessionUser } from "@/lib/actions/config/user.actions";
+import toast from "react-hot-toast";
 
 type YEAR = {
     FYEARID: number
@@ -32,6 +34,7 @@ type YEAR = {
 }
 type Props = {
     years: YEAR[]
+    sessionUser: sessionUser
 }
 
 type RECORD = {
@@ -50,24 +53,21 @@ const columns = [
     { name: "DESIGNATION", uid: "DESIGNATION", sortable: true },
     { name: "LAST APPRAISAL ON", uid: "LAST_APPRAISAL", sortable: true },
     { name: "POINTS", uid: "POINTS", sortable: true },
-    { name: "ACTIONS", uid: "actions" },
+    // { name: "ACTIONS", uid: "actions" },
 ];
-export default function ServiceTable({ years }: Props) {
+export default function ServiceTable({ years, sessionUser }: Props) {
 
     const [Data, setData] = useState<RECORD[]>([])
     const [isLoading, setIsLoading] = useState(true);
 
-    const [selectedYear, setSelectedYear] = useState((years.length) ? "" + years[0].FYEARID : "1")
+    const [selectedYear, setSelectedYear] = useState((years.length) ? "" + years[1].FYEARID : "1")
 
     const fetchData = async (yearid: number) => {
-        let records = await getServicePeriod(yearid)
-        if (records == null) {
-            records = await getServicePeriod(yearid)
-        }
+        let records = await getServicePeriod(yearid, sessionUser)
 
         setIsLoading(false)
         if (records && records.error != "") {
-            console.log(records.error)
+            toast.error(records.error)
             return;
         }
         if (records)
@@ -191,7 +191,7 @@ export default function ServiceTable({ years }: Props) {
                     value={filterValue}
                     onClear={() => onClear()}
                     onValueChange={onSearchChange}
-                    size="lg"
+                    size="sm"
                 />
                 <Select
                     label="Fiscal Year"

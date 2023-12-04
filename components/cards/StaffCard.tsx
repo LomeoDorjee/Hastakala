@@ -1,7 +1,7 @@
 "use client"
 import { Switch, Select, SelectItem, Card, CardHeader, CardBody, Divider, User, Avatar, RadioGroup, Radio } from "@nextui-org/react"
 import toast from "react-hot-toast"
-import { mapUserToStaff, mapUserType, updateUserDepartment } from "@/lib/actions/config/user.actions"
+import { mapUserToStaff, mapUserType, sessionUser } from "@/lib/actions/config/user.actions"
 import { useState } from "react"
 import { updateSupportStaff } from "@/lib/actions/pis/staffs.actions"
 
@@ -22,14 +22,7 @@ type Props = {
         fullname: string
         image: string
     }[]
-    userdetail: {
-        userid: string
-        username: string
-        onboarded: string
-        depid: number
-        staffid: number
-        usertype: string
-    }
+    userdetail: sessionUser
 }
 
 export default function StaffCard({
@@ -83,37 +76,43 @@ export default function StaffCard({
                 <CardBody>
 
                     <div className="flex flex-col flex-wrap gap-5 py-2">
+                        {
+                            (userdetail) ? (
+                                <>
+                                    <Select
+                                        autoFocus
+                                        items={users}
+                                        label="Mapped To"
+                                        placeholder="Select a User"
+                                        defaultSelectedKeys={[(userdetail?.userid) ? userdetail.userid : ""]}
+                                        onChange={(e) => handleUserMap(e.target.value)}
+                                    >
+                                        {(user) => <SelectItem key={user.userid} textValue={user.fullname}>
+                                            <User
+                                                description={user.depname}
+                                                name={user.fullname}
+                                            />
+                                        </SelectItem>}
+                                    </Select>
 
-                        <Select
-                            autoFocus
-                            items={users}
-                            label="Mapped To"
-                            placeholder="Select a User"
-                            defaultSelectedKeys={[(userdetail?.userid) ? userdetail.userid : ""]}
-                            onChange={(e) => handleUserMap(e.target.value)}
-                        >
-                            {(user) => <SelectItem key={user.userid} textValue={user.fullname}>
-                                <User
-                                    description={user.depname}
-                                    name={user.fullname}
-                                />
-                            </SelectItem>}
-                        </Select>
+                                    <RadioGroup
+                                        label="Staff Type"
+                                        value={userType}
+                                        onValueChange={setUserType}
+                                        onChange={(e) => handleUserType(e.target.value)}
+                                        orientation="horizontal"
+                                        className="p-2 bg-gray-100 rounded-lg"
+                                        color="secondary"
+                                    >
+                                        <Radio value="REGULAR">Regular</Radio>
+                                        <Radio value="HOD">Department Head</Radio>
+                                        <Radio value="SUPERVISOR">Supervisor</Radio>
+                                        <Radio value="MANAGEMENT">Management</Radio>
+                                    </RadioGroup>
+                                </>
+                            ) : (<></>)
+                        }
 
-                        <RadioGroup
-                            label="Staff Type"
-                            value={userType}
-                            onValueChange={setUserType}
-                            onChange={(e) => handleUserType(e.target.value)}
-                            orientation="horizontal"
-                            className="p-2 bg-gray-100 rounded-lg"
-                            color="secondary"
-                        >
-                            <Radio value="REGULAR">Regular</Radio>
-                            <Radio value="HOD">Department Head</Radio>
-                            <Radio value="SUPERVISOR">Supervisor</Radio>
-                            <Radio value="MANAGEMENT">Management</Radio>
-                        </RadioGroup>
 
                         <Switch
                             isSelected={isSupport}

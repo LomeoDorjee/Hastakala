@@ -1,7 +1,26 @@
 import {Card, CardHeader, CardBody, CardFooter, Image, Button, Link} from "@nextui-org/react"
-import { SignedIn } from "@clerk/nextjs"
+import { SignedIn, currentUser } from "@clerk/nextjs"
+import { getUserDetail, onBoardUser, sessionUser } from "@/lib/actions/config/user.actions"
 
 export default async function Home() {
+
+    const currentuser = await currentUser()
+
+    if (currentuser) {
+        const user: {
+            data: sessionUser[]
+            error: string
+        } = await getUserDetail(currentuser.id, 1)
+
+        if (!user.data[0].onboarded) {
+            const userData = {
+                userid: currentuser.id,
+                username: (currentuser.username) ? currentuser.username : "NoUserName"
+            }
+            await onBoardUser(userData)
+        }
+    }
+
 
     return (
         <div className="max-w-[1200px] gap-5 grid grid-cols-12 pt-10">

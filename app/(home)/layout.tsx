@@ -40,7 +40,7 @@ export default function RootLayout({
             <SignedOut>
               <div className="w-[50px] flex max-md:w-[15px]"></div>
             </SignedOut>
-            <section className='flex min-h-screen flex-1 flex-col items-center px-5 pb-10 pt-6 max-md:pb-32 sm:px-6 max-md:pt-16'>
+            <section className='flex min-h-screen flex-1 flex-col items-center px-5 pb-10 pt-4 max-md:pb-32 sm:px-6 max-md:pt-16'>
               <div className='w-full'>
                 <Providers>
                   {children}

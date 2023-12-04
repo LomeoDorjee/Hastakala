@@ -29,6 +29,8 @@ import { ChangeEvent, Key, useCallback, useEffect, useMemo, useState } from "rea
 import { ChevronDownIcon, DeleteIcon, EditIcon, EyeIcon, SearchIcon } from "../../icons/icons";
 import { getAllMarks } from "@/lib/actions/performance/evaluation.actions";
 import StaffMarksForm from "../../forms/StaffMarksForm";
+import { sessionUser } from "@/lib/actions/config/user.actions";
+import toast from "react-hot-toast";
 
 type MARKS = {
     MARKSID: number,
@@ -42,11 +44,11 @@ type MARKS = {
     HOD_Q3: number,
     HOD_Q4: number,
     HOD_Q5: number,
-    HOD_Q6: number,
-    HOD_Q7: number,
-    HOD_Q8: number,
-    HOD_Q9: number,
-    HOD_Q10: number,
+    SUP_Q6: number,
+    SUP_Q7: number,
+    SUP_Q8: number,
+    SUP_Q9: number,
+    SUP_Q10: number,
     TOTAL_HOD: number,
     SUP_Q1: number,
     SUP_Q2: number,
@@ -60,21 +62,22 @@ type YEARS = {
     FYEARID: number
     FYEAR: string
 }
-type YearProps = {
-    years: YEARS[]
+type Props = {
+    years: YEARS[],
+    sessionUser: sessionUser
 }
 
 
 const columns = [
     // {name: "ID", uid: "id", sortable: true},
     { name: "NAME", uid: "STAFFNAME", sortable: true },
-    { name: "HOD TOTAL", uid: "TOTAL_HOD", sortable: true },
-    { name: "SUPERVISOR TOTAL", uid: "TOTAL_SUP", sortable: true },
+    { name: "LEVEL 1 TOTAL", uid: "TOTAL_SUP", sortable: true },
+    { name: "LEVEL 2 TOTAL", uid: "TOTAL_HOD", sortable: true },
     { name: "ACTIONS", uid: "actions" },
 ];
 
 
-export default function MarksTable({ years }: YearProps) {
+export default function MarksTable({ years, sessionUser }: Props) {
 
     const { isOpen, onOpenChange, onClose, onOpen } = useDisclosure()
 
@@ -84,18 +87,18 @@ export default function MarksTable({ years }: YearProps) {
     const [toEditStaffName, setToEditStaffName] = useState("");
     const [toEditStaffId, setToEditStaffId] = useState(0);
 
-    const [selectedYear, setSelectedYear] = useState((years.length) ? "" + years[0].FYEARID : "1")
+    const [selectedYear, setSelectedYear] = useState((years.length) ? "" + years[1].FYEARID : "1")
 
     const [hod_q1, sethod_q1] = useState(0);
     const [hod_q2, sethod_q2] = useState(0)
     const [hod_q3, sethod_q3] = useState(0)
     const [hod_q4, sethod_q4] = useState(0)
     const [hod_q5, sethod_q5] = useState(0)
-    const [hod_q6, sethod_q6] = useState(0)
-    const [hod_q7, sethod_q7] = useState(0)
-    const [hod_q8, sethod_q8] = useState(0)
-    const [hod_q9, sethod_q9] = useState(0)
-    const [hod_q10, sethod_q10] = useState(0)
+    const [sup_q6, setsup_q6] = useState(0)
+    const [sup_q7, setsup_q7] = useState(0)
+    const [sup_q8, setsup_q8] = useState(0)
+    const [sup_q9, setsup_q9] = useState(0)
+    const [sup_q10, setsup_q10] = useState(0)
     const [sup_q1, setsup_q1] = useState(0)
     const [sup_q2, setsup_q2] = useState(0)
     const [sup_q3, setsup_q3] = useState(0)
@@ -104,15 +107,12 @@ export default function MarksTable({ years }: YearProps) {
 
 
     const fetchMarksData = async (yearid: number) => {
-        let records = await getAllMarks(yearid)
-        if (records == null) {
-            records = await getAllMarks(yearid)
-        }
+        let records = await getAllMarks(sessionUser, yearid) 
 
         setIsLoading(false)
-        console.log(records)
+
         if (records && records.error != "") {
-            console.log(records.error)
+            toast.error(records.error)
             return;
         }
         if (records)
@@ -126,7 +126,7 @@ export default function MarksTable({ years }: YearProps) {
     }, [])
 
     const [filterValue, setFilterValue] = useState("");
-    const [rowsPerPage, setRowsPerPage] = useState(7);
+    const [rowsPerPage, setRowsPerPage] = useState(6);
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
         column: "STAFFNAME",
         direction: "ascending",
@@ -177,11 +177,11 @@ export default function MarksTable({ years }: YearProps) {
         sethod_q3(0)
         sethod_q4(0)
         sethod_q5(0)
-        sethod_q6(0)
-        sethod_q7(0)
-        sethod_q8(0)
-        sethod_q9(0)
-        sethod_q10(0)
+        setsup_q6(0)
+        setsup_q7(0)
+        setsup_q8(0)
+        setsup_q9(0)
+        setsup_q10(0)
         setsup_q1(0)
         setsup_q2(0)
         setsup_q3(0)
@@ -198,16 +198,16 @@ export default function MarksTable({ years }: YearProps) {
             sethod_q4(item.HOD_Q4)
         if (item.HOD_Q5)
             sethod_q5(item.HOD_Q5)
-        if (item.HOD_Q6)
-            sethod_q6(item.HOD_Q6)
-        if (item.HOD_Q7)
-            sethod_q7(item.HOD_Q7)
-        if (item.HOD_Q8)
-            sethod_q8(item.HOD_Q8)
-        if (item.HOD_Q9)
-            sethod_q9(item.HOD_Q9)
-        if (item.HOD_Q10)
-            sethod_q10(item.HOD_Q10)
+        if (item.SUP_Q6)
+            setsup_q6(item.SUP_Q6)
+        if (item.SUP_Q7)
+            setsup_q7(item.SUP_Q7)
+        if (item.SUP_Q8)
+            setsup_q8(item.SUP_Q8)
+        if (item.SUP_Q9)
+            setsup_q9(item.SUP_Q9)
+        if (item.SUP_Q10)
+            setsup_q10(item.SUP_Q10)
         if (item.SUP_Q1)
             setsup_q1(item.SUP_Q1)
         if (item.SUP_Q2)
@@ -346,7 +346,7 @@ export default function MarksTable({ years }: YearProps) {
                         className="bg-transparent outline-none text-default-400 text-small"
                         onChange={onRowsPerPageChange}
                     >
-                        <option value="7">7</option>
+                        <option value="6">6</option>
                         <option value="10">10</option>
                         <option value="15">15</option>
                     </select>
@@ -371,16 +371,18 @@ export default function MarksTable({ years }: YearProps) {
                 hod_q3={hod_q3}
                 hod_q4={hod_q4}
                 hod_q5={hod_q5}
-                hod_q6={hod_q6}
-                hod_q7={hod_q7}
-                hod_q8={hod_q8}
-                hod_q9={hod_q9}
-                hod_q10={hod_q10}
+                sup_q6={sup_q6}
+                sup_q7={sup_q7}
+                sup_q8={sup_q8}
+                sup_q9={sup_q9}
+                sup_q10={sup_q10}
                 sup_q1={sup_q1}
                 sup_q2={sup_q2}
                 sup_q3={sup_q3}
                 sup_q4={sup_q4}
                 sup_q5={sup_q5}
+                sessionUser={sessionUser}
+                fetchData={fetchMarksData}
             />
             <Table
                 isCompact

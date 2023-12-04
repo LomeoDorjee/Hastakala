@@ -98,7 +98,7 @@ export default function AppreciationForm({
                                         className="min-w-xs"
                                         name="fyearid"
                                         placeholder="Select Fiscal Year"
-                                        defaultSelectedKeys={[toSelectFyearid]}
+                                        defaultSelectedKeys={["" + toSelectFyearid]}
                                         isDisabled
                                     >
                                         {years.map((year) => (

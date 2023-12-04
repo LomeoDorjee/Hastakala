@@ -53,18 +53,18 @@ export async function fetchUserInfo(userId: string) {
 
 }
 
-
+export type sessionUser = {
+    userid: string
+    username: string
+    onboarded: boolean
+    depid: number
+    staffid: number
+    usertype: string
+}
 export async function getUserDetail(userId: string, staffid: number) {
 
     try {
-        let data: {
-            userid: string
-            username: string
-            onboarded: string
-            depid: number
-            staffid: number
-            usertype: string
-        }[] = []
+        let data: sessionUser[] = []
 
         if (userId != "") {
             data = await prisma.$queryRaw`SELECT * FROM "USER" WHERE USERID = ${userId}`
