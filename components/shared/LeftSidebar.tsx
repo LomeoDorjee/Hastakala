@@ -23,11 +23,16 @@ function LeftSidebar() {
                         if (link.route === '/profile')
                             link.route = `/profile/${userId}`
                         return (
-                            <Tooltip content={link.label} placement='right-end' offset={-7} color='foreground' showArrow={true}>
+                            <Tooltip
+                                content={link.label}
+                                placement='right-end'
+                                offset={-7}
+                                color='foreground'
+                                showArrow={true}
+                                key={link.label}>
                                 <Link
                                     href={link.route}
                                     className={`relative flex justify-start gap-4 rounded-lg p-4 hover:shadow-xl ${isActive && 'shadow-xl border-b-2 border-l-2 border-pink-700'} `}
-                                    key={link.label}
                                 >
                                     <Image
                                         src={link.imgURL}

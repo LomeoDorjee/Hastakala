@@ -2,8 +2,6 @@
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, Input, Button, useDisclosure, SortDescriptor, Tooltip, Chip } from "@nextui-org/react"
 import { Key, useCallback, useMemo, useState } from "react"
 import { DeleteIcon, EditIcon, EyeIcon, SearchIcon } from "@/components/icons/icons"
-import DepartmentForm from "@/components/forms/DepartmentForm"
-import { deleteDepartment } from "@/lib/actions/config/department.actions"
 import Link from "next/link"
 
 type Transfer = {
@@ -17,7 +15,7 @@ type Transfer = {
     status: string
 }
 type TransferProps = {
-    transfers: Transfer[] | undefined
+    transfers: Transfer[]
 }
 
 
@@ -54,11 +52,27 @@ export default function TransferTable({ transfers }: TransferProps) {
 
     const pages = Math.ceil(((filteredItems?.length) ? filteredItems.length : 1) / rowsPerPage);
 
+    // Sorting
+    const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+        column: "age",
+        direction: "ascending",
+    });
+
+    const sortedData = useMemo(() => {
+        return [...filteredItems].sort((a: Transfer, b: Transfer) => {
+            const first = a[sortDescriptor.column as keyof Transfer] as number;
+            const second = b[sortDescriptor.column as keyof Transfer] as number;
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+
+            return sortDescriptor.direction === "descending" ? -cmp : cmp;
+        });
+    }, [sortDescriptor, filteredItems]);
+
     const items = useMemo(() => {
         const start = (page - 1) * rowsPerPage
         const end = start + rowsPerPage;
-        return (filteredItems) ? filteredItems.slice(start, end) : [];
-    }, [page, filteredItems]);
+        return (sortedData) ? sortedData.slice(start, end) : [];
+    }, [page, sortedData]);
 
     const onNextPage = useCallback(() => {
         if (page < pages) {
@@ -72,21 +86,7 @@ export default function TransferTable({ transfers }: TransferProps) {
         }
     }, [page]);
 
-    // Sorting
-    const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-        column: "age",
-        direction: "ascending",
-    });
 
-    const sortedData = useMemo(() => {
-        return [...items].sort((a: Transfer, b: Transfer) => {
-            const first = a[sortDescriptor.column as keyof Transfer] as number;
-            const second = b[sortDescriptor.column as keyof Transfer] as number;
-            const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-            return sortDescriptor.direction === "descending" ? -cmp : cmp;
-        });
-    }, [sortDescriptor, items]);
 
     // Inputs
     const topContent = useMemo(() => {
@@ -223,7 +223,7 @@ export default function TransferTable({ transfers }: TransferProps) {
                     <TableColumn key="action" align="center" allowsSorting={true}>Action</TableColumn>
                 </TableHeader>
                 <TableBody emptyContent={"No Transfers found"}
-                    items={sortedData}
+                    items={items}
                 >
                     {(item) => (
                         <TableRow key={item.transfermasterid}>

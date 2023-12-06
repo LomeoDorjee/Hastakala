@@ -1,6 +1,7 @@
 // "use client"
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
-import Image from 'next/image'
+import { Image } from '@nextui-org/react'
+
 import Link from 'next/link'
 // import { topbarLinks } from '@/constants'
 import { usePathname, useRouter } from 'next/navigation'

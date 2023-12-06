@@ -5,6 +5,11 @@ export const sidebarLinks = [
     label: "Home",
   },
   {
+    imgURL: "/assets/svg/list.svg",
+    route: "/evaluation",
+    label: "Evaluation",
+  },
+  {
     imgURL: "/assets/svg/user.svg",
     route: "/pis",
     label: "PIS",
@@ -18,11 +23,6 @@ export const sidebarLinks = [
     imgURL: "/assets/svg/gear.svg",
     route: "/config",
     label: "Setup",
-  },
-  {
-    imgURL: "/assets/svg/list.svg",
-    route: "/evaluation",
-    label: "Evaluation",
   },
   // {
   //   imgURL: "/assets/search.svg",

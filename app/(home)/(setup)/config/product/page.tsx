@@ -3,13 +3,13 @@ import { getAllProducts } from "@/lib/actions/config/products.actions"
 import toast from "react-hot-toast"
 
 type ProductData = {
-    data?: {
+    data: {
         productid: number
         productcode: string
         productname: string
         isactive: boolean
-    }[] | undefined
-    error?: string | undefined
+    }[]
+    error: string
 }
 
 export default async function Page() {

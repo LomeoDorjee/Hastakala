@@ -25,7 +25,7 @@ type ProductProps = {
     productcode: string
     productname: string
     isactive: boolean
-  }[] | undefined
+  }[]
 }
 
 type Product = {
@@ -44,7 +44,6 @@ const columns = [
 
 
 export default function ProductTable({ products }: ProductProps) {
-
 
   const { isOpen, onClose, onOpen, onOpenChange } = useDisclosure()
 
@@ -77,22 +76,24 @@ export default function ProductTable({ products }: ProductProps) {
     return filteredProducts;
   }, [products, filterValue]);
 
-  const items = useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-
-    return (filteredItems) ? filteredItems?.slice(start, end) : [];
-  }, [page, filteredItems, rowsPerPage]);
 
   const sortedItems = useMemo(() => {
-    return [...items].sort((a: Product, b: Product) => {
+    return [...filteredItems].sort((a: Product, b: Product) => {
       const first = a[sortDescriptor.column as keyof Product] as unknown as number;
       const second = b[sortDescriptor.column as keyof Product] as unknown as number;
       const cmp = first < second ? -1 : first > second ? 1 : 0;
 
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
-  }, [sortDescriptor, items]);
+  }, [sortDescriptor, filteredItems]);
+
+  const items = useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    return (sortedItems) ? sortedItems?.slice(start, end) : [];
+  }, [page, sortedItems, rowsPerPage]);
+
 
   const handleEdit = (item: Product) => {
     setToEditProductName(item.productname)
@@ -265,7 +266,7 @@ export default function ProductTable({ products }: ProductProps) {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody emptyContent={"No products found"} items={sortedItems}>
+        <TableBody emptyContent={"No products found"} items={items}>
           {(item) => (
             <TableRow key={item.productid}>
               {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}

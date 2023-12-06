@@ -115,22 +115,22 @@ export default function AverageTable({ years, sessionUser }: Props) {
 
     const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
-    const items = useMemo(() => {
-        const start = (page - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-
-        return filteredItems.slice(start, end);
-    }, [page, filteredItems, rowsPerPage]);
-
     const sortedItems = useMemo(() => {
-        return [...items].sort((a: RECORD, b: RECORD) => {
+        return [...filteredItems].sort((a: RECORD, b: RECORD) => {
             const first = a[sortDescriptor.column as keyof RECORD] as number;
             const second = b[sortDescriptor.column as keyof RECORD] as number;
             const cmp = first < second ? -1 : first > second ? 1 : 0;
 
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
         });
-    }, [sortDescriptor, items]);
+    }, [sortDescriptor, filteredItems]);
+
+    const items = useMemo(() => {
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        return sortedItems.slice(start, end);
+    }, [page, sortedItems, rowsPerPage]);
 
     const renderCell = useCallback((data: RECORD, columnKey: Key) => {
         const cellValue = data[columnKey as keyof RECORD];
@@ -290,7 +290,7 @@ export default function AverageTable({ years, sessionUser }: Props) {
             </TableHeader>
             <TableBody
                 emptyContent={"No Data found"}
-                items={sortedItems}
+                items={items}
                 isLoading={isLoading}
                 loadingContent={<Spinner color="secondary" />}
             >

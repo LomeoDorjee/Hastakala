@@ -23,11 +23,13 @@ export async function getAllTransfers() {
         FROM TRANSFERMASTER T`
 
         return {
-            data: data
+            data: data,
+            error: ""
         }
 
     } catch (e: unknown) {
         return {
+            data: [],
             error: catchErrorMessage(e)
         }
     }

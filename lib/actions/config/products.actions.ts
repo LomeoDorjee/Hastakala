@@ -23,11 +23,13 @@ export async function getAllProducts(isactive = false) {
         }[] = await prisma.$queryRaw`SELECT P.*, (SELECT TOP(1) "PATH" FROM IMAGES WHERE p.productid = masterid AND TYPE = 'PRODUCT' ORDER BY ID DESC ) imgpath FROM PRODUCT P ${isactive ? Prisma.sql` WHERE ISACTIVE = 1` : Prisma.empty}`
 
         return {
-            data: data
+            data: data,
+            error: ""
         }
 
     } catch (e: unknown) {
         return {
+            data: [],
             error: catchErrorMessage(e)
         }
     }

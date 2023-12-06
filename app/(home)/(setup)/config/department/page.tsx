@@ -4,7 +4,6 @@ import { getAllDepartment } from "@/lib/actions/config/department.actions"
 export default async function Page() {
 
     const data = await getAllDepartment();
-    console.log(data)
 
     return (
         <>

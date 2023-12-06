@@ -32,11 +32,11 @@ type UserProps = {
     depname: string | null
     fullname: string
     image: string
-  }[] | undefined;
+  }[];
   departments: {
     depid: number
     depname: string 
-  }[] | undefined
+  }[]
 }
 
 type User = {
@@ -86,22 +86,24 @@ export default function UserTable({ users, departments }: UserProps) {
     return filteredUsers;
   }, [users, filterValue]);
 
-  const items = useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-
-    return (filteredItems)?filteredItems?.slice(start, end):[];
-  }, [page, filteredItems, rowsPerPage]);
 
   const sortedItems = useMemo(() => {
-    return [...items].sort((a: User, b: User) => {
+    return [...filteredItems].sort((a: User, b: User) => {
       const first = a[sortDescriptor.column as keyof User] as unknown as number;
       const second = b[sortDescriptor.column as keyof User] as unknown as number;
       const cmp = first < second ? -1 : first > second ? 1 : 0;
 
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
-  }, [sortDescriptor, items]);
+  }, [sortDescriptor, filteredItems]);
+
+  const items = useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    return (sortedItems) ? sortedItems?.slice(start, end) : [];
+  }, [page, sortedItems, rowsPerPage]);
+
 
   const handleUserEdit = (item: User) => {
     setToEditUserId(item.userid)
@@ -268,7 +270,7 @@ export default function UserTable({ users, departments }: UserProps) {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody emptyContent={"No users found"} items={sortedItems}>
+        <TableBody emptyContent={"No users found"} items={items}>
           {(item) => (
             <TableRow key={item.userid}>
               {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}

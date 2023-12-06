@@ -10,7 +10,7 @@ type DepProps = {
         depid: number;
         depname: string;
         isactive: boolean;
-    }[] | undefined;
+    }[];
 }
 
 type Department = {
@@ -56,13 +56,29 @@ export default function DepartmentTable({ departments }: DepProps) {
         const [page, setPage] = useState(1);
         const rowsPerPage = 9;
 
-        const pages = Math.ceil(((filteredItems?.length) ? filteredItems.length : 1 ) / rowsPerPage);
+    const pages = Math.ceil(((filteredItems?.length) ? filteredItems.length : 1) / rowsPerPage);
+
+    // Sorting
+    const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+        column: "age",
+        direction: "ascending",
+    });
+
+    const sortedData = useMemo(() => {
+        return filteredItems.sort((a: Department, b: Department) => {
+            const first = a[sortDescriptor.column as keyof Department] as number;
+            const second = b[sortDescriptor.column as keyof Department] as number;
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+
+            return sortDescriptor.direction === "descending" ? -cmp : cmp;
+        });
+    }, [sortDescriptor, filteredItems]);
     
         const items = useMemo(() => {
             const start = (page - 1) * rowsPerPage
             const end = start + rowsPerPage;
-            return (filteredItems) ? filteredItems.slice(start, end) : [];
-        }, [page, filteredItems]);
+            return (sortedData) ? sortedData.slice(start, end) : [];
+        }, [page, sortedData]);
 
         const onNextPage = useCallback(() => {
             if (page < pages) {
@@ -75,22 +91,6 @@ export default function DepartmentTable({ departments }: DepProps) {
             setPage(page - 1);
             }
         }, [page]);
-
-    // Sorting
-        const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-            column: "age",
-            direction: "ascending",
-        });
-
-        const sortedData = useMemo(() => {
-            return [...items].sort((a: Department, b: Department) => {
-                const first = a[sortDescriptor.column as keyof Department] as number;
-                const second = b[sortDescriptor.column as keyof Department] as number;
-                const cmp = first < second ? -1 : first > second ? 1 : 0;
-          
-                return sortDescriptor.direction === "descending" ? -cmp : cmp;
-              });
-        }, [sortDescriptor, items]);
 
         const handleEdit = (item: Department) => {
             setDepartmentName(item.depname)
@@ -222,7 +222,7 @@ export default function DepartmentTable({ departments }: DepProps) {
                     <TableColumn key="actions" align="center" allowsSorting={false}>ACTION</TableColumn>
                 </TableHeader>
                 <TableBody emptyContent={"No data found"}
-                    items={sortedData}
+                    items={items}
                 >
                     {(item) => (
                         <TableRow key={item.depid}>

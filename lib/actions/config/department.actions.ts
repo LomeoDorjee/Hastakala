@@ -14,11 +14,13 @@ export async function getAllDepartment() {
         })
 
         return {
-            data: data
+            data: data,
+            error: ""
         }
 
     } catch (e) {
         return {
+            data: [],
             error: catchErrorMessage(e)
         }
     }

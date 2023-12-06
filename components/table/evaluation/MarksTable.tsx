@@ -69,19 +69,24 @@ type Props = {
 
 
 const columns = [
-    // {name: "ID", uid: "id", sortable: true},
     { name: "NAME", uid: "STAFFNAME", sortable: true },
     { name: "LEVEL 1 TOTAL", uid: "TOTAL_SUP", sortable: true },
     { name: "LEVEL 2 TOTAL", uid: "TOTAL_HOD", sortable: true },
     { name: "ACTIONS", uid: "actions" },
 ];
 
+const statusOptions = [
+    { name: "Staff", uid: "P1-" },
+    { name: "Producer", uid: "P2-" },
+    { name: "All", uid: "all" },
+];
 
 export default function MarksTable({ years, sessionUser }: Props) {
 
     const { isOpen, onOpenChange, onClose, onOpen } = useDisclosure()
 
     const [marks, setMarks] = useState<MARKS[]>([])
+    const [statusFilter, setStatusFilter] = useState("all");
     const [isLoading, setIsLoading] = useState(true);
 
     const [toEditStaffName, setToEditStaffName] = useState("");
@@ -146,27 +151,33 @@ export default function MarksTable({ years, sessionUser }: Props) {
             );
         }
 
+        if (statusFilter !== "all") {
+            filteredUsers = filteredUsers.filter((user) =>
+                user.STAFFCODE.substring(0, 3).includes(statusFilter),
+            );
+        }
+
         return filteredUsers;
-    }, [marks, filterValue]);
+    }, [marks, filterValue, statusFilter]);
 
     const pages = Math.ceil(filteredItems.length / rowsPerPage);
+
+    const sortedItems = useMemo(() => {
+        return [...filteredItems].sort((a: MARKS, b: MARKS) => {
+            const first = a[sortDescriptor.column as keyof MARKS] as number;
+            const second = b[sortDescriptor.column as keyof MARKS] as number;
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+
+            return sortDescriptor.direction === "descending" ? -cmp : cmp;
+        });
+    }, [sortDescriptor, filteredItems]);
 
     const items = useMemo(() => {
         const start = (page - 1) * rowsPerPage;
         const end = start + rowsPerPage;
 
-        return (filteredItems) ? filteredItems.slice(start, end) : [];
-    }, [page, filteredItems, rowsPerPage]);
-
-    const sortedItems = useMemo(() => {
-        return [...items].sort((a: MARKS, b: MARKS) => {
-            const first = a[sortDescriptor.column as keyof MARKS]
-            const second = b[sortDescriptor.column as keyof MARKS]
-            const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-            return sortDescriptor.direction === "descending" ? -cmp : cmp;
-        });
-    }, [sortDescriptor, items]);
+        return sortedItems.slice(start, end);
+    }, [page, sortedItems, rowsPerPage]);
 
     const handleMarksEdit = (item: MARKS) => {
         setToEditStaffId(item.STAFFID)
@@ -311,6 +322,20 @@ export default function MarksTable({ years, sessionUser }: Props) {
                         </SelectItem>
                     ))}
                 </Select>
+                <Select
+                    color="success"
+                    defaultSelectedKeys={["all"]}
+                    className="hidden sm:flex sm:max-w-sm"
+                    aria-label="Staff Type"
+                    size="sm"
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                    {statusOptions.map((status) => (
+                        <SelectItem key={status.uid} className="capitalize">
+                            {(status.name)}
+                        </SelectItem>
+                    ))}
+                </Select>
             </div>
         );
     }, [
@@ -318,7 +343,8 @@ export default function MarksTable({ years, sessionUser }: Props) {
         onSearchChange,
         onRowsPerPageChange,
         sortedItems?.length,
-        hasSearchFilter
+        hasSearchFilter,
+        statusFilter,
     ]);
 
     const bottomContent = useMemo(() => {
@@ -410,7 +436,7 @@ export default function MarksTable({ years, sessionUser }: Props) {
                 </TableHeader>
                 <TableBody
                     emptyContent={"No Data found"}
-                    items={sortedItems}
+                    items={items}
                     isLoading={isLoading}
                     loadingContent={<Spinner color="secondary" />}
                 >

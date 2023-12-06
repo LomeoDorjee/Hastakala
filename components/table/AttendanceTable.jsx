@@ -1,9 +1,15 @@
 "use client"
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, Input, Button } from "@nextui-org/react"
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, Input, Button, Select, SelectItem } from "@nextui-org/react"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { fetchDeviceLog } from "@/lib/actions/pis/attendance.actions"
 import { formatDateToTime } from "@/lib/utils"
 import { SearchIcon } from "@/components/icons/icons"
+
+const statusOptions = [
+    { name: "Staff", uid: "P1-" },
+    { name: "Producer", uid: "P2-" },
+    { name: "All", uid: "all" },
+];
 
 export default function AttendanceTable() {
 
@@ -31,19 +37,27 @@ export default function AttendanceTable() {
     }, []);
 
     const [filterValue, setFilterValue] = useState('');
+    const [statusFilter, setStatusFilter] = useState("all");
 
     const hasSearchFilter = Boolean(filterValue);
 
     const filteredItems = useMemo(() => {
-        let filteredData = [...logs];
+        let filteredUsers = staffs;
+
         if (hasSearchFilter) {
-            filteredData = filteredData.filter((log) =>
-                log.STAFF.toLowerCase().includes(filterValue.toLowerCase()),
+            filteredUsers = filteredUsers?.filter((user) =>
+                user.STAFFNAME.toLowerCase().includes(filterValue.toLowerCase()),
             );
         }
-    
-        return filteredData;
-    }, [logs, filterValue]);
+
+        if (statusFilter !== "all") {
+            filteredUsers = filteredUsers.filter((user) =>
+                user.STAFFCODE.substring(0, 3).includes(statusFilter),
+            );
+        }
+
+        return filteredUsers;
+    }, [logs, filterValue, statusFilter]);
 
     // Fetch Data
     const [filterDate, setFilterDate] = useState(today);
@@ -55,7 +69,23 @@ export default function AttendanceTable() {
             fetchLogs(e.target.value)
         }
     }, []);
-    
+
+    // Sorting
+    const [sortDescriptor, setSortDescriptor] = useState({
+        column: "CODE",
+        direction: "ascending",
+    });
+
+    const sortedLogs = useMemo(() => {
+        return [...filteredItems].sort((a, b) => {
+            const first = a[sortDescriptor.column];
+            const second = b[sortDescriptor.column];
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+
+            return sortDescriptor.direction === "descending" ? -cmp : cmp;
+        });
+    }, [sortDescriptor, filteredItems]);
+
     // Pagination
     const [page, setPage] = useState(1);
     const rowsPerPage = 9;
@@ -65,8 +95,8 @@ export default function AttendanceTable() {
     const items = useMemo(() => {
         const start = (page - 1) * rowsPerPage
         const end = start + rowsPerPage;
-        return filteredItems.slice(start, end);
-    }, [page, filteredItems]);
+        return sortedLogs.slice(start, end);
+    }, [page, sortedLogs]);
 
     const onNextPage = useCallback(() => {
         if (page < pages) {
@@ -80,21 +110,7 @@ export default function AttendanceTable() {
         }
     }, [page]);
 
-    // Sorting
-    const [sortDescriptor, setSortDescriptor] = useState({
-        column: "CODE",
-        direction: "ascending",
-    });
 
-    const sortedLogs = useMemo(() => {
-        return [...items].sort((a, b) => {
-          const first = a[sortDescriptor.column];
-          const second = b[sortDescriptor.column];
-          const cmp = first < second ? -1 : first > second ? 1 : 0;
-    
-          return sortDescriptor.direction === "descending" ? -cmp : cmp;
-        });
-    }, [sortDescriptor, items]);
 
 
     // Inputs
@@ -103,24 +119,32 @@ export default function AttendanceTable() {
             <div className="flex justify-between gap-4 items-center w-full">
                 <Input
                     isClearable
-                    // className="w-full sm:max-w-[49%]"
                     placeholder="Search by Staff Name..."
                     startContent={ <SearchIcon /> }
                     value={filterValue}
-                    // onClear={() => onClear()}
                     onValueChange={onSearchChange}
                     size="sm"
                 />
                 <Input
                     type="date"
-                    // className="w-full sm:max-w-[49%]"
-                    // startContent={<SearchIcon />}
                     value={filterDate}
                     defaultValue={today}
-                    // pattern="\d{4}-\d{2}-\d{2}"
-                    // onValueChange={onDateChange}
                     onChange={onDateChange}
                 />
+                <Select
+                    color="success"
+                    defaultSelectedKeys={["all"]}
+                    className="hidden sm:flex sm:max-w-sm"
+                    aria-label="Staff Type"
+                    size="sm"
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                    {statusOptions.map((status) => (
+                        <SelectItem key={status.uid} className="capitalize">
+                            {(status.name)}
+                        </SelectItem>
+                    ))}
+                </Select>
             </div>
         );
       }, [
@@ -188,24 +212,20 @@ export default function AttendanceTable() {
                 selectionMode="single" 
                 sortDescriptor={sortDescriptor}
                 onSortChange={setSortDescriptor}
-                // defaultSelectedKeys={["2"]} 
-                aria-label="Example static collection table"
+                aria-label="Attendance Table"
                 bottomContent={bottomContent}
                 classNames={{
                     wrapper: "min-h-[222px]",
                 }}
                 bottomContentPlacement="outside"
-                topContent={
-                    topContent
-                }
-                // topContentPlacement="outside"
+                topContent={topContent}
             >
                 <TableHeader>
                     <TableColumn key="CODE" align="center" allowsSorting="true"> CODE</TableColumn>
                     <TableColumn key="STAFF" align="start" allowsSorting="true">STAFF</TableColumn>
                     <TableColumn key="TIME" align="center" allowsSorting="true">TIME</TableColumn>
                 </TableHeader>
-                <TableBody emptyContent={"No data found"} items={sortedLogs}>
+                <TableBody emptyContent={"No data found"} items={items}>
                     {(item) => (
                         <TableRow key={item.LOGID}>
                             {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}

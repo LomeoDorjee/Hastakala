@@ -1,8 +1,9 @@
 import TransferTable from "@/components/table/TransferTable";
 import { getAllTransfers } from "@/lib/actions/transfer/transfer.actions";
+import toast from "react-hot-toast";
 
 type TransferData = {
-    data?: {
+    data: {
         transfermasterid: number
         productid: number
         productname: string
@@ -11,8 +12,8 @@ type TransferData = {
         startbyuserid: string
         startdate: string
         status: string
-    }[] | undefined
-    error?: string
+    }[]
+    error: string
 }
 
 export default async function Page() {
@@ -20,7 +21,7 @@ export default async function Page() {
     const { data, error }: TransferData = await getAllTransfers()
 
     if (error) {
-        console.log(error)
+        toast.error(error)
         return
     }
 

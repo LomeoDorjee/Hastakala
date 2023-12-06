@@ -20,10 +20,12 @@ import {
     SortDescriptor,
     Tooltip,
     useDisclosure,
-    Link
+    Link,
+    Select,
+    SelectItem
 } from "@nextui-org/react";
 import { ChangeEvent, Key, useCallback, useMemo, useState } from "react";
-import { DeleteIcon, EditIcon, EyeIcon, SearchIcon } from "../icons/icons";
+import { ChevronDownIcon, DeleteIcon, EditIcon, EyeIcon, SearchIcon } from "../icons/icons";
 import UserDepartForm from "../forms/UserDepartForm";
 import { sessionUser } from "@/lib/actions/config/user.actions";
 
@@ -43,7 +45,6 @@ type StaffProps = {
 
 
 const columns = [
-    // {name: "ID", uid: "id", sortable: true},
     { name: "CODE", uid: "STAFFCODE", sortable: true },
     { name: "NAME", uid: "STAFFNAME", sortable: true },
     { name: "DEPARTMENT", uid: "DEPARTMENT", sortable: true },
@@ -51,6 +52,11 @@ const columns = [
     { name: "ACTIONS", uid: "actions" },
 ];
 
+const statusOptions = [
+    { name: "Staff", uid: "P1-" },
+    { name: "Producer", uid: "P2-" },
+    { name: "All", uid: "all" },
+];
 
 export default function StaffTable({ staffs, sessionUser }: StaffProps) {
 
@@ -58,6 +64,7 @@ export default function StaffTable({ staffs, sessionUser }: StaffProps) {
 
     const [filterValue, setFilterValue] = useState("");
     const [rowsPerPage, setRowsPerPage] = useState(7);
+    const [statusFilter, setStatusFilter] = useState("all");
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
         column: "STAFFCODE",
         direction: "ascending",
@@ -77,31 +84,32 @@ export default function StaffTable({ staffs, sessionUser }: StaffProps) {
             );
         }
 
+        if (statusFilter !== "all") {
+            filteredUsers = filteredUsers.filter((user) =>
+                user.STAFFCODE.substring(0, 3).includes(statusFilter),
+            );
+        }
+
         return filteredUsers;
-    }, [staffs, filterValue]);
+    }, [staffs, filterValue, statusFilter]);
 
-    const items = useMemo(() => {
-        const start = (page - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-
-        return (filteredItems) ? filteredItems?.slice(start, end) : [];
-    }, [page, filteredItems, rowsPerPage]);
 
     const sortedItems = useMemo(() => {
-        return [...items].sort((a: STAFF, b: STAFF) => {
+        return [...filteredItems].sort((a: STAFF, b: STAFF) => {
             const first = a[sortDescriptor.column as keyof STAFF] as unknown as number;
             const second = b[sortDescriptor.column as keyof STAFF] as unknown as number;
             const cmp = first < second ? -1 : first > second ? 1 : 0;
 
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
         });
-    }, [sortDescriptor, items]);
+    }, [sortDescriptor, filteredItems]);
 
-    const handleUserEdit = (item: STAFF) => {
-        // setToEditUserId(item.userid)
-        // setToEditUserName(item.username)
-        // onOpen()
-    }
+    const items = useMemo(() => {
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        return (sortedItems) ? sortedItems?.slice(start, end) : [];
+    }, [page, sortedItems, rowsPerPage]);
 
     const renderCell = useCallback((staff: STAFF, columnKey: Key) => {
         const cellValue = staff[columnKey as keyof STAFF];
@@ -156,20 +164,32 @@ export default function StaffTable({ staffs, sessionUser }: StaffProps) {
 
     const topContent = useMemo(() => {
         return (
-            <div className="flex flex-col gap-4">
-                <div className="flex justify-between gap-3 items-end">
-                    <Input
-                        isClearable
-                        className="w-full"
-                        placeholder="Search by Staff Name..."
-                        startContent={<SearchIcon className="text-default-300" />}
-                        value={filterValue}
-                        variant="bordered"
-                        onClear={() => setFilterValue("")}
-                        onValueChange={onSearchChange}
-                        size="sm"
-                    />
-                </div>
+            <div className="flex gap-4">
+                <Input
+                    isClearable
+                    className="w-full"
+                    placeholder="Search by Staff Name..."
+                    startContent={<SearchIcon className="text-default-300" />}
+                    value={filterValue}
+                    variant="bordered"
+                    onClear={() => setFilterValue("")}
+                    onValueChange={onSearchChange}
+                    size="sm"
+                />
+                <Select
+                    color="success"
+                    defaultSelectedKeys={["all"]}
+                    className="hidden sm:flex sm:max-w-sm"
+                    aria-label="Staff Type"
+                    size="sm"
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                    {statusOptions.map((status) => (
+                        <SelectItem key={status.uid} className="capitalize">
+                            {(status.name)}
+                        </SelectItem>
+                    ))}
+                </Select>
             </div>
         );
     }, [
@@ -178,6 +198,7 @@ export default function StaffTable({ staffs, sessionUser }: StaffProps) {
         onRowsPerPageChange,
         staffs?.length,
         hasSearchFilter,
+        statusFilter,
     ]);
 
     const bottomContent = useMemo(() => {
@@ -252,7 +273,7 @@ export default function StaffTable({ staffs, sessionUser }: StaffProps) {
                         </TableColumn>
                     )}
                 </TableHeader>
-                <TableBody emptyContent={"No users found"} items={sortedItems}>
+                <TableBody emptyContent={"No users found"} items={items}>
                     {(item) => (
                         <TableRow key={item.STAFFID}>
                             {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}

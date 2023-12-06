@@ -61,11 +61,10 @@ export default async function Home() {
                             </div>
                         </div>
                     </section>
-                </div >
-            </SignedOut >
+                </div>
+            </SignedOut>
             <SignedIn>
                 <div className="max-w-[1200px] gap-10 grid grid-cols-12 pt-8">
-
 
                     <Card className="col-span-6 sm:col-span-6 h-[250px]">
                         <Link href="/pis" color="secondary">
