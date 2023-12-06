@@ -19,14 +19,12 @@ export default function RootLayout({
 }) {
     return (
         <ClerkProvider
-            // appearance={
-            //     {
-            //         baseTheme: dark
-            //     }
-            // }
+            appearance={{
+                baseTheme: dark
+            }}
         >
             <html lang="en">
-                <body className={`${inter.className}`}>
+                <body className={`${inter.className} bg-gradient-to-br from-slate-950 via-pink-950 to-slate-950 `}>
                     {children}
                 </body>
             </html>

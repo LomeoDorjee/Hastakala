@@ -175,6 +175,7 @@ export default function ProductTable({ products }: ProductProps) {
             variant="bordered"
             onClear={() => setFilterValue("")}
             onValueChange={onSearchChange}
+            size="sm"
           />
           <Button onPress={() => handleNew()} color="primary">&#10010; Add</Button>
         </div>

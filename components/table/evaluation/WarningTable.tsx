@@ -29,6 +29,8 @@ import { EditIcon, SearchIcon } from "../../icons/icons";
 import { getAppreciationRecord, getWarningRecord } from "@/lib/actions/performance/evaluation.actions";
 import AppreciationForm from "@/components/forms/AppreciationForm";
 import WarningForm from "@/components/forms/WarningForm";
+import { sessionUser } from "@/lib/actions/config/user.actions";
+import toast from "react-hot-toast";
 
 type YEAR = {
     FYEARID: number
@@ -41,6 +43,7 @@ type CRITERIA = {
 type Props = {
     years: YEAR[]
     criterias: CRITERIA[]
+    sessionUser: sessionUser
 }
 
 type RECORD = {
@@ -62,7 +65,7 @@ const columns = [
     { name: "CATEGORY", uid: "CATEGORY", sortable: true },
     { name: "ACTIONS", uid: "actions" },
 ];
-export default function WarningTable({ years, criterias }: Props) {
+export default function WarningTable({ years, criterias, sessionUser }: Props) {
 
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
@@ -72,18 +75,14 @@ export default function WarningTable({ years, criterias }: Props) {
     const [Data, setData] = useState<RECORD[]>([])
     const [isLoading, setIsLoading] = useState(true);
 
-    const [toSelectFyearid, setToSelectFyearid] = useState((years.length) ? "" + years[0].FYEARID : "1")
+    const [toSelectFyearid, setToSelectFyearid] = useState((years.length) ? "" + years[1].FYEARID : "1")
 
     const fetchData = async (fyearid: number) => {
-        let records = await getWarningRecord(fyearid)
-        if (records == null) {
-            records = await getWarningRecord(fyearid)
-        }
+        let records = await getWarningRecord(fyearid, sessionUser)
 
         setIsLoading(false)
-        console.log(records)
         if (records && records.error != "") {
-            console.log(records.error)
+            toast.error(records.error)
             return;
         }
         if (records)
@@ -208,7 +207,7 @@ export default function WarningTable({ years, criterias }: Props) {
                     value={filterValue}
                     onClear={() => onClear()}
                     onValueChange={onSearchChange}
-                    size="lg"
+                    size="sm"
                 />
                 <Select
                     label="Fiscal Year"

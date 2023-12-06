@@ -53,6 +53,38 @@ export async function fetchUserInfo(userId: string) {
 
 }
 
+export type sessionUser = {
+    userid: string
+    username: string
+    onboarded: boolean
+    depid: number
+    staffid: number
+    usertype: string
+}
+export async function getUserDetail(userId: string, staffid: number) {
+
+    try {
+        let data: sessionUser[] = []
+
+        if (userId != "") {
+            data = await prisma.$queryRaw`SELECT * FROM "USER" WHERE USERID = ${userId}`
+        } else {
+            data = await prisma.$queryRaw`SELECT * FROM "USER" WHERE STAFFID = ${staffid}`
+        }
+
+        return {
+            data: data,
+            error: ""
+        }
+    } catch (error) {
+        return {
+            data: [],
+            error: catchErrorMessage(error)
+        }
+    }
+
+}
+
 type userDepProps = {
     depid: number
     userid: string
@@ -117,68 +149,44 @@ export async function getAllUsers() {
         })
         
         return {
-            data: users
+            data: users,
+            error: ""
         }
     } catch (error: unknown) {
         return {
+            data: [],
             error: catchErrorMessage(error)
         }
     }
 
 }
 
+export async function mapUserToStaff(userid: string, staffid: number) {
 
-// export async function searchUsers({
-//     userId,
-//     searchString = "",
-//     pageNumber = 1,
-//     pageSize = 20,
-//     sortBy = "desc"
-// }: {
-//     userId: string
-//     searchString?: string,
-//     pageNumber?: number,
-//     pageSize?: number,
-//     sortBy?: string
-// }){
+    try {
+        await prisma.$queryRaw`UPDATE "USER" SET STAFFID=${staffid} WHERE USERID=${userid}`
+        return {
+            status: "Mapping Success"
+        }
+    } catch (e) {
+        return {
+            status: catchErrorMessage(e)
+        }
+    }
 
-//     try {
+}
 
-//         const skipAmount = (pageNumber - 1) * pageSize;
+export async function mapUserType(usertype: string, staffid: number) {
 
-//         const regex = new RegExp(searchString, "i")
+    try {
+        await prisma.$queryRaw`UPDATE "USER" SET USERTYPE=${usertype} WHERE STAFFID=${staffid}`
+        return {
+            status: "User Type Updated"
+        }
+    } catch (e) {
+        return {
+            status: catchErrorMessage(e)
+        }
+    }
 
-//         let query: any = {
-//             where: {
-//                 NOT: {
-//                     id: userId
-//                 },
-//             },
-//             orderBy: {
-//                 name: sortBy
-//             },
-//             skip: skipAmount,
-//             take: pageSize,
-//         }
-
-//         if (searchString.trim() !== '') {
-            
-//             query.where.OR = [
-//                 { username: { $regex: regex } },
-//                 { name: {$regex: regex} }
-//             ]
-
-//         }
-
-//         const data = await prisma.user.findMany(query)
-
-//         const totalCount = await prisma.user.findMany();
-
-//         const isNext = totalCount.length > skipAmount + data.length
-
-//         return {data, isNext}
-
-//     } catch (error: any) {
-//         throw new Error(`Failed to update user: ${error.message}`)
-//     }
-// }
+}

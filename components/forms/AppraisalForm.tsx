@@ -71,7 +71,7 @@ export default function AppraisalForm({
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1">Appraisal Actions</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">Promotion Actions</ModalHeader>
                             <ModalBody>
                                 <form
                                     action={formSubmit}
@@ -89,7 +89,7 @@ export default function AppraisalForm({
                                         className="min-w-xs"
                                         name="fyearid"
                                         placeholder="Select Fiscal Year"
-                                        defaultSelectedKeys={[toSelectFyearid]}
+                                        defaultSelectedKeys={["" + toSelectFyearid]}
                                     >
                                         {years.map((year) => (
                                             <SelectItem key={year.FYEARID} value={year.FYEAR}>

@@ -109,6 +109,7 @@ export default function AttendanceTable() {
                     value={filterValue}
                     // onClear={() => onClear()}
                     onValueChange={onSearchChange}
+                    size="sm"
                 />
                 <Input
                     type="date"

@@ -5,6 +5,7 @@ import { useFormStatus } from "react-dom"
 import toast from "react-hot-toast"
 import { MarksValidation } from "@/lib/validations/evaluation"
 import { createUpdateMarks } from "@/lib/actions/performance/evaluation.actions"
+import { sessionUser } from "@/lib/actions/config/user.actions"
 
 
 type YEARS = {
@@ -26,16 +27,18 @@ type Props = {
     hod_q3: number
     hod_q4: number
     hod_q5: number
-    hod_q6: number
-    hod_q7: number
-    hod_q8: number
-    hod_q9: number
-    hod_q10: number
+    sup_q6: number
+    sup_q7: number
+    sup_q8: number
+    sup_q9: number
+    sup_q10: number
     sup_q1: number
     sup_q2: number
     sup_q3: number
     sup_q4: number
     sup_q5: number
+    sessionUser: sessionUser
+    fetchData: (yearid: number) => Promise<void>
 }
 
 export default function StaffMarksForm({
@@ -52,16 +55,18 @@ export default function StaffMarksForm({
     hod_q3,
     hod_q4,
     hod_q5,
-    hod_q6,
-    hod_q7,
-    hod_q8,
-    hod_q9,
-    hod_q10,
+    sup_q6,
+    sup_q7,
+    sup_q8,
+    sup_q9,
+    sup_q10,
     sup_q1,
     sup_q2,
     sup_q3,
     sup_q4,
     sup_q5,
+    sessionUser,
+    fetchData
 }: Props) {
 
     const formSubmit = async (formData: FormData) => {
@@ -74,16 +79,16 @@ export default function StaffMarksForm({
             hod_q3: parseInt(formData.get('hod_q3') as string) as number,
             hod_q4: parseInt(formData.get('hod_q4') as string) as number,
             hod_q5: parseInt(formData.get('hod_q5') as string) as number,
-            hod_q6: parseInt(formData.get('hod_q6') as string) as number,
-            hod_q7: parseInt(formData.get('hod_q7') as string) as number,
-            hod_q8: parseInt(formData.get('hod_q8') as string) as number,
-            hod_q9: parseInt(formData.get('hod_q9') as string) as number,
-            hod_q10: parseInt(formData.get('hod_q10') as string) as number,
             sup_q1: parseInt(formData.get('sup_q1') as string) as number,
             sup_q2: parseInt(formData.get('sup_q2') as string) as number,
             sup_q3: parseInt(formData.get('sup_q3') as string) as number,
             sup_q4: parseInt(formData.get('sup_q4') as string) as number,
             sup_q5: parseInt(formData.get('sup_q5') as string) as number,
+            sup_q6: parseInt(formData.get('sup_q6') as string) as number,
+            sup_q7: parseInt(formData.get('sup_q7') as string) as number,
+            sup_q8: parseInt(formData.get('sup_q8') as string) as number,
+            sup_q9: parseInt(formData.get('sup_q9') as string) as number,
+            sup_q10: parseInt(formData.get('sup_q10') as string) as number,
         }
 
         // Validation
@@ -100,28 +105,22 @@ export default function StaffMarksForm({
         }
 
         // serverside function call 
-        const response = await createUpdateMarks(zod.data)
+        const response = await createUpdateMarks(zod.data, sessionUser)
         if (response?.error) {
             toast.error(response.error)
             return
         }
 
+        fetchData(selectedYear as unknown as number)
+
         toast.success("Data Saved")
         onClose()
     }
 
-    const handleValueChange = useCallback((value?: string) => {
-        // if (value) {
-        //     setDepartmentName(value);
-        // } else {
-        //     setDepartmentName("");
-        // }
-    }, []);
-
 
     function HodQuestion() {
         let lines = [];
-        for (let i = 1; i <= 10; i++) {
+        for (let i = 1; i <= 5; i++) {
             let val: string = eval('hod_q' + i)
             lines.push(
                 <Input
@@ -143,8 +142,8 @@ export default function StaffMarksForm({
 
     function SupQuestion() {
         let lines = [];
-        for (let i = 1; i <= 5; i++) {
-            let val: string = eval('hod_q' + i)
+        for (let i = 1; i <= 10; i++) {
+            let val: string = eval('sup_q' + i)
             lines.push(
                 <Input
                     key={`inp_${i}`}
@@ -199,16 +198,16 @@ export default function StaffMarksForm({
 
                                     <Divider />
 
-                                    <Chip color="success">Department Head</Chip>
-                                    <div className="grid grid-cols-5 max-sm:grid-cols-2 gap-2">
-                                        <HodQuestion />
-                                    </div>
 
-                                    <Divider />
-
-                                    <Chip color="danger">Supervisor</Chip>
+                                    <Chip color="success">Level 1</Chip>
                                     <div className="grid grid-cols-5 max-sm:grid-cols-2 gap-2">
                                         <SupQuestion />
+                                    </div>
+                                    <Divider />
+
+                                    <Chip color="success">Level 2</Chip>
+                                    <div className="grid grid-cols-5 max-sm:grid-cols-2 gap-2">
+                                        <HodQuestion />
                                     </div>
 
                                     <SubmitButton />

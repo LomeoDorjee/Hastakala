@@ -48,17 +48,6 @@ export default function TransferTable({ transfers }: TransferProps) {
         return filteredData;
     }, [transfers, filterValue]);
 
-    // Fetch Data
-    // const [filterDate, setFilterDate] = useState(today);
-
-    // const onDateChange = useCallback((e) => {
-    //     if (e.target.value) {
-    //         console.log(e.target.value)
-    //         setFilterDate(new Date(e.target.value).toISOString().split('T')[0])
-    //         fetchLogs(e.target.value)
-    //     }
-    // }, []);
-
     // Pagination
     const [page, setPage] = useState(1);
     const rowsPerPage = 9;
@@ -99,32 +88,17 @@ export default function TransferTable({ transfers }: TransferProps) {
         });
     }, [sortDescriptor, items]);
 
-    const handleEdit = (item: Transfer) => {
-        // setTransferName(item.depname)
-        // setTransferId(item.depid)
-        // setIsSelected(item.isactive)
-        // onOpen()
-    }
-
-    const handleNew = () => {
-        // setTransferName("")
-        // setTransferId(0)
-        // setIsSelected(true)
-        // onOpen()
-    }
-
     // Inputs
     const topContent = useMemo(() => {
         return (
             <div className="flex justify-between gap-4 items-center w-full">
                 <Input
                     isClearable
-                    // className="w-full sm:max-w-[49%]"
                     placeholder="Search by Product Name..."
                     startContent={<SearchIcon />}
                     value={filterValue}
-                    // onClear={() => onClear()}
                     onValueChange={onSearchChange}
+                    size="sm"
                 />
                 <Button
                     href="/transfer/new"

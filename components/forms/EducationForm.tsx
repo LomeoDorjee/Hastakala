@@ -33,6 +33,8 @@ export default function EducationForm({
     years
 }: Props) {
 
+    console.log(toSelectFyearid)
+
     const formSubmit = async (formData: FormData) => {
 
         const newData = {
@@ -90,7 +92,7 @@ export default function EducationForm({
                                         className="min-w-xs"
                                         name="fyearid"
                                         placeholder="Select Fiscal Year"
-                                        defaultSelectedKeys={[toSelectFyearid]}
+                                        defaultSelectedKeys={["" + toSelectFyearid]}
                                         isDisabled
                                     >
                                         {years.map((year) => (

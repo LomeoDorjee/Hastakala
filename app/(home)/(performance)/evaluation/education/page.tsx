@@ -1,5 +1,9 @@
 import EducationTable from "@/components/table/evaluation/EducationTable"
 import { getAllFiscalYears } from "@/lib/actions/performance/evaluation.actions"
+import { getUserDetail, sessionUser } from "@/lib/actions/config/user.actions"
+import { currentUser } from "@clerk/nextjs"
+import { redirect } from "next/navigation"
+
 
 type YEARS = {
     data: {
@@ -13,10 +17,18 @@ export default async function Page() {
 
     const years: YEARS = await getAllFiscalYears()
 
+    const currentuser = await currentUser()
+    if (!currentuser) redirect("/")
+
+    const sessionUser: {
+        data: sessionUser[]
+        error: string
+    } = await getUserDetail(currentuser.id, 1)
+
     return (
         <>
             <h3 className="widgettitle">Education Record</h3>
-            <EducationTable years={years.data} />
+            <EducationTable years={years.data} sessionUser={sessionUser.data[0]} />
         </>
     )
 

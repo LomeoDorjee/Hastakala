@@ -19,29 +19,6 @@ export default function ProductImage({ productid }: ImageProps) {
 
     const query = useSearchParams()
 
-    const formSubmit = async (formData: FormData) => {
-
-        console.log(12111111111)
-        alert(1)
-        // setUploading(true)
-
-        // if (!selectedFile) {
-        //     setUploading(false)
-        //     return
-        // }
-
-        // const response = await uploadProductImage(formData)
-        // if (response?.error) {
-        //     toast.error(response.error)
-        //     setUploading(false)
-        //     return
-        // }
-
-        // toast.success("Data Saved")
-        // setUploading(false)
-
-    }
-
     const handleSelect = async () => {
 
         if (!selectedFile) {
@@ -73,7 +50,7 @@ export default function ProductImage({ productid }: ImageProps) {
         <>
             <div className="imageSection flex gap-4">
                 <form
-                    action={formSubmit}
+                    // action={formSubmit}
                     className="w-full"
                 >
                     <div className="flex items-center justify-start w-full">
