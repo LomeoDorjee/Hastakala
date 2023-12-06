@@ -25,7 +25,7 @@ function Bottombar() {
                         return (
                             <Link
                                 href={link.route}
-                                className={`relative flex flex-col items-center gap-2 rounded-lg p-2 sm:flex-1 sm:px-2 sm:py-2.5 ${isActive && 'bg-primary-500'} `}
+                                className={`relative flex flex-col items-center gap-2 rounded-lg p-2 sm:flex-1 sm:px-2 sm:py-2.5 hover:shadow-xl ${isActive && 'shadow-xl border-b-2 border-pink-700'} `}
                                 key={link.label}
                             >
                                 <Image

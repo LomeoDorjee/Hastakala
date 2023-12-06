@@ -80,21 +80,19 @@ export default function DepartmentForm({
                     <ModalHeader className="flex flex-col gap-1">Department Actions</ModalHeader>
                     <ModalBody>
                         <form
-                            action={ formSubmit }      
-                            // onSubmit={handleSubmit}
+                                  action={formSubmit}      
                             className="flex flex-col justify-start gap-10" >
                             
                             <Input
                                 autoFocus
                                 label="Department"
-                                // placeholder="Enter Department Name"
+                                      placeholder="Enter Department Name"
                                 variant="bordered"
                                 name="departmentName"
                                 value={departmentName}     
                                 onValueChange={handleValueChange}      
                             />  
-                            <Switch isSelected={isSelected} onValueChange={setIsSelected} color="success">Is Active?</Switch>
-                            {/* <input type="hidden" value={departmentId} name="departmentId" />      */}
+                                  <Switch isSelected={isSelected} onValueChange={setIsSelected} color="success">Is Active?</Switch>
                             <SubmitButton /> 
                         </form>
                     </ModalBody>

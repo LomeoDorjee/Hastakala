@@ -13,9 +13,6 @@ export default async function Page({ params }: { params: { productid: number } }
         error?: string | undefined
     } = await getProductImages(params.productid)
 
-    console.table(images)
-
-
     return (
         <>
             <div className="flex gap-2 justify-between">

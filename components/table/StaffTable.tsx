@@ -167,6 +167,7 @@ export default function StaffTable({ staffs, sessionUser }: StaffProps) {
                         variant="bordered"
                         onClear={() => setFilterValue("")}
                         onValueChange={onSearchChange}
+                        size="sm"
                     />
                 </div>
             </div>

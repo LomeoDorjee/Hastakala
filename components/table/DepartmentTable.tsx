@@ -52,17 +52,6 @@ export default function DepartmentTable({ departments }: DepProps) {
             return filteredData;
         }, [departments, filterValue]);
 
-    // Fetch Data
-        // const [filterDate, setFilterDate] = useState(today);
-
-        // const onDateChange = useCallback((e) => {
-        //     if (e.target.value) {
-        //         console.log(e.target.value)
-        //         setFilterDate(new Date(e.target.value).toISOString().split('T')[0])
-        //         fetchLogs(e.target.value)
-        //     }
-        // }, []);
-    
     // Pagination
         const [page, setPage] = useState(1);
         const rowsPerPage = 9;
@@ -123,14 +112,13 @@ export default function DepartmentTable({ departments }: DepProps) {
                 <div className="flex justify-between gap-4 items-center w-full">
                     <Input
                         isClearable
-                        // className="w-full sm:max-w-[49%]"
                         placeholder="Search by Staff Name..."
                         startContent={ <SearchIcon /> }
                         value={filterValue}
-                        // onClear={() => onClear()}
                         onValueChange={onSearchChange}
+                        size="sm"
                     />
-                    <Button onPress={() => handleNew()} color="primary">&#10010; Add</Button>
+                    <Button onPress={() => handleNew()} color="secondary">&#10010; Add</Button>
                 </div>
             );
         }, [
@@ -215,21 +203,18 @@ export default function DepartmentTable({ departments }: DepProps) {
                 isSelected={isSelected}
                 setIsSelected={setIsSelected}
             />
+
             <Table 
                 color="success"
                 isHeaderSticky
                 selectionMode="single" 
                 sortDescriptor={sortDescriptor}
                 onSortChange={setSortDescriptor}
-                // defaultSelectedKeys={["2"]} 
                 aria-label="User Collection Table"
                 bottomContent={bottomContent}
-                classNames={{
-                    wrapper: "min-h-[111px]",
-                }}
                 bottomContentPlacement="outside"
                 topContent={ topContent }
-                // topContentPlacement="outside"
+                topContentPlacement="outside"
             >
                 <TableHeader>
                     <TableColumn key="depname" align="start" allowsSorting={true}>DEPARTMENT NAME</TableColumn>

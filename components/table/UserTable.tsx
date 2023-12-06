@@ -183,6 +183,7 @@ export default function UserTable({ users, departments }: UserProps) {
             variant="bordered"
             onClear={() => setFilterValue("")}
             onValueChange={onSearchChange}
+            size="sm"
           />
         </div>
       </div>
