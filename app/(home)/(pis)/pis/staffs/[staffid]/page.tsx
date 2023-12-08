@@ -1,5 +1,5 @@
 import StaffCard from "@/components/cards/StaffCard"
-import { getAllUsers, getUserDetail } from "@/lib/actions/config/user.actions";
+import { getAllUsers, getUserDetail, sessionUser } from "@/lib/actions/config/user.actions";
 import { getStaffDetail } from "@/lib/actions/pis/staffs.actions";
 
 
@@ -30,14 +30,7 @@ export default async function Page({ params }: { params: { staffid: number } }) 
     } = await getAllUsers()
 
     const userdetail: {
-        data: {
-            userid: string
-            username: string
-            onboarded: string
-            depid: number
-            staffid: number
-            usertype: string
-        }[]
+        data: sessionUser[]
         error: string
     } = await getUserDetail("", params.staffid)
 
