@@ -6,14 +6,14 @@ export default function Page() {
             <Card
                 isFooterBlurred
                 radius="lg"
-                className="border-none col-span-6 sm:col-span-4"
+                className="border-none col-span-12 sm:col-span-6 flex items-center"
             >
                 <Image
                     alt="Personal Information System"
                     className="object-cover"
-                    height={350}
+                    height={450}
                     src="/assets/svg/device-log.svg"
-                    width={350}
+                    width={450}
                 />
                 <CardFooter className="justify-between before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
                     <p className="text-tiny">Attendance Device Logs.</p>
@@ -25,14 +25,14 @@ export default function Page() {
             <Card
                 isFooterBlurred
                 radius="lg"
-                className="border-none col-span-6 sm:col-span-4"
+                className="border-none col-span-12 sm:col-span-6 flex items-center"
             >
                 <Image
                     alt="Staff List"
                     className="object-cover"
-                    height={350}
+                    height={450}
                     src="/assets/svg/users.svg"
-                    width={350}
+                    width={450}
                 />
                 <CardFooter className="justify-between before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
                     <p className="text-tiny">Staff List.</p>

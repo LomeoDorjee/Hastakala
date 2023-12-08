@@ -35,8 +35,8 @@ export default function RootLayout({
           <SignedIn>
             <Topbar />
             <main className='flex flex-row'>
-              <LeftSidebar />
-              <section className='flex min-h-screen flex-1 flex-col items-center px-5 pb-10 pt-4 max-md:pb-32 sm:px-6 max-md:pt-16'>
+              {/* <LeftSidebar /> */}
+              <section className='flex min-h-screen flex-1 flex-col items-center px-5 pb-10 pt-4 max-md:pb-32 sm:px-4 max-md:pt-16'>
                 <div className='w-full'>
                   <Providers>
                     {children}
@@ -44,6 +44,7 @@ export default function RootLayout({
                   </Providers>
                 </div>
               </section>
+              <RightSidebar />
               <Bottombar />
             </main>
           </SignedIn>

@@ -63,7 +63,7 @@ export default function StaffTable({ staffs, sessionUser }: StaffProps) {
     // const { isOpen, onClose, onOpen, onOpenChange } = useDisclosure()
 
     const [filterValue, setFilterValue] = useState("");
-    const [rowsPerPage, setRowsPerPage] = useState(7);
+    const [rowsPerPage, setRowsPerPage] = useState(6);
     const [statusFilter, setStatusFilter] = useState("all");
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
         column: "STAFFCODE",
@@ -223,7 +223,7 @@ export default function StaffTable({ staffs, sessionUser }: StaffProps) {
                         className="bg-transparent outline-none text-default-400 text-small"
                         onChange={onRowsPerPageChange}
                     >
-                        <option value="7">7</option>
+                        <option value="6">6</option>
                         <option value="10">10</option>
                         <option value="15">15</option>
                     </select>

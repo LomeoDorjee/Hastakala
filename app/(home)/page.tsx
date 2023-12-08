@@ -64,9 +64,9 @@ export default async function Home() {
                 </div>
             </SignedOut>
             <SignedIn>
-                <div className="max-w-[1200px] gap-10 grid grid-cols-12 pt-8">
+                <div className="gap-10 grid grid-cols-12 p-2 pt-8">
 
-                    <Card className="col-span-6 sm:col-span-6 h-[250px]">
+                    <Card className="col-span-12 sm:col-span-6 h-[250px]">
                         <Link href="/pis" color="secondary">
                             <CardHeader className="absolute z-10 top-1 flex-col !items-start">
                                 <p className="text-4xl uppercase font-bold">PIS</p>
@@ -82,7 +82,7 @@ export default async function Home() {
                         </Link>
                     </Card>
 
-                    <Card className="col-span-6 sm:col-span-6 h-[250px]">
+                    <Card className="col-span-12 sm:col-span-6 h-[250px]">
                         <Link href="/transfer" color="warning">
                             <CardHeader className="absolute z-10 top-1 flex-col !items-start">
                                 <p className="text-4xl uppercase font-bold">Tracking</p>
@@ -98,7 +98,7 @@ export default async function Home() {
                         </Link>
                     </Card>
 
-                    <Card className="col-span-6 sm:col-span-6 h-[250px]">
+                    <Card className="col-span-12 sm:col-span-6 h-[250px]">
                         <Link href="/evaluation" color="warning">
                             <CardHeader className="absolute z-10 top-1 flex-col !items-start">
                                 <p className="text-4xl uppercase font-bold">Evaluation</p>
@@ -114,7 +114,7 @@ export default async function Home() {
                         </Link>
                     </Card>
 
-                    <Card className="col-span-6 sm:col-span-6 h-[250px]">
+                    <Card className="col-span-12 sm:col-span-6 h-[250px]">
                         <Link href="/config" color="danger">
                             <CardHeader className="absolute z-10 top-1 flex-col !items-start">
                                 <p className="text-4xl uppercase font-bold">Setup</p>

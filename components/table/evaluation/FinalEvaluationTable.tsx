@@ -62,8 +62,6 @@ type RECORD = {
 
 const columns = [
     { name: "NAME", uid: "STAFFNAME", sortable: true },
-    // { name: "DEPARTMENT", uid: "DEPARTMENT", sortable: true },
-    // { name: "DESIGNATION", uid: "DESIGNATION", sortable: true },
     { name: "PERFORMANCE", uid: "AVERAGE", sortable: true },
     { name: "SERVICE", uid: "SERVICE", sortable: true },
     { name: "EDUCATION", uid: "EDUCATION", sortable: true },
@@ -72,18 +70,23 @@ const columns = [
     { name: "WARNING", uid: "WARNING", sortable: true },
     // { name: "ACTIONS", uid: "actions" },
 ];
+
+const statusOptions = [
+    { name: "Staff", uid: "P1-" },
+    { name: "Producer", uid: "P2-" },
+    { name: "All", uid: "all" },
+];
+
 export default function FinalEvalutionTable({ years }: Props) {
 
     const [Data, setData] = useState<RECORD[]>([])
     const [isLoading, setIsLoading] = useState(true);
+    const [statusFilter, setStatusFilter] = useState("all");
 
     const [selectedYear, setSelectedYear] = useState((years.length) ? "" + years[1].FYEARID : "1")
 
     const fetchData = async (yearid: number) => {
         let records = await getFinalRecord(yearid)
-        if (records == null) {
-            records = await getFinalRecord(yearid)
-        }
 
         setIsLoading(false)
         if (records && records.error != "") {
@@ -118,8 +121,14 @@ export default function FinalEvalutionTable({ years }: Props) {
             );
         }
 
+        if (statusFilter !== "all") {
+            filteredData = filteredData.filter((user) =>
+                user.STAFFCODE.substring(0, 3).includes(statusFilter),
+            );
+        }
+
         return filteredData;
-    }, [Data, filterValue]);
+    }, [Data, filterValue, statusFilter]);
 
     const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -227,6 +236,20 @@ export default function FinalEvalutionTable({ years }: Props) {
                         </SelectItem>
                     ))}
                 </Select>
+                <Select
+                    color="success"
+                    defaultSelectedKeys={["all"]}
+                    className="hidden sm:flex sm:max-w-sm"
+                    aria-label="Staff Type"
+                    size="sm"
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                    {statusOptions.map((status) => (
+                        <SelectItem key={status.uid} className="capitalize">
+                            {(status.name)}
+                        </SelectItem>
+                    ))}
+                </Select>
             </div>
         );
     }, [
@@ -235,6 +258,7 @@ export default function FinalEvalutionTable({ years }: Props) {
         onRowsPerPageChange,
         Data.length,
         hasSearchFilter,
+        statusFilter,
     ]);
 
     const bottomContent = useMemo(() => {

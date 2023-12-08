@@ -125,8 +125,8 @@ export default function Page() {
                 radius="lg"
                 className="border-none col-span-12 sm:col-span-12"
             >
-                <CardHeader className="font-bold text-center w-full text-pink-800">
-                    Administration
+                <CardHeader className="w-full text-pink-700">
+                    <p className="text-center w-full font-bold"> Administration</p>
                 </CardHeader>
                 <Divider />
                 <CardBody className="grid gap-4 grid-cols-12">
@@ -197,7 +197,7 @@ export default function Page() {
                         className="border-none col-span-6 sm:col-span-3 flex items-center"
                     >
                         <Image
-                            alt="Admin Avergae"
+                            alt="Admin Average"
                             className="object-contain"
                             height={100}
                             src="/assets/svg/scale.svg"
