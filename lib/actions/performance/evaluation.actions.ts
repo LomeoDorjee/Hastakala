@@ -396,6 +396,9 @@ export async function getAverageMarks(fyearid: number, sessionUser: sessionUser)
             });
         }
 
+
+        // Average Calculation 
+
         sql = `SELECT * FROM PE_APPRAISAL S WHERE 1=1 ` + toJoin
 
         // Get Last Appraisal
@@ -405,9 +408,9 @@ export async function getAverageMarks(fyearid: number, sessionUser: sessionUser)
         }[] = await pisprisma.$queryRaw(Prisma.raw(sql))
 
         appraisals.forEach((val) => {
-            let last_appraisal = val.FYEARID
-            let year_since_la = fyearid - last_appraisal
-            // console.log("Year: " + year_since_la)
+
+            let year_since_la = fyearid - val.FYEARID
+
             if (final[val.STAFFID]) {
 
                 final[val.STAFFID].YEARSTAKEN = year_since_la
@@ -415,24 +418,31 @@ export async function getAverageMarks(fyearid: number, sessionUser: sessionUser)
                 if (final[val.STAFFID].STAFFCODE.substring(0, 2) == "P1") {
                     // STAFF
                     if (year_since_la >= 3) {
+
+                        final[val.STAFFID].YEARSTAKEN = 3
+
                         // TAKE 3 YEARS AVERAGE : 40% - 35% & 25%
                         final[val.STAFFID].AVERAGE =
                             (final[val.STAFFID].AVERAGE1 * 0.4) +
                             (final[val.STAFFID].AVERAGE2 * 0.35) +
                             (final[val.STAFFID].AVERAGE3 * 0.25)
                     } else {
+
+                        final[val.STAFFID].YEARSTAKEN = year_since_la
+
                         // TAKE AVERAGE of years after appraisal
                         let summation = 0
                         for (let i = 0; i < year_since_la; i++) {
                             summation += eval('final[val.STAFFID].AVERAGE' + (i + 1))
                         }
                         final[val.STAFFID].AVERAGE = summation / year_since_la
-                        // console.log("Summation:" + summation)
-                        // console.log("Average:" + final[val.STAFFID].AVERAGE)
                     }
                 } else {
                     // PRODUCER
                     if (year_since_la > 5) {
+
+                        final[val.STAFFID].YEARSTAKEN = 5
+
                         // TAKE 5 YEARS AVERAGE 
                         final[val.STAFFID].AVERAGE =
                             (
@@ -443,14 +453,15 @@ export async function getAverageMarks(fyearid: number, sessionUser: sessionUser)
                                 final[val.STAFFID].AVERAGE5
                             ) / 5
                     } else {
+
+                        final[val.STAFFID].YEARSTAKEN = year_since_la
+
                         // TAKE AVERAGE of years after appraisal
                         let summation = 0
                         for (let i = 0; i < year_since_la; i++) {
                             summation += eval('final[val.STAFFID].AVERAGE' + (i + 1))
                         }
                         final[val.STAFFID].AVERAGE = summation / year_since_la
-                        // console.log("Summation:" + summation)
-                        // console.log("Average:" + final[val.STAFFID].AVERAGE)
                     }
                 }
 
@@ -995,7 +1006,7 @@ export async function getAdminAverage(fyearid: number, sessionUser: sessionUser)
 
     try {
 
-        let sql = `SELECT S.STAFFNAME, S.STAFFCODE, S.STAFFID,
+        let sql = `SELECT S.STAFFNAME, S.STAFFCODE, S.STAFFID, S.ISSUPPORT,
                     (SELECT DEPARTMENTNAME FROM PISDEPARTMENT WHERE DEPARTMENTID = S.DEPARTMENTID) DEPARTMENT,
                     (SELECT POSITIONNAME FROM STAFFPOSITION WHERE POSITIONID = S.POSITIONID) DESIGNATION, 
                     (
@@ -1017,6 +1028,7 @@ export async function getAdminAverage(fyearid: number, sessionUser: sessionUser)
             DEPARTMENT: string
             DESIGNATION: string
             POINTS: number
+            ISSUPPORT: boolean
         }[] = await pisprisma.$queryRaw(Prisma.raw(sql))
 
         let data: AdminvgData = []
@@ -1034,22 +1046,29 @@ export async function getAdminAverage(fyearid: number, sessionUser: sessionUser)
             }
         });
 
+        // ================== Appreciation ==================== //
+
         sql = `SELECT SUM( ISNULL(POINTS,0)  ) AVERAGE, STAFFID
                 FROM (    
                     SELECT A.*, (
-                        CASE WHEN ${fyearid} - ISNULL(LAST_APPRAISAL,0) < 3 THEN (LAST_APPRAISAL + 1)  
+                        CASE WHEN ${fyearid} - ISNULL(LAST_APPRAISAL,0) < 
+                        (
+                            CASE WHEN 
+                                (SELECT SUBSTRING(STAFFCODE,1,3) FROM STAFF WHERE STAFFID = A.STAFFID) = 'P1-' 
+                                AND 
+                                (SELECT ISSUPPORT FROM STAFF WHERE STAFFID = A.STAFFID) = 0 
+                            THEN 3 
+                            ELSE 5 END 
+                        )
+                        THEN (LAST_APPRAISAL + 1)  
                         ELSE ${fyearid} - 2 END
                     ) SUM_FROM      
                         FROM (
                         SELECT APP.* ,(
                             SELECT ( CASE WHEN FYEARID > 0 THEN FYEARID ELSE 0 END ) FROM PE_APPRAISAL
                             WHERE STAFFID = APP.STAFFID
-                        ) LAST_APPRAISAL FROM PE_APPRECIATION APP`
-        if (!["ADMIN", "MANAGEMENT"].includes(sessionUser.usertype)) {
-            sql += ` WHERE APP.STAFFID IN (SELECT STAFFID FROM PE_INCHARGE WHERE UNDERID = ${sessionUser.staffid})`
-        }
-
-        sql += `    ) A
+                        ) LAST_APPRAISAL FROM PE_APPRECIATION APP
+                ) A
                 )B WHERE FYEARID BETWEEN SUM_FROM AND ${fyearid} 
                 GROUP BY STAFFID`
 
@@ -1059,13 +1078,24 @@ export async function getAdminAverage(fyearid: number, sessionUser: sessionUser)
         }[] = await pisprisma.$queryRaw(Prisma.raw(sql))
 
         appreciation.forEach(res => {
-            data[res.STAFFID].APPRECIATION = res.AVERAGE
+            if (data[res.STAFFID])
+                data[res.STAFFID].APPRECIATION = res.AVERAGE
         });
 
+        // ================== Warning ==================== //
         sql = `SELECT SUM( ISNULL(POINTS,0)  ) AVERAGE, STAFFID
                 FROM (    
                     SELECT A.*, (
-                        CASE WHEN ${fyearid} - ISNULL(LAST_APPRAISAL,0) < 3 THEN (LAST_APPRAISAL + 1)  
+                        CASE WHEN ${fyearid} - ISNULL(LAST_APPRAISAL,0) < 
+                        (
+                            CASE WHEN 
+                                (SELECT SUBSTRING(STAFFCODE,1,3) FROM STAFF WHERE STAFFID = A.STAFFID) = 'P1-' 
+                                AND 
+                                (SELECT ISSUPPORT FROM STAFF WHERE STAFFID = A.STAFFID) = 0 
+                            THEN 3 
+                            ELSE 5 END 
+                        )
+                        THEN (LAST_APPRAISAL + 1)  
                         ELSE ${fyearid} - 2 END
                     ) SUM_FROM      
                         FROM (
@@ -1085,7 +1115,8 @@ export async function getAdminAverage(fyearid: number, sessionUser: sessionUser)
         }[] = await pisprisma.$queryRaw(Prisma.raw(sql))
 
         warning.forEach(res => {
-            data[res.STAFFID].WARNING = res.AVERAGE
+            if (data[res.STAFFID])
+                data[res.STAFFID].WARNING = res.AVERAGE
         });
 
         return {
@@ -1143,6 +1174,7 @@ type FinalMain = {
         ATTENDANCE: number
         APPRECIATION: number
         WARNING: number
+        YEARSTAKEN: number
     }
 }
 export async function getFinalRecord(fyearid: number) {
@@ -1178,21 +1210,7 @@ export async function getFinalRecord(fyearid: number) {
                         ELSE POINTS END
                     ) FROM PE_LEAVEEVAL
                     WHERE FYEARID = ${fyearid} AND STAFFID = S.STAFFID
-                ) ATTENDANCE,
-                (
-                    SELECT (
-                        CASE WHEN ISNULL(POINTS,0) = 0 THEN 0
-                        ELSE POINTS END
-                    ) FROM PE_APPRECIATION
-                    WHERE FYEARID = ${fyearid} AND STAFFID = S.STAFFID
-                ) APPRECIATION,
-                (
-                    SELECT (
-                        CASE WHEN ISNULL(POINTS,0) = 0 THEN 0
-                        ELSE POINTS END
-                    ) FROM PE_WARNING
-                    WHERE FYEARID = ${fyearid} AND STAFFID = S.STAFFID
-                ) WARNING
+                ) ATTENDANCE
                 FROM STAFF S INNER JOIN PE_AVERAGE A ON S.STAFFID = A.STAFFID 
                 WHERE S.JOBSTATUSID = 1 AND FYEARID = ${fyearid}`
 
@@ -1220,8 +1238,9 @@ export async function getFinalRecord(fyearid: number) {
                 SERVICE: res.SERVICE,
                 EDUCATION: res.EDUCATION,
                 ATTENDANCE: res.ATTENDANCE,
-                APPRECIATION: res.APPRECIATION,
-                WARNING: res.WARNING
+                APPRECIATION: 0,
+                WARNING: 0,
+                YEARSTAKEN: 0
             }
         });
 
@@ -1234,9 +1253,6 @@ export async function getFinalRecord(fyearid: number) {
             year2.forEach(res => {
                 final[res.STAFFID].AVERAGE2 = res.AVERAGE
                 final[res.STAFFID].YEAR2 = years[1].FYEAR
-                if (res.AVERAGE && res.AVERAGE > 0) {
-                    final[res.STAFFID].AVERAGE = (final[res.STAFFID].AVERAGE + res.AVERAGE) / 2
-                }
             });
         }
 
@@ -1250,9 +1266,6 @@ export async function getFinalRecord(fyearid: number) {
             year3.forEach(res => {
                 final[res.STAFFID].AVERAGE3 = res.AVERAGE
                 final[res.STAFFID].YEAR3 = years[2].FYEAR
-                if (res.AVERAGE && res.AVERAGE > 0) {
-                    final[res.STAFFID].AVERAGE = (final[res.STAFFID].AVERAGE + res.AVERAGE) / 2
-                }
             });
         }
 
@@ -1265,9 +1278,6 @@ export async function getFinalRecord(fyearid: number) {
             year4.forEach(res => {
                 final[res.STAFFID].AVERAGE4 = res.AVERAGE
                 final[res.STAFFID].YEAR4 = years[3].FYEAR
-                if (res.AVERAGE && res.AVERAGE > 0) {
-                    final[res.STAFFID].AVERAGE = (final[res.STAFFID].AVERAGE + res.AVERAGE) / 2
-                }
             });
         }
 
@@ -1280,11 +1290,146 @@ export async function getFinalRecord(fyearid: number) {
             year5.forEach(res => {
                 final[res.STAFFID].AVERAGE5 = res.AVERAGE
                 final[res.STAFFID].YEAR5 = years[4].FYEAR
-                if (res.AVERAGE && res.AVERAGE > 0) {
-                    final[res.STAFFID].AVERAGE = (final[res.STAFFID].AVERAGE + res.AVERAGE) / 2
-                }
             });
         }
+
+        // Average Calculation
+        let sql = `SELECT * FROM PE_APPRAISAL`
+
+        const appraisals: {
+            FYEARID: number
+            STAFFID: number
+        }[] = await pisprisma.$queryRaw(Prisma.raw(sql))
+
+        appraisals.forEach((val) => {
+
+            let year_since_la = fyearid - val.FYEARID
+
+            if (final[val.STAFFID]) {
+
+                final[val.STAFFID].YEARSTAKEN = year_since_la
+
+                if (final[val.STAFFID].STAFFCODE.substring(0, 2) == "P1") {
+                    // STAFF
+                    if (year_since_la >= 3) {
+
+                        final[val.STAFFID].YEARSTAKEN = 3
+
+                        // TAKE 3 YEARS AVERAGE : 40% - 35% & 25%
+                        final[val.STAFFID].AVERAGE =
+                            (final[val.STAFFID].AVERAGE1 * 0.4) +
+                            (final[val.STAFFID].AVERAGE2 * 0.35) +
+                            (final[val.STAFFID].AVERAGE3 * 0.25)
+                    } else {
+
+                        final[val.STAFFID].YEARSTAKEN = year_since_la
+
+                        // TAKE AVERAGE of years after appraisal
+                        let summation = 0
+                        for (let i = 0; i < year_since_la; i++) {
+                            summation += eval('final[val.STAFFID].AVERAGE' + (i + 1))
+                        }
+                        final[val.STAFFID].AVERAGE = summation / year_since_la
+                    }
+                } else {
+                    // PRODUCER
+                    if (year_since_la > 5) {
+
+                        final[val.STAFFID].YEARSTAKEN = 5
+
+                        // TAKE 5 YEARS AVERAGE 
+                        final[val.STAFFID].AVERAGE =
+                            (
+                                final[val.STAFFID].AVERAGE1 +
+                                final[val.STAFFID].AVERAGE2 +
+                                final[val.STAFFID].AVERAGE3 +
+                                final[val.STAFFID].AVERAGE4 +
+                                final[val.STAFFID].AVERAGE5
+                            ) / 5
+                    } else {
+
+                        final[val.STAFFID].YEARSTAKEN = year_since_la
+
+                        // TAKE AVERAGE of years after appraisal
+                        let summation = 0
+                        for (let i = 0; i < year_since_la; i++) {
+                            summation += eval('final[val.STAFFID].AVERAGE' + (i + 1))
+                        }
+                        final[val.STAFFID].AVERAGE = summation / year_since_la
+                    }
+                }
+
+            }
+
+        })
+
+        // ================== Appreciation ==================== //
+        sql = `SELECT SUM( ISNULL(POINTS,0)  ) AVERAGE, STAFFID
+                FROM (    
+                    SELECT A.*, (
+                        CASE WHEN ${fyearid} - ISNULL(LAST_APPRAISAL,0) < 
+                        (
+                            CASE WHEN 
+                                (SELECT SUBSTRING(STAFFCODE,1,3) FROM STAFF WHERE STAFFID = A.STAFFID) = 'P1-' 
+                                AND 
+                                (SELECT ISSUPPORT FROM STAFF WHERE STAFFID = A.STAFFID) = 0 
+                            THEN 3 
+                            ELSE 5 END 
+                        )
+                        THEN (LAST_APPRAISAL + 1)  
+                        ELSE ${fyearid} - 2 END
+                    ) SUM_FROM      
+                        FROM (
+                        SELECT APP.* ,(
+                            SELECT ( CASE WHEN FYEARID > 0 THEN FYEARID ELSE 0 END ) FROM PE_APPRAISAL
+                            WHERE STAFFID = APP.STAFFID
+                        ) LAST_APPRAISAL FROM PE_APPRECIATION APP
+                ) A
+                )B WHERE FYEARID BETWEEN SUM_FROM AND ${fyearid} 
+                GROUP BY STAFFID`
+        const appreciation: {
+            STAFFID: number
+            AVERAGE: number
+        }[] = await pisprisma.$queryRaw(Prisma.raw(sql))
+
+        appreciation.forEach(res => {
+            if (final[res.STAFFID])
+                final[res.STAFFID].APPRECIATION = res.AVERAGE
+        });
+
+        // ================== Warning ==================== //
+        sql = `SELECT SUM( ISNULL(POINTS,0)  ) AVERAGE, STAFFID
+                FROM (    
+                    SELECT A.*, (
+                        CASE WHEN ${fyearid} - ISNULL(LAST_APPRAISAL,0) < 
+                        (
+                            CASE WHEN 
+                                (SELECT SUBSTRING(STAFFCODE,1,3) FROM STAFF WHERE STAFFID = A.STAFFID) = 'P1-' 
+                                AND 
+                                (SELECT ISSUPPORT FROM STAFF WHERE STAFFID = A.STAFFID) = 0 
+                            THEN 3 
+                            ELSE 5 END 
+                        )
+                        THEN (LAST_APPRAISAL + 1)  
+                        ELSE ${fyearid} - 2 END
+                    ) SUM_FROM      
+                        FROM (
+                        SELECT APP.* ,(
+                            SELECT ( CASE WHEN FYEARID > 0 THEN FYEARID ELSE 0 END ) FROM PE_APPRAISAL
+                            WHERE STAFFID = APP.STAFFID
+                        ) LAST_APPRAISAL FROM PE_WARNING APP
+                    ) A
+                )B WHERE FYEARID BETWEEN SUM_FROM AND ${fyearid} 
+                GROUP BY STAFFID`
+        const warning: {
+            STAFFID: number
+            AVERAGE: number
+        }[] = await pisprisma.$queryRaw(Prisma.raw(sql))
+
+        warning.forEach(res => {
+            if (final[res.STAFFID])
+                final[res.STAFFID].WARNING = res.AVERAGE
+        });
 
         return {
             data: Object.values(final),

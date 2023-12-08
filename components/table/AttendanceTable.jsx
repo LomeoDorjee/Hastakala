@@ -42,17 +42,17 @@ export default function AttendanceTable() {
     const hasSearchFilter = Boolean(filterValue);
 
     const filteredItems = useMemo(() => {
-        let filteredUsers = staffs;
+        let filteredUsers = logs;
 
         if (hasSearchFilter) {
             filteredUsers = filteredUsers?.filter((user) =>
-                user.STAFFNAME.toLowerCase().includes(filterValue.toLowerCase()),
+                user.STAFF.toLowerCase().includes(filterValue.toLowerCase()),
             );
         }
 
         if (statusFilter !== "all") {
             filteredUsers = filteredUsers.filter((user) =>
-                user.STAFFCODE.substring(0, 3).includes(statusFilter),
+                user.CODE.substring(0, 3).includes(statusFilter),
             );
         }
 
@@ -77,7 +77,7 @@ export default function AttendanceTable() {
     });
 
     const sortedLogs = useMemo(() => {
-        return [...filteredItems].sort((a, b) => {
+        return filteredItems.sort((a, b) => {
             const first = a[sortDescriptor.column];
             const second = b[sortDescriptor.column];
             const cmp = first < second ? -1 : first > second ? 1 : 0;
@@ -130,6 +130,7 @@ export default function AttendanceTable() {
                     value={filterDate}
                     defaultValue={today}
                     onChange={onDateChange}
+                    size="sm"
                 />
                 <Select
                     color="success"

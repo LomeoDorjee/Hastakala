@@ -26,6 +26,7 @@ import {
 import { SearchIcon } from "../../icons/icons";
 import { getAverageMarks } from "@/lib/actions/performance/evaluation.actions";
 import { sessionUser } from "@/lib/actions/config/user.actions";
+import toast from "react-hot-toast";
 
 type YEAR = {
     FYEARID: number
@@ -66,9 +67,17 @@ const columns = [
     { name: "AVERAGE", uid: "AVERAGE", sortable: true },
     // { name: "ACTIONS", uid: "actions" },
 ];
+
+const statusOptions = [
+    { name: "Staff", uid: "P1-" },
+    { name: "Producer", uid: "P2-" },
+    { name: "All", uid: "all" },
+];
+
 export default function AverageTable({ years, sessionUser }: Props) {
 
     const [Data, setData] = useState<RECORD[]>([])
+    const [statusFilter, setStatusFilter] = useState("all");
     const [isLoading, setIsLoading] = useState(true);
 
     const [selectedYear, setSelectedYear] = useState((years.length) ? "" + years[1].FYEARID : "1")
@@ -79,7 +88,7 @@ export default function AverageTable({ years, sessionUser }: Props) {
         setIsLoading(false)
 
         if (records && records.error != "") {
-            console.log(records.error)
+            toast.error(records.error)
             return;
         }
         if (records)
@@ -110,8 +119,14 @@ export default function AverageTable({ years, sessionUser }: Props) {
             );
         }
 
+        if (statusFilter !== "all") {
+            filteredData = filteredData.filter((data) =>
+                data.STAFFCODE.substring(0, 3).includes(statusFilter),
+            );
+        }
+
         return filteredData;
-    }, [Data, filterValue]);
+    }, [Data, filterValue, statusFilter]);
 
     const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -219,6 +234,20 @@ export default function AverageTable({ years, sessionUser }: Props) {
                         </SelectItem>
                     ))}
                 </Select>
+                <Select
+                    color="success"
+                    defaultSelectedKeys={["all"]}
+                    className="hidden sm:flex sm:max-w-sm"
+                    aria-label="Staff Type"
+                    size="sm"
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                    {statusOptions.map((status) => (
+                        <SelectItem key={status.uid} className="capitalize">
+                            {(status.name)}
+                        </SelectItem>
+                    ))}
+                </Select>
             </div>
         );
     }, [
@@ -226,6 +255,7 @@ export default function AverageTable({ years, sessionUser }: Props) {
         onSearchChange,
         onRowsPerPageChange,
         Data.length,
+        statusFilter,
         hasSearchFilter,
     ]);
 

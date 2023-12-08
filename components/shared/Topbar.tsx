@@ -11,11 +11,14 @@ function Topbar() {
     // const pathname = usePathname()
 
     return (
-        <nav className='fixed top-0 z-30 flex w-full items-center justify-between p-4 md:pl-6'>
-            <Link href="/" className='flex items-center gap-4 '>
+        <nav className='fixed top-0 z-30 flex w-full items-center justify-end p-4 md:pr-6'>
+            <SignedIn>
+                <UserButton />
+            </SignedIn>
+            {/* <Link href="/" className='flex items-center gap-4 '>
                 <Image src="/assets/svg/logo.svg" alt="logo" width={30} height={30} />
-                {/* <p className='font-bold text-light-1 max-xs:hidden'>{process.env.NEXT_PUBLIC_APP_NAME}</p> */}
-            </Link>
+                <p className='font-bold text-light-1 max-xs:hidden'>{process.env.NEXT_PUBLIC_APP_NAME}</p>
+            </Link> */}
 
             {/* <div className="flex flex-row gap-2">
             {
@@ -47,7 +50,7 @@ function Topbar() {
                 }
             </div> */}
             
-            <div className="flex items-center gap-1">
+            {/* <div className="flex items-center gap-1"> */}
 
                 {/* <div className="block md:hidden">
                     <SignedIn>
@@ -63,10 +66,10 @@ function Topbar() {
                     </SignedIn>
                 </div> */}
 
-                <div className="block">
+            {/* <div className="block">
                     <SignedIn>
                         <UserButton />
-                    </SignedIn>
+                    </SignedIn> */}
 
                     {/* <SignedOut>
                         <div className="inline-flex gap-2">
@@ -82,9 +85,9 @@ function Topbar() {
                             </Link>
                         </div>
                     </SignedOut> */}
-                </div>
+            {/* </div> */}
                 
-            </div>
+            {/* </div> */}
             
         </nav>
     )
