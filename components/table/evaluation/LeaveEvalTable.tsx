@@ -26,7 +26,7 @@ import {
     useDisclosure
 } from "@nextui-org/react";
 import { EditIcon, SearchIcon } from "../../icons/icons";
-import { getEducationRecord, getLeaveEvalRecord } from "@/lib/actions/performance/evaluation.actions";
+import { getEducationRecord, getLeaveEvalRecord, populateLeave } from "@/lib/actions/performance/evaluation.actions";
 import EducationForm from "@/components/forms/EducationForm";
 import LeaveEvalForm from "@/components/forms/LeaveEvalForm";
 import { sessionUser } from "@/lib/actions/config/user.actions";
@@ -76,6 +76,7 @@ export default function LeaveEvalTable({ years, criterias, sessionUser }: Props)
     const [isLoading, setIsLoading] = useState(true);
 
     const [toSelectFyearid, setToSelectFyearid] = useState((years.length) ? "" + years[1].FYEARID : "1")
+    let fyearID = toSelectFyearid
 
     const fetchData = async (fyearid: number) => {
         let records = await getLeaveEvalRecord(fyearid, sessionUser)
@@ -193,8 +194,22 @@ export default function LeaveEvalTable({ years, criterias, sessionUser }: Props)
         if (e.target.value) {
             setIsLoading(true)
             fetchData(e.target.value as unknown as number)
+            fyearID = e.target.value
         }
     };
+
+    const populateData = async (num: number) => {
+
+        const response = await populateLeave(num, fyearID as unknown as number)
+
+        if (response?.error !== "") {
+            toast.error(response.error)
+        } else if (response) {
+            toast.success("Data Populated")
+            fetchData(fyearID as unknown as number)
+        }
+
+    }
 
     const topContent = useMemo(() => {
         return (
@@ -223,6 +238,29 @@ export default function LeaveEvalTable({ years, criterias, sessionUser }: Props)
                         </SelectItem>
                     ))}
                 </Select>
+                <Dropdown>
+                    <DropdownTrigger>
+                        <Button
+                            variant="flat"
+                            size="lg"
+                            className="rounded-lg min-w-sm max-sm:hidden"
+                        >
+                            Populate
+                        </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu aria-label="Static Actions">
+                        <DropdownItem key="no"
+                            onClick={() => populateData(1)}
+                        >
+                            MORE THAN 31.5 WITH LOP
+                        </DropdownItem>
+                        <DropdownItem key="one"
+                            onClick={() => populateData(0)}
+                        >
+                            LESS THAN 13
+                        </DropdownItem>
+                    </DropdownMenu>
+                </Dropdown>
             </div>
         );
     }, [

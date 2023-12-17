@@ -256,11 +256,12 @@ export async function createUpdateMarks(marksData: unknown, sessionUser: session
                 VALUES (SRC.FYEARID, SRC.STAFFID, SRC.HOD_TOTAL, SRC.HOD_WEIGHT, SRC.SUP_TOTAL, SRC.SUP_WEIGHT, SRC.AVERAGE );`
 
         // revalidatePath("/evaluation/marks")
-        return
+        return {
+            error: ""
+        }
 
     } catch (error) {
         return {
-            data: [],
             error: catchErrorMessage(error)
         }
     }
@@ -596,11 +597,12 @@ export async function createUpdateAppraisal(formData: unknown) {
 
 
         // revalidatePath("/evaluation/appraisal")
-        return
+        return {
+            error: ""
+        }
 
     } catch (error) {
         return {
-            data: [],
             error: catchErrorMessage(error)
         }
     }
@@ -696,16 +698,50 @@ export async function createUpdateEducation(formData: unknown) {
                 VALUES (SRC.FYEARID, SRC.STAFFID, SRC.QUALIFICATION, SRC.POINTS);`
 
         // revalidatePath("/evaluation/education")
-        return
+        return {
+            error: ""
+        }
 
     } catch (error) {
         return {
-            data: [],
             error: catchErrorMessage(error)
         }
     }
 
 }
+
+export async function populateEducationData(fyearid: number) {
+
+    try {
+
+
+        await pisprisma.$queryRaw`MERGE PE_EDUCATION AS tgt  
+            USING (
+                SELECT MAX( POINTS) POINTS, STAFFID,
+                MAX(QUALIFICATION) QUALIFICATION, ${fyearid} FYEARID 
+                FROM PE_EDUCATION 
+                GROUP BY STAFFID
+            ) AS SRC (POINTS, STAFFID, QUALIFICATION, FYEARID)  
+            ON (TGT.STAFFID = SRC.STAFFID AND TGT.FYEARID = SRC.FYEARID)
+            WHEN NOT MATCHED THEN   
+                INSERT (FYEARID, STAFFID, QUALIFICATION, POINTS) 
+                VALUES (SRC.FYEARID, SRC.STAFFID, SRC.QUALIFICATION, SRC.POINTS);`
+
+        return {
+            status: "success",
+            message: "Data Populated!"
+        }
+
+    } catch (error) {
+        return {
+            status: "error",
+            message: catchErrorMessage(error)
+        }
+    }
+
+}
+
+
 
 
 // ========================= Administration: Leaves ========================== //
@@ -790,17 +826,54 @@ export async function createUpdateAnnualLeaveData(formData: unknown) {
                 VALUES (SRC.FYEARID, SRC.STAFFID, SRC.CATEGORY, SRC.POINTS);`
 
         // revalidatePath("/evaluation/leave")
-        return
+        return {
+            error: ""
+        }
 
     } catch (error) {
         return {
-            data: [],
             error: catchErrorMessage(error)
         }
     }
 
 }
 
+
+export async function populateLeave(num: number, fyearid: number) {
+
+    try {
+
+        let category = "LESS THAN 13"
+        let point = 15
+
+        if (num == 1) {
+            category = "MORE THAN 31.5 WITH LOP"
+            point = 0
+        }
+
+        await pisprisma.$queryRaw`MERGE PE_LEAVEEVAL AS tgt  
+            USING (
+                SELECT ${fyearid} FYEARID, STAFFID, ${category}, ${point}
+                FROM STAFF WHERE JOBSTATUSID = 1
+            ) AS SRC (FYEARID, STAFFID, CATEGORY, POINTS)  
+            ON (TGT.STAFFID = SRC.STAFFID AND TGT.FYEARID = SRC.FYEARID)  
+            WHEN MATCHED THEN 
+                UPDATE SET CATEGORY = SRC.CATEGORY, POINTS = SRC.POINTS
+            WHEN NOT MATCHED THEN   
+                INSERT (FYEARID, STAFFID, CATEGORY, POINTS) 
+                VALUES (SRC.FYEARID, SRC.STAFFID, SRC.CATEGORY, SRC.POINTS);`
+
+        return {
+            error: ""
+        }
+
+    } catch (error) {
+        return {
+            error: catchErrorMessage(error)
+        }
+    }
+
+}
 // ========================= Administration: Appreciation ========================== //
 export async function getAppreciationRecord(fyearid: number, sessionUser: sessionUser) {
     try {
@@ -883,11 +956,12 @@ export async function createUpdateAppreciation(formData: unknown) {
                 VALUES (SRC.FYEARID, SRC.STAFFID, SRC.CATEGORY, SRC.POINTS);`
 
         // revalidatePath("/evaluation/appreciation")
-        return
+        return {
+            error: ""
+        }
 
     } catch (error) {
         return {
-            data: [],
             error: catchErrorMessage(error)
         }
     }
@@ -976,11 +1050,51 @@ export async function createUpdateWarning(formData: unknown) {
                 VALUES (SRC.FYEARID, SRC.STAFFID, SRC.CATEGORY, SRC.POINTS);`
 
         // revalidatePath("/evaluation/warning")
-        return
+        return {
+            error: ""
+        }
 
     } catch (error) {
         return {
-            data: [],
+            error: catchErrorMessage(error)
+        }
+    }
+
+}
+
+export async function populateWarning(num: number, fyearid: number) {
+
+    try {
+
+        let category = "TWO OR MORE"
+        let point = 0
+
+        if (num == 0) {
+            category = "NONE"
+            point = 2.5
+        } else if (num == 1) {
+            category = "ONE"
+            point = 1
+        }
+
+        await pisprisma.$queryRaw`MERGE PE_WARNING AS tgt  
+            USING (
+                SELECT ${fyearid} FYEARID, STAFFID, ${category}, ${point}
+                FROM STAFF WHERE JOBSTATUSID = 1
+            ) AS SRC (FYEARID, STAFFID, CATEGORY, POINTS)  
+            ON (TGT.STAFFID = SRC.STAFFID AND TGT.FYEARID = SRC.FYEARID)
+            WHEN MATCHED THEN 
+                UPDATE SET CATEGORY = SRC.CATEGORY, POINTS = SRC.POINTS
+            WHEN NOT MATCHED THEN   
+                INSERT (FYEARID, STAFFID, CATEGORY, POINTS) 
+                VALUES (SRC.FYEARID, SRC.STAFFID, SRC.CATEGORY, SRC.POINTS);`
+
+        return {
+            error: ""
+        }
+
+    } catch (error) {
+        return {
             error: catchErrorMessage(error)
         }
     }

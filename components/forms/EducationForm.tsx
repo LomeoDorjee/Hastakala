@@ -33,8 +33,6 @@ export default function EducationForm({
     years
 }: Props) {
 
-    console.log(toSelectFyearid)
-
     const formSubmit = async (formData: FormData) => {
 
         const newData = {

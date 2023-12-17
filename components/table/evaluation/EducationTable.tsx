@@ -26,9 +26,10 @@ import {
     useDisclosure
 } from "@nextui-org/react";
 import { EditIcon, SearchIcon } from "../../icons/icons";
-import { getEducationRecord } from "@/lib/actions/performance/evaluation.actions";
+import { getEducationRecord, populateEducationData } from "@/lib/actions/performance/evaluation.actions";
 import EducationForm from "@/components/forms/EducationForm";
 import { sessionUser } from "@/lib/actions/config/user.actions";
+import toast from "react-hot-toast";
 
 type YEAR = {
     FYEARID: number
@@ -69,6 +70,9 @@ export default function EducationTable({ years, sessionUser }: Props) {
     const [isLoading, setIsLoading] = useState(true);
 
     const [toSelectFyearid, setToSelectFyearid] = useState((years.length) ? "" + years[1].FYEARID : "1")
+
+    let yearID = toSelectFyearid
+    const [isPopulate, setIsPopulate] = useState(false)
 
     const fetchData = async (fyearid: number) => {
         let records = await getEducationRecord(fyearid, sessionUser)
@@ -185,9 +189,27 @@ export default function EducationTable({ years, sessionUser }: Props) {
     const handleFyearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         if (e.target.value) {
             setIsLoading(true)
+            yearID = e.target.value
             fetchData(e.target.value as unknown as number)
         }
     };
+
+    const populateData = async () => {
+
+        setIsPopulate(true)
+
+        const response = await populateEducationData(yearID as unknown as number)
+
+        setIsPopulate(false)
+
+        if (response?.status !== "success") {
+            toast.error(response.message)
+        } else if (response) {
+            toast.success(response.message)
+            fetchData(yearID as unknown as number)
+        }
+
+    }
 
     const topContent = useMemo(() => {
         return (
@@ -216,6 +238,16 @@ export default function EducationTable({ years, sessionUser }: Props) {
                         </SelectItem>
                     ))}
                 </Select>
+                <Tooltip color="warning" content="Same as Previous Years">
+                    <Button
+                        color="warning"
+                        onClick={populateData}
+                        size="md"
+                        className="rounded-lg"
+                    >
+                        {(isPopulate) ? <Spinner /> : "Populate"}
+                    </Button>
+                </Tooltip>
             </div>
         );
     }, [
@@ -224,6 +256,7 @@ export default function EducationTable({ years, sessionUser }: Props) {
         onRowsPerPageChange,
         Data.length,
         hasSearchFilter,
+        isPopulate,
     ]);
 
     const bottomContent = useMemo(() => {
@@ -275,7 +308,7 @@ export default function EducationTable({ years, sessionUser }: Props) {
                 years={years}
             />
             <Table
-                aria-label="Example table with custom cells, pagination and sorting"
+                aria-label="Education Table"
                 isHeaderSticky
                 bottomContent={bottomContent}
                 bottomContentPlacement="outside"

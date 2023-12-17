@@ -26,7 +26,7 @@ import {
     useDisclosure
 } from "@nextui-org/react";
 import { EditIcon, SearchIcon } from "../../icons/icons";
-import { getAppreciationRecord, getWarningRecord } from "@/lib/actions/performance/evaluation.actions";
+import { getAppreciationRecord, getWarningRecord, populateWarning } from "@/lib/actions/performance/evaluation.actions";
 import AppreciationForm from "@/components/forms/AppreciationForm";
 import WarningForm from "@/components/forms/WarningForm";
 import { sessionUser } from "@/lib/actions/config/user.actions";
@@ -76,6 +76,7 @@ export default function WarningTable({ years, criterias, sessionUser }: Props) {
     const [isLoading, setIsLoading] = useState(true);
 
     const [toSelectFyearid, setToSelectFyearid] = useState((years.length) ? "" + years[1].FYEARID : "1")
+    let fyearID = toSelectFyearid
 
     const fetchData = async (fyearid: number) => {
         let records = await getWarningRecord(fyearid, sessionUser)
@@ -193,15 +194,31 @@ export default function WarningTable({ years, criterias, sessionUser }: Props) {
         if (e.target.value) {
             setIsLoading(true)
             fetchData(e.target.value as unknown as number)
+            fyearID = e.target.value
         }
     };
 
+
+    const populateData = async (num: number) => {
+
+        const response = await populateWarning(num, fyearID as unknown as number)
+
+        if (response?.error !== "") {
+            toast.error(response.error)
+        } else if (response) {
+            toast.success("Data Populated")
+            fetchData(fyearID as unknown as number)
+        }
+
+    }
+
+
     const topContent = useMemo(() => {
         return (
-            <div className="flex flex-row gap-3 justify-between items-center">
+            <div className="flex flex-row gap-3 justify-start items-center">
                 <Input
                     isClearable
-                    className="w-full"
+                    className="min-w-sm"
                     placeholder="Search by Staff Name..."
                     startContent={<SearchIcon />}
                     value={filterValue}
@@ -223,6 +240,34 @@ export default function WarningTable({ years, criterias, sessionUser }: Props) {
                         </SelectItem>
                     ))}
                 </Select>
+                <Dropdown>
+                    <DropdownTrigger>
+                        <Button
+                            variant="flat"
+                            size="lg"
+                            className="rounded-lg min-w-sm max-sm:hidden"
+                        >
+                            Populate
+                        </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu aria-label="Static Actions">
+                        <DropdownItem key="no"
+                            onClick={() => populateData(0)}
+                        >
+                            No Warnings
+                        </DropdownItem>
+                        <DropdownItem key="one"
+                            onClick={() => populateData(1)}
+                        >
+                            One Warning
+                        </DropdownItem>
+                        <DropdownItem key="two"
+                            onClick={() => populateData(2)}
+                        >
+                            Two Warnings
+                        </DropdownItem>
+                    </DropdownMenu>
+                </Dropdown>
             </div>
         );
     }, [
