@@ -33,10 +33,19 @@ export async function getAllFiscalYears() {
 export async function getCriterias(ctype: string) {
 
     try {
+
+        let sql = `SELECT * FROM PE_CRITERIAS`
+        if (ctype != "ALL") {
+            sql += ` WHERE CTYPE = ${ctype} `
+        }
+        sql += ` ORDER BY CRITERIAID `
+
         const data: {
-            CVALUE: number,
+            CRITERIAID: number
+            CVALUE: number
             CNAME: string
-        }[] = await pisprisma.$queryRaw`SELECT CNAME, CVALUE FROM PE_CRITERIAS WHERE CTYPE = ${ctype}`
+            CTYPE: string
+        }[] = await pisprisma.$queryRaw(Prisma.raw(sql))
 
         return {
             data: data,
@@ -465,6 +474,8 @@ export async function getAverageMarks(fyearid: number, sessionUser: sessionUser)
                         final[val.STAFFID].AVERAGE = summation / year_since_la
                     }
                 }
+
+                final[val.STAFFID].AVERAGE = final[val.STAFFID].AVERAGE.toFixed(2) as unknown as number
 
             }
 
@@ -1289,6 +1300,10 @@ type FinalMain = {
         APPRECIATION: number
         WARNING: number
         YEARSTAKEN: number
+        ISELIGIBLE: string
+        ADMINTOTAL: number
+        GRANDTOTAL: number
+        LASTPROMOTION: string
     }
 }
 export async function getFinalRecord(fyearid: number) {
@@ -1354,8 +1369,13 @@ export async function getFinalRecord(fyearid: number) {
                 ATTENDANCE: res.ATTENDANCE,
                 APPRECIATION: 0,
                 WARNING: 0,
-                YEARSTAKEN: 0
+                YEARSTAKEN: 0,
+                ISELIGIBLE: "",
+                ADMINTOTAL: 0,
+                GRANDTOTAL: 0,
+                LASTPROMOTION: ""
             }
+
         });
 
         if (years[1].FYEARID) {
@@ -1408,11 +1428,12 @@ export async function getFinalRecord(fyearid: number) {
         }
 
         // Average Calculation
-        let sql = `SELECT * FROM PE_APPRAISAL`
+        let sql = `SELECT A.*, (SELECT FYEAR FROM ENG_FYEAR_PIS WHERE FYEARID = A.FYEARID) FYEAR FROM PE_APPRAISAL A `
 
         const appraisals: {
             FYEARID: number
             STAFFID: number
+            FYEAR: string
         }[] = await pisprisma.$queryRaw(Prisma.raw(sql))
 
         appraisals.forEach((val) => {
@@ -1422,6 +1443,8 @@ export async function getFinalRecord(fyearid: number) {
             if (final[val.STAFFID]) {
 
                 final[val.STAFFID].YEARSTAKEN = year_since_la
+
+                final[val.STAFFID].LASTPROMOTION = val.FYEAR
 
                 if (final[val.STAFFID].STAFFCODE.substring(0, 2) == "P1") {
                     // STAFF
@@ -1543,6 +1566,63 @@ export async function getFinalRecord(fyearid: number) {
         warning.forEach(res => {
             if (final[res.STAFFID])
                 final[res.STAFFID].WARNING = res.AVERAGE
+        });
+
+        // ================== Eligibility ==================== //
+        const eligibility: {
+            ETYPE: string
+            VALUE: number
+        }[] = await pisprisma.$queryRaw`SELECT * FROM PE_ELIGIBILITY ORDER BY ELIGIBLEID`
+
+        const min_service_period = eligibility[0].VALUE
+        const max_leave_taken = eligibility[1].VALUE
+
+        const fiscal_year = years[0].FYEAR
+
+        const start_date = fiscal_year.substring(0, 4) + "/04/01"
+        const end_date = fiscal_year.substring(5) + "/03/33"
+
+        // == LEAVE TAKEN == //
+        const taken: {
+            STAFFID: number
+            TAKEN: number
+        }[] = await pisprisma.$queryRaw`SELECT STAFFID, (
+                SELECT SUM(TOTTAKENLEAVE)
+                FROM LEAVETAKEN
+                WHERE STATUS = 'A' 
+                AND DATEVS BETWEEN ${start_date} AND ${end_date}
+                AND STAFFID = S.STAFFID
+            ) TAKEN
+            FROM STAFF S 
+            WHERE JOBSTATUSID = 1
+            ORDER BY STAFFID`
+
+        taken.forEach(e => {
+            if (final[e.STAFFID]) {
+
+                final[e.STAFFID].ISELIGIBLE = "Eligible"
+
+                if (final[e.STAFFID].SERVICE < min_service_period) {
+
+                    final[e.STAFFID].ISELIGIBLE = `Service Period less than ${min_service_period}`
+
+                } else if (e.TAKEN > max_leave_taken) {
+
+                    final[e.STAFFID].ISELIGIBLE = `Leave Taken Greater than ${max_leave_taken}`
+                }
+
+                // Admin Total Calculation
+                final[e.STAFFID].ADMINTOTAL = final[e.STAFFID].APPRECIATION + final[e.STAFFID].WARNING + final[e.STAFFID].ATTENDANCE
+
+                // Admin Total Calculation
+                final[e.STAFFID].GRANDTOTAL =
+                    final[e.STAFFID].APPRECIATION +
+                    final[e.STAFFID].WARNING +
+                    final[e.STAFFID].ATTENDANCE +
+                    final[e.STAFFID].EDUCATION +
+                    final[e.STAFFID].SERVICE
+                final[e.STAFFID].AVERAGE
+            }
         });
 
         return {

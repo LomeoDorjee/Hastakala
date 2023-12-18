@@ -64,12 +64,6 @@ export const sidebarLinks = [
         route: "/evaluation/adminavg",
         label: "Admin Average",
         showDivider: true,
-      },
-      {
-        imgURL: "/assets/svg/average.svg",
-        route: "/evaluation/setup/weight",
-        label: "Marks Weight",
-        showDivider: false,
       }
     ]
   },
@@ -127,7 +121,19 @@ export const sidebarLinks = [
       {
         imgURL: "/assets/svg/scale.svg",
         route: "/evaluation/setup/weight",
-        label: "Marks Weight",
+        label: "Weight Update",
+        showDivider: false,
+      },
+      {
+        imgURL: "/assets/svg/criterias.svg",
+        route: "/evaluation/setup/criterias",
+        label: "Criteria Update",
+        showDivider: false,
+      },
+      {
+        imgURL: "/assets/svg/eligible.svg",
+        route: "/evaluation/setup/eligibility",
+        label: "Eligibility Update",
         showDivider: false,
       }
     ],

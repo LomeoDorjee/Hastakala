@@ -208,8 +208,8 @@ export default function Page() {
                                 Average Analysis
                             </Link>
                             <Link href="/evaluation/adminavg" isExternal showAnchorIcon color="warning"></Link>
-                </CardFooter>
-            </Card>
+                        </CardFooter>
+                    </Card>
 
 
                 </CardBody>

@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useCallback } from "react"
 
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Switch, Select, SelectItem } from "@nextui-org/react"
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Switch, Select, SelectItem, Spinner } from "@nextui-org/react"
 import { useFormStatus } from "react-dom"
 import toast from "react-hot-toast"
 import { AppraisalValidation } from "@/lib/validations/evaluation"
@@ -119,7 +119,7 @@ function SubmitButton() {
     const { pending } = useFormStatus()
     return (
         <Button type="submit" color="secondary" isDisabled={pending}>
-            {pending ? "..." : "Submit"}
+            {pending ? <Spinner /> : "Submit"}
         </Button>
     )
 }

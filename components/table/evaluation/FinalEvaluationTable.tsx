@@ -21,11 +21,16 @@ import {
     SortDescriptor,
     Spinner,
     Select,
-    SelectItem
+    SelectItem,
+    Tooltip,
+    CardHeader,
+    CardBody,
+    Card,
+    Divider
 } from "@nextui-org/react";
-import { SearchIcon } from "../../icons/icons";
+import { ChevronDownIcon, SearchIcon } from "../../icons/icons";
 import { getAverageMarks, getFinalRecord } from "@/lib/actions/performance/evaluation.actions";
-import toast from "react-hot-toast";
+import toast, { CheckmarkIcon, ErrorIcon } from "react-hot-toast";
 
 type YEAR = {
     FYEARID: number
@@ -58,16 +63,34 @@ type RECORD = {
     ATTENDANCE: number
     APPRECIATION: number
     WARNING: number
+    YEARSTAKEN: number
+    ISELIGIBLE: string
+    ADMINTOTAL: number
+    GRANDTOTAL: number
+    LASTPROMOTION: string
 }
+
+const INITIAL_VISIBLE_COLUMNS = ["STAFFNAME", "AVERAGE", "SERVICE", "EDUCATION", "ADMINTOTAL", "GRANDTOTAL"];
 
 const columns = [
     { name: "NAME", uid: "STAFFNAME", sortable: true },
+    { name: "DEPARTMENT", uid: "DEPARTMENT", sortable: true },
+    { name: "YEAR 1", uid: "AVERAGE1", sortable: true },
+    { name: "YEAR 2", uid: "AVERAGE2", sortable: true },
+    { name: "YEAR 3", uid: "AVERAGE3", sortable: true },
+    { name: "YEAR 4", uid: "AVERAGE4", sortable: true },
+    { name: "YEAR 5", uid: "AVERAGE5", sortable: true },
     { name: "PERFORMANCE", uid: "AVERAGE", sortable: true },
     { name: "SERVICE", uid: "SERVICE", sortable: true },
     { name: "EDUCATION", uid: "EDUCATION", sortable: true },
     { name: "ATTENDANCE", uid: "ATTENDANCE", sortable: true },
     { name: "APPRECIATION", uid: "APPRECIATION", sortable: true },
     { name: "WARNING", uid: "WARNING", sortable: true },
+    { name: "ADMINISTRATION", uid: "ADMINTOTAL", sortable: true },
+    { name: "ELIGIBLE", uid: "ISELIGIBLE", sortable: true },
+    { name: "YEARS TAKEN", uid: "YEARSTAKEN", sortable: true },
+    { name: "PROMOTION YEAR", uid: "LASTPROMOTION", sortable: true },
+    { name: "TOTAL", uid: "GRANDTOTAL", sortable: true },
     // { name: "ACTIONS", uid: "actions" },
 ];
 
@@ -84,6 +107,7 @@ export default function FinalEvalutionTable({ years }: Props) {
     const [statusFilter, setStatusFilter] = useState("all");
 
     const [selectedYear, setSelectedYear] = useState((years.length) ? "" + years[1].FYEARID : "1")
+    const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
 
     const fetchData = async (yearid: number) => {
         let records = await getFinalRecord(yearid)
@@ -100,6 +124,13 @@ export default function FinalEvalutionTable({ years }: Props) {
     useEffect(() => {
         fetchData(selectedYear as unknown as number)
     }, [])
+
+    // Column Filter
+    const headerColumns = useMemo(() => {
+        if (visibleColumns === "all") return columns;
+
+        return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
+    }, [visibleColumns]);
 
     const [filterValue, setFilterValue] = useState("");
     const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -160,6 +191,39 @@ export default function FinalEvalutionTable({ years }: Props) {
                         name={data.STAFFNAME}
                     />
                 );
+            case "AVERAGE":
+                return (
+                    <Tooltip
+                        content={
+                            <div className="flex flex-col">
+                                <p className="pb-1 mb-1 font-bold border-b border-black">{"YEARS TAKEN: " + data.YEARSTAKEN}</p>
+                                <p className="pb-1 mb-1 font-bold border-b border-black">{"LAST PROMO.: " + data.LASTPROMOTION}</p>
+                                <p>{data.YEAR1 + ": " + data.AVERAGE1}</p>
+                                <p>{data.YEAR2 + ": " + data.AVERAGE2}</p>
+                                <p>{data.YEAR3 + ": " + data.AVERAGE3}</p>
+                                <p>{data.YEAR4 + ": " + data.AVERAGE4}</p>
+                                <p>{data.YEAR5 + ": " + data.AVERAGE5}</p>
+                            </div>
+                        }
+                        color="foreground"
+                        placement="left"
+                        delay={800}
+                        offset={-15}
+                    >
+                        <p className="cursor-pointer w-full text-center">{cellValue}</p>
+                    </Tooltip>
+                );
+            case "ISELIGIBLE":
+                return (
+                    <Tooltip content={cellValue} color={(cellValue == 'Eligible') ? "success" : "danger"}>
+                        <Chip
+                            color={(cellValue == 'Eligible') ? "success" : "danger"}
+                            variant="flat"
+                        >
+                            {(cellValue == "Eligible") ? <CheckmarkIcon /> : <ErrorIcon />}
+                        </Chip>
+                    </Tooltip>
+                );
             case "actions":
                 return (
                     <div className="relative flex justify-end items-center gap-2">
@@ -178,7 +242,7 @@ export default function FinalEvalutionTable({ years }: Props) {
                     </div>
                 );
             default:
-                return cellValue;
+                return <p className="text-center">{cellValue}</p>;
         }
     }, []);
 
@@ -250,6 +314,32 @@ export default function FinalEvalutionTable({ years }: Props) {
                         </SelectItem>
                     ))}
                 </Select>
+                <Dropdown>
+                    <DropdownTrigger className="hidden sm:flex">
+                        <Button
+                            endContent={<ChevronDownIcon className="text-small" />}
+                            variant="flat"
+                            size="lg"
+                            className="rounded-lg"
+                        >
+                            Columns
+                        </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu
+                        disallowEmptySelection
+                        aria-label="Table Columns"
+                        closeOnSelect={false}
+                        selectedKeys={visibleColumns}
+                        selectionMode="multiple"
+                        onSelectionChange={setVisibleColumns}
+                    >
+                        {columns.map((column) => (
+                            <DropdownItem key={column.uid}>
+                                {column.name}
+                            </DropdownItem>
+                        ))}
+                    </DropdownMenu>
+                </Dropdown>
             </div>
         );
     }, [
@@ -259,6 +349,7 @@ export default function FinalEvalutionTable({ years }: Props) {
         Data.length,
         hasSearchFilter,
         statusFilter,
+        visibleColumns,
     ]);
 
     const bottomContent = useMemo(() => {
@@ -306,14 +397,17 @@ export default function FinalEvalutionTable({ years }: Props) {
             color="success"
             sortDescriptor={sortDescriptor}
             topContent={topContent}
-            topContentPlacement="inside"
+            topContentPlacement="outside"
             onSortChange={setSortDescriptor}
+            classNames={{
+                wrapper: "max-w-screen-xl",
+            }}
         >
-            <TableHeader columns={columns}>
+            <TableHeader columns={headerColumns}>
                 {(column) => (
                     <TableColumn
                         key={column.uid}
-                        align={column.uid === "actions" ? "center" : "start"}
+                        align={column.uid !== "name" ? "center" : "start"}
                         allowsSorting={column.sortable}
                     >
                         {column.name}
