@@ -21,7 +21,7 @@ async function Page() {
     } = await getUserDetail(currentuser.id, 1)
 
 
-    if (!user.data[0].onboarded) {
+    if (user.data.length == 0) {
         const userData = {
             userid: currentuser.id,
             username: (currentuser.username) ? currentuser.username : "NoUserName"

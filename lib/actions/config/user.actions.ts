@@ -20,7 +20,7 @@ export async function onBoardUser({
 
     try {
 
-        await prisma.$queryRaw`INSERT INTO "USER" VALUES (${userid},${username},1,NULL)`
+        await prisma.$queryRaw`INSERT INTO "USER" (USERID, USERNAME, ONBOARDED, DEPID) VALUES (${userid},${username},1,NULL)`
         
         return {
             status: "success"
@@ -28,6 +28,7 @@ export async function onBoardUser({
         
 
     } catch (error: unknown) {
+        console.log(error)
         return {
             status: catchErrorMessage(error)
         }
