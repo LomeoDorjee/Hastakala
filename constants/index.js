@@ -30,6 +30,12 @@ export const sidebarLinks = [
         showDivider: false,
       },
       {
+        imgURL: "/assets/svg/appraisal.svg",
+        route: "/evaluation/appraisal",
+        label: "Promotion Record",
+        showDivider: false,
+      },
+      {
         imgURL: "/assets/svg/education.svg",
         route: "/evaluation/education",
         label: "Education Record",
@@ -48,9 +54,9 @@ export const sidebarLinks = [
         showDivider: false,
       },
       {
-        imgURL: "/assets/svg/appraisal.svg",
-        route: "/evaluation/appraisal",
-        label: "Promotion Record",
+        imgURL: "/assets/svg/appreciate.svg",
+        route: "/evaluation/appreciation",
+        label: "Appreciation Record",
         showDivider: false,
       },
       {

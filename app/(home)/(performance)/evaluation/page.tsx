@@ -63,7 +63,7 @@ export default function Page() {
             <Card
                 isFooterBlurred
                 radius="lg"
-                className="border-none col-span-6 sm:col-span-4 flex items-center"
+                className="border-none col-span-6 sm:col-span-3 flex items-center"
             >
                 <Image
                     alt="Service"
@@ -83,7 +83,27 @@ export default function Page() {
             <Card
                 isFooterBlurred
                 radius="lg"
-                className="border-none col-span-6 sm:col-span-4 flex items-center"
+                className="border-none col-span-6 sm:col-span-3 flex items-center"
+            >
+                <Image
+                    alt="Appraisal"
+                    className="object-contain"
+                    height={150}
+                    src="/assets/svg/appraisal.svg"
+                    width={150}
+                />
+                <CardFooter className="justify-start before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small z-10">
+                    <Link href="/evaluation/appraisal" className="rounded-sm px-4 py-2 w-full font-bold" color="foreground">
+                        Promotion
+                    </Link>
+                    <Link href="/evaluation/appraisal" isExternal showAnchorIcon color="warning"></Link>
+                </CardFooter>
+            </Card>
+
+            <Card
+                isFooterBlurred
+                radius="lg"
+                className="border-none col-span-6 sm:col-span-3 flex items-center"
             >
                 <Image
                     alt="Education"
@@ -104,7 +124,7 @@ export default function Page() {
             <Card
                 isFooterBlurred
                 radius="lg"
-                className="border-none col-span-6 sm:col-span-4 flex items-center"
+                className="border-none col-span-6 sm:col-span-3 flex items-center"
             >
                 <Image
                     alt="Report"
@@ -160,14 +180,14 @@ export default function Page() {
                             alt="Appraisal"
                             className="object-contain"
                             height={100}
-                            src="/assets/svg/appraisal.svg"
+                            src="/assets/svg/appreciate.svg"
                             width={100}
                         />
                         <CardFooter className="justify-start before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small z-10">
-                            <Link href="/evaluation/appraisal" className="rounded-sm px-4 py-2 w-full font-bold" color="foreground">
+                            <Link href="/evaluation/appreciation" className="rounded-sm px-4 py-2 w-full font-bold" color="foreground">
                                 Promotion
                             </Link>
-                            <Link href="/evaluation/appraisal" isExternal showAnchorIcon color="warning"></Link>
+                            <Link href="/evaluation/appreciation" isExternal showAnchorIcon color="warning"></Link>
                         </CardFooter>
                     </Card>
 

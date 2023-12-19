@@ -26,7 +26,7 @@ import {
     useDisclosure
 } from "@nextui-org/react";
 import { EditIcon, SearchIcon } from "../../icons/icons";
-import { getAppreciationRecord } from "@/lib/actions/performance/evaluation.actions";
+import { getAppreciationRecord, populateAppreciation } from "@/lib/actions/performance/evaluation.actions";
 import AppreciationForm from "@/components/forms/AppreciationForm";
 import { sessionUser } from "@/lib/actions/config/user.actions";
 import toast from "react-hot-toast";
@@ -75,6 +75,7 @@ export default function AppreciationTable({ years, criterias, sessionUser }: Pro
     const [isLoading, setIsLoading] = useState(true);
 
     const [toSelectFyearid, setToSelectFyearid] = useState((years.length) ? "" + years[1].FYEARID : "1")
+    let fyearID = toSelectFyearid
 
     const fetchData = async (fyearid: number) => {
         let records = await getAppreciationRecord(fyearid, sessionUser)
@@ -192,8 +193,22 @@ export default function AppreciationTable({ years, criterias, sessionUser }: Pro
         if (e.target.value) {
             setIsLoading(true)
             fetchData(e.target.value as unknown as number)
+            fyearID = e.target.value
         }
     };
+
+    const populateData = async (num: number) => {
+
+        const response = await populateAppreciation(num, fyearID as unknown as number)
+
+        if (response?.error !== "") {
+            toast.error(response.error)
+        } else if (response) {
+            toast.success("Data Populated")
+            fetchData(fyearID as unknown as number)
+        }
+
+    }
 
     const topContent = useMemo(() => {
         return (
@@ -222,6 +237,35 @@ export default function AppreciationTable({ years, criterias, sessionUser }: Pro
                         </SelectItem>
                     ))}
                 </Select>
+
+                <Dropdown>
+                    <DropdownTrigger>
+                        <Button
+                            variant="flat"
+                            size="lg"
+                            className="rounded-lg min-w-sm max-sm:hidden"
+                        >
+                            Populate
+                        </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu aria-label="Static Actions">
+                        <DropdownItem key="no"
+                            onClick={() => populateData(0)}
+                        >
+                            NO APPRECIATION
+                        </DropdownItem>
+                        <DropdownItem key="one"
+                            onClick={() => populateData(1)}
+                        >
+                            ONE APPRECIATION
+                        </DropdownItem>
+                        <DropdownItem key="two"
+                            onClick={() => populateData(2)}
+                        >
+                            TWO OR MORE
+                        </DropdownItem>
+                    </DropdownMenu>
+                </Dropdown>
             </div>
         );
     }, [

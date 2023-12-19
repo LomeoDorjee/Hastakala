@@ -36,7 +36,7 @@ export async function getCriterias(ctype: string) {
 
         let sql = `SELECT * FROM PE_CRITERIAS`
         if (ctype != "ALL") {
-            sql += ` WHERE CTYPE = ${ctype} `
+            sql += ` WHERE CTYPE = '${ctype}' `
         }
         sql += ` ORDER BY CRITERIAID `
 
@@ -967,6 +967,45 @@ export async function createUpdateAppreciation(formData: unknown) {
                 VALUES (SRC.FYEARID, SRC.STAFFID, SRC.CATEGORY, SRC.POINTS);`
 
         // revalidatePath("/evaluation/appreciation")
+        return {
+            error: ""
+        }
+
+    } catch (error) {
+        return {
+            error: catchErrorMessage(error)
+        }
+    }
+
+}
+
+
+
+export async function populateAppreciation(num: number, fyearid: number) {
+
+    try {
+
+        let category = "TWO OR MORE"
+        let point = 2.5
+
+        if (num == 1) {
+            category = "ONE"
+            point = 1
+        } else if (num == 0) {
+            category = "NONE"
+            point = 0
+        }
+
+        await pisprisma.$queryRaw`MERGE PE_APPRECIATION AS tgt  
+            USING (
+                SELECT ${fyearid} FYEARID, STAFFID, ${category}, ${point}
+                FROM STAFF WHERE JOBSTATUSID = 1
+            ) AS SRC (FYEARID, STAFFID, CATEGORY, POINTS)  
+            ON (TGT.STAFFID = SRC.STAFFID AND TGT.FYEARID = SRC.FYEARID)
+            WHEN NOT MATCHED THEN   
+                INSERT (FYEARID, STAFFID, CATEGORY, POINTS) 
+                VALUES (SRC.FYEARID, SRC.STAFFID, SRC.CATEGORY, SRC.POINTS);`
+
         return {
             error: ""
         }
